@@ -19,8 +19,8 @@ const Navbar: React.FC = () => {
                     <Menu.Item key="items">
                         <Link to="/items">Items</Link>
                     </Menu.Item>
-                    <Menu.Item key="dungeons">
-                        <Link to="/dungeons">Dungeons</Link>
+                    <Menu.Item key="Campaign">
+                        <Link to="/campaigns">Campaigns</Link>
                     </Menu.Item>
                     <Menu.Item key="profile">
                         <Link to="/profile">Profile</Link>

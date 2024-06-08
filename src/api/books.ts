@@ -11,16 +11,16 @@ export const getBooks = async () => {
 };
 
 // 获取书籍详情
-export const getBookDetail = async (id: number) => {
+export const getBookDetail = async (id: string) => {
     return axios.get(`/books/${id}`);
 };
 
 // 更新书籍信息
-export const updateBook = async (id: number, data: { title: string; description: string; tags?: string[] }) => {
+export const updateBook = async (id: string, data: { title: string; description: string; tags?: string[] }) => {
     return axios.put(`/books/${id}`, data);
 };
 
 // 删除书籍
-export const deleteBook = async (id: number) => {
+export const deleteBook = async (id: string) => {
     return axios.delete(`/books/${id}`);
 };

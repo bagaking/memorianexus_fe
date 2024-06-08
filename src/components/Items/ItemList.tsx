@@ -70,6 +70,12 @@ const ItemList: React.FC = () => {
 
     const columns = [
         {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 200,
+        },
+        {
             title: 'Content',
             dataIndex: 'content',
             key: 'content',
@@ -86,10 +92,7 @@ const ItemList: React.FC = () => {
             render: (_: any, record: Item) => (
                 <>
                     <Button type="link" size="small">
-                        <Link to={`/items/${record.id}`}>Details</Link>
-                    </Button>
-                    <Button type="link" size="small">
-                        <Link to={`/items/${record.id}/edit`}>Edit</Link>
+                        <Link to={`/items/${record.id}`}>Detail</Link>
                     </Button>
                     <Button type="link"  size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
                         Delete
@@ -111,10 +114,10 @@ const ItemList: React.FC = () => {
 
     return (
         <div>
-        <h2>Items</h2>
-            <Button type="primary" style={{ marginBottom: '16px', width:"100%" }}>
-                <Link to="/items/new/edit">Create New Item</Link>
-            </Button>
+            <h2>Items</h2>
+            <Link to="/items/new">
+                <Button type="primary" style={{ marginBottom: '16px', width:"100%" }}>Create New Item</Button>
+            </Link>
             <Table
                 columns={columns}
                 dataSource={items}

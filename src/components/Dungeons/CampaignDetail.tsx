@@ -1,56 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, } from 'react-router-dom';
 import { Form, Input, Button, message, Modal } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
+import {getDungeonDetail, updateDungeon, deleteDungeon, createCampaign} from '../../api/dungeons';
 
-interface Book {
+interface Dungeon {
     id?: string;
     title: string;
     description: string;
-    tags?: string[];
+    rule: string;
+    books?: number[];
+    items?: number[];
+    tag_names?: string[]
 }
 
-const BookDetail: React.FC = () => {
+const CampaignDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [form] = Form.useForm();
-    const [book, setBook] = useState<Book | null>(null);
+    const [dungeon, setDungeon] = useState<Dungeon | null>(null);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
     useEffect(() => {
-        const fetchBook = async () => {
+        const fetchDungeon = async () => {
             try {
                 if (id && id !== "new") {
-                    const response = await getBookDetail(id);
+                    const response = await getDungeonDetail(id);
                     const data = response.data.data;
-                    setBook(data);
+                    setDungeon(data);
                     form.setFieldsValue(data);
                 } else {
-                    setBook({ title: '', description: '' });
+                    setDungeon({
+                        title: '',
+                        description: '',
+                        rule: ''
+                    });
                 }
             } catch (error) {
                 console.error(error);
-                message.error('Failed to fetch book details');
+                message.error('Failed to fetch campaign details');
             }
         };
 
-        fetchBook();
+        fetchDungeon();
     }, [id, form]);
 
-    const handleSubmit = async (values: Book) => {
+    const handleSubmit = async (values: Dungeon) => {
         try {
             if (id && id !== "new") {
-                await updateBook(id, values);
-                message.success('Book updated successfully');
+                await updateDungeon(id, values);
+                message.success('campaign updated successfully');
             } else {
-                await createBook(values);
-                message.success('Book created successfully');
+                await createCampaign(values);
+                message.success('campaign created successfully');
             }
-            navigate('/books');
+            navigate('/campaigns');
         } catch (error) {
             console.error(error);
-            message.error(`Failed to ${id && id !== "new" ? 'update' : 'create'} book`);
+            message.error(`Failed to ${id && id !== "new" ? 'update' : 'create'} campaigns`);
         }
     };
 
@@ -61,30 +68,30 @@ const BookDetail: React.FC = () => {
     const handleDelete = async () => {
         try {
             if (id) {
-                await deleteBook(id);
-                message.success('Book deleted successfully');
-                navigate('/books');
+                await deleteDungeon(id);
+                message.success('Campaign deleted successfully');
+                navigate('/campaigns');
             }
         } catch (error) {
             console.error(error);
-            message.error('Failed to delete book');
+            message.error('Failed to delete dungeon');
         } finally {
             setDeleteModalVisible(false);
         }
     };
 
-    if (!book) {
-        return <div>Loading...</div>;
+    if (!dungeon) {
+        return <div>CAMPAIGN Loading...</div>;
     }
 
     return (
         <div>
-            <Button type="link" onClick={() => navigate('/books')} style={{ marginBottom: '16px' }}>
+            <Button type="link" onClick={() => navigate('/campaigns')} style={{ marginBottom: '16px' }}>
                 <ArrowLeftOutlined /> Back
             </Button>
-            <h2>{(id && id !== 'new') ? (`Edit Book (id: ${id})` ) : 'Create Book'}</h2>
+            <h2>{(id && id !== 'new') ? (`Edit Campaign (id: ${id})` ) : 'Create Campaign'}</h2>
             <Form form={form} onFinish={handleSubmit}>
-                <Form.Item name="title" rules={[{ required: true, message: 'Please enter the title!' }]}>
+                <Form.Item name="title" rules={[{ required: true, message: 'Please enter the name!' }]}>
                     <Input placeholder="Title" />
                 </Form.Item>
                 <Form.Item name="description" rules={[{ required: true, message: 'Please enter the description!' }]}>
@@ -92,6 +99,12 @@ const BookDetail: React.FC = () => {
                 </Form.Item>
                 <Form.Item name="tags">
                     <Input placeholder="Tags (comma separated)" />
+                </Form.Item>
+                <Form.Item name="book_ids">
+                    <Input placeholder="Books (comma separated)" />
+                </Form.Item>
+                <Form.Item name="item_ids">
+                    <Input placeholder="Items (comma separated)" />
                 </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit">Save</Button>
@@ -108,10 +121,10 @@ const BookDetail: React.FC = () => {
                 onOk={handleDelete}
                 onCancel={() => setDeleteModalVisible(false)}
             >
-                <p>Are you sure you want to delete this book?</p>
+                <p>Are you sure you want to delete this dungeon?</p>
             </Modal>
         </div>
     );
 };
 
-export default BookDetail;
+export default CampaignDetail;

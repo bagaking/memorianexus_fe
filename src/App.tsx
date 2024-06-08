@@ -9,9 +9,8 @@ import BookList from './components/Books/BookList';
 import BookDetail from './components/Books/BookDetail';
 import ItemList from './components/Items/ItemList';
 import ItemDetail from './components/Items/ItemDetail';
-import EditItem from './components/Items/EditItem';
-import DungeonList from './components/Dungeons/DungeonList';
-import DungeonDetail from './components/Dungeons/DungeonDetail';
+import CampaignList from './components/Dungeons/CampaignList';
+import DungeonDetail from './components/Dungeons/CampaignDetail';
 import Home from './components/Home/Home';
 import Navbar from './components/Layout/Navbar';
 import { AuthProvider } from './context/AuthContext';
@@ -36,9 +35,8 @@ const App: React.FC = () => {
                         <Route path="/books/:id" element={<BookDetail />} />
                         <Route path="/items" element={<ItemList />} />
                         <Route path="/items/:id" element={<ItemDetail />} />
-                        <Route path="/items/:id/edit" element={<EditItem />} />
-                        <Route path="/dungeons" element={<DungeonList />} />
-                        <Route path="/dungeons/:id" element={<DungeonDetail />} />
+                        <Route path="/campaigns" element={<CampaignList />} />
+                        <Route path="/campaigns/:id" element={<DungeonDetail />} />
                     </Routes>
                 </Content>
             </Layout>
