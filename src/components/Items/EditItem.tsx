@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Form, Input, Button, message } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Form, Input, Button, Select, message } from 'antd';
 import MdEditor from 'react-markdown-editor-lite';
 import MarkdownIt from 'markdown-it';
 import 'react-markdown-editor-lite/lib/index.css';
-import { getItemDetail, updateItem } from '../../api/items';
+import { getItemDetail, updateItem, createItem } from '../../api/items';
 
 interface Item {
-    id: string;
+    id?: string;
     content: string;
     type: string;
+    book_ids?: number[];
+    tags?: string[];
 }
+
+const { Option } = Select;
 
 const EditItem: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [form] = Form.useForm();
     const [item, setItem] = useState<Item | null>(null);
     const [markdown, setMarkdown] = useState('');
@@ -21,18 +26,18 @@ const EditItem: React.FC = () => {
     useEffect(() => {
         const fetchItem = async () => {
             try {
-                if (!id) {
-                    message.error('Invalid ID');
-                    return
+                if (!!id && id !== "new") {
+                    const response = await getItemDetail(id);
+                    const data = response.data.data;
+                    setItem(data);
+                    setMarkdown(data.content);
+                    form.setFieldsValue(data);
+                } else {
+                    setItem({ content: '', type: '' });
                 }
-                const response = await getItemDetail(id);
-                const data = response.data.data
-                setItem(data);
-                setMarkdown(data.content);
-                form.setFieldsValue(data);
             } catch (error) {
                 console.error(error);
-                message.error('Failed to edit item details');
+                message.error('Failed to fetch item details');
             }
         };
 
@@ -45,15 +50,17 @@ const EditItem: React.FC = () => {
 
     const handleSubmit = async (values: Item) => {
         try {
-            if (!id) {
-                message.error('Invalid ID');
-                return
+            if (id && id !== "new") {
+                await updateItem(id, { ...values, content: markdown });
+                message.success('Item updated successfully');
+            } else {
+                await createItem({ ...values, content: markdown });
+                message.success('Item created successfully');
             }
-            await updateItem(id, { ...values, content: markdown });
-            message.success('Item updated successfully');
+            navigate('/items');
         } catch (error) {
             console.error(error);
-            message.error('Failed to update item');
+            message.error(`Failed to ${id && id !== "new" ? 'update' : 'create'} item`);
         }
     };
 
@@ -63,15 +70,25 @@ const EditItem: React.FC = () => {
 
     return (
         <div>
-            <h2>Edit Item</h2>
+            <h2>{(id && id !== 'new') ? 'Edit Item' : 'Create Item'}</h2>
             <Form form={form} onFinish={handleSubmit}>
-                <Form.Item name="type" rules={[{ required: true, message: 'Please input the item type!' }]}>
-                    <Input placeholder="Type" />
+                <Form.Item name="type" rules={[{ required: true, message: 'Please select the item type!' }]}>
+                    <Select placeholder="Select a type">
+                        <Option value="flashcard">Flashcard</Option>
+                        <Option value="multiple_choice">Multiple Choice</Option>
+                        <Option value="fill_in_the_blank">Fill in the Blank</Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item name="book_ids">
+                    <Input placeholder="Book IDs (comma separated)" />
+                </Form.Item>
+                <Form.Item name="tags">
+                    <Input placeholder="Tags (comma separated)" />
                 </Form.Item>
                 <Form.Item>
                     <MdEditor
                         value={markdown}
-                        style={{ height: '500px', width: "100%" }}
+                        style={{ height: '480px', width: "100%" }}
                         renderHTML={(text) => new MarkdownIt().render(text)}
                         onChange={handleEditorChange}
                     />
