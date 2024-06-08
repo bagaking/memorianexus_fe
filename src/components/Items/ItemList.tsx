@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card } from 'antd';
+import {Table, message, Button, Card, Modal, Tooltip, Badge} from 'antd';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { getItems } from '../../api/items';
+import { getItems, deleteItem } from '../../api/items';
 
 interface Item {
     id: string;
@@ -13,6 +13,8 @@ interface Item {
 const ItemList: React.FC = () => {
     const [items, setItems] = useState<Item[]>([]);
     const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
     const fetchItems = async () => {
         try {
@@ -45,6 +47,27 @@ const ItemList: React.FC = () => {
         return lines.length > 0 ? lines[0] : '';
     };
 
+    const showDeleteModal = (item: Item) => {
+        setItemToDelete(item);
+        setDeleteModalVisible(true);
+    };
+
+    const handleDelete = async () => {
+        if (itemToDelete) {
+            try {
+                await deleteItem(itemToDelete.id);
+                message.success('Item deleted successfully');
+                fetchItems();
+            } catch (error) {
+                console.error(error);
+                message.error('Failed to delete item');
+            } finally {
+                setDeleteModalVisible(false);
+                setItemToDelete(null);
+            }
+        }
+    };
+
     const columns = [
         {
             title: 'Content',
@@ -61,30 +84,36 @@ const ItemList: React.FC = () => {
             title: 'Action',
             key: 'action',
             render: (_: any, record: Item) => (
-                <Button type="primary">
-                    <Link to={`/items/${record.id}/edit`}>Edit</Link>
-                </Button>
+                <>
+                    <Button type="link" size="small">
+                        <Link to={`/items/${record.id}`}>Details</Link>
+                    </Button>
+                    <Button type="link" size="small">
+                        <Link to={`/items/${record.id}/edit`}>Edit</Link>
+                    </Button>
+                    <Button type="link"  size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
+                        Delete
+                    </Button>
+                </>
             ),
         },
     ];
 
+
     const expandedRowRender = (record: Item) => (
-        <Card
-            key={record.id}
-            style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}
-            // title=
-        >
-            <ReactMarkdown className="markdown-content">{record.content}</ReactMarkdown>
+        <Card key={record.id} style={{margin: '-17px', borderRadius: '0px 0px 8px 8px '}}>
+            <small>&{record.type}</small>
             <br/>
-            {record.type}
+            <ReactMarkdown className="markdown-content">{record.content}</ReactMarkdown>
+
         </Card>
     );
 
     return (
         <div>
-            <h2>Items</h2>
-            <Button type="primary" style={{ marginBottom: '16px' }}>
-                <Link to="/items/new/edit">Create Item</Link>
+        <h2>Items</h2>
+            <Button type="primary" style={{ marginBottom: '16px', width:"100%" }}>
+                <Link to="/items/new/edit">Create New Item</Link>
             </Button>
             <Table
                 columns={columns}
@@ -96,6 +125,14 @@ const ItemList: React.FC = () => {
                 })}
                 expandable={{ expandedRowRender }}
             />
+            <Modal
+                title="Confirm Deletion"
+                visible={deleteModalVisible}
+                onOk={handleDelete}
+                onCancel={() => setDeleteModalVisible(false)}
+            >
+                <p>Are you sure you want to delete this item?</p>
+            </Modal>
         </div>
     );
 };

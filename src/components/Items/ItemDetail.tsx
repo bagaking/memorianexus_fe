@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {Card, Spin, Button, message} from 'antd';
 import { getItemDetail } from '../../api/items';
+import {ArrowLeftOutlined} from "@ant-design/icons";
+import MarkdownIt from "markdown-it";
+import MdEditor from "react-markdown-editor-lite";
+import ReactMarkdown from "react-markdown";
 
 interface Item {
     id: string;
@@ -11,6 +15,7 @@ interface Item {
 
 const ItemDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [item, setItem] = useState<Item | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -44,13 +49,20 @@ const ItemDetail: React.FC = () => {
     }
 
     return (
-        <Card title={`Item: ${item.id}`}>
-            <p>{item.content}</p>
-            <p>Type: {item.type}</p>
-            <Link to={`/items/${item.id}/edit`}>
-                <Button type="primary">Edit</Button>
-            </Link>
-        </Card>
+        <div>
+            <Button type="link" onClick={() => navigate('/items')} style={{ marginBottom: '16px' }}>
+                <ArrowLeftOutlined /> Back
+            </Button>
+
+            <Card title={`Item: ${item.id}`}>
+                <ReactMarkdown className="markdown-content">{item.content}</ReactMarkdown>
+                <br/>
+                <p>Type: {item.type}</p>
+                <Link to={`/items/${item.id}/edit`}>
+                    <Button type="primary">Edit</Button>
+                </Link>
+            </Card>
+        </div>
     );
 };
 

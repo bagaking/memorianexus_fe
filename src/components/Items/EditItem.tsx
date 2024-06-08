@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Select, message } from 'antd';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Form, Input, Button, Select, message, Modal } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import MdEditor from 'react-markdown-editor-lite';
 import MarkdownIt from 'markdown-it';
 import 'react-markdown-editor-lite/lib/index.css';
-import { getItemDetail, updateItem, createItem } from '../../api/items';
+import { getItemDetail, updateItem, createItem, deleteItem } from '../../api/items';
 
 interface Item {
     id?: string;
@@ -22,11 +23,12 @@ const EditItem: React.FC = () => {
     const [form] = Form.useForm();
     const [item, setItem] = useState<Item | null>(null);
     const [markdown, setMarkdown] = useState('');
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
     useEffect(() => {
         const fetchItem = async () => {
             try {
-                if (!!id && id !== "new") {
+                if (id && id !== "new") {
                     const response = await getItemDetail(id);
                     const data = response.data.data;
                     setItem(data);
@@ -64,12 +66,34 @@ const EditItem: React.FC = () => {
         }
     };
 
+    const showDeleteModal = () => {
+        setDeleteModalVisible(true);
+    };
+
+    const handleDelete = async () => {
+        try {
+            if (id) {
+                await deleteItem(id);
+                message.success('Item deleted successfully');
+                navigate('/items');
+            }
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to delete item');
+        } finally {
+            setDeleteModalVisible(false);
+        }
+    };
+
     if (!item) {
         return <div>Loading...</div>;
     }
 
     return (
         <div>
+            <Button type="link" onClick={() => navigate('/items')} style={{ marginBottom: '16px' }}>
+                <ArrowLeftOutlined /> Back
+            </Button>
             <h2>{(id && id !== 'new') ? 'Edit Item' : 'Create Item'}</h2>
             <Form form={form} onFinish={handleSubmit}>
                 <Form.Item name="type" rules={[{ required: true, message: 'Please select the item type!' }]}>
@@ -95,8 +119,21 @@ const EditItem: React.FC = () => {
                 </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit">Save</Button>
+                    {id && id !== 'new' && (
+                        <Button type="primary" danger onClick={showDeleteModal} style={{ marginLeft: '8px' }}>
+                            Delete
+                        </Button>
+                    )}
                 </Form.Item>
             </Form>
+            <Modal
+                title="Confirm Deletion"
+                visible={deleteModalVisible}
+                onOk={handleDelete}
+                onCancel={() => setDeleteModalVisible(false)}
+            >
+                <p>Are you sure you want to delete this item?</p>
+            </Modal>
         </div>
     );
 };
