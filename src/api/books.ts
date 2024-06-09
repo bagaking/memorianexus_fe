@@ -6,10 +6,9 @@ export const createBook = async (data: { title: string; description: string; tag
 };
 
 // 获取所有书籍
-export const getBooks = async () => {
-    return axios.get('/books');
+export const getBooks = async (params: { page: number, limit: number }) => {
+    return axios.get('/books', { params });
 };
-
 // 获取书籍详情
 export const getBookDetail = async (id: string) => {
     return axios.get(`/books/${id}`);

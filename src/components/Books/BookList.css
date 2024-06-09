@@ -1,0 +1,133 @@
+/* BookList.css */
+.book-list-container {
+    padding: 20px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
+
+.book-list-container h2 {
+    font-size: 32px;
+    color: #001529;
+    margin-bottom: 20px;
+}
+
+.create-book-button {
+    margin-bottom: 16px;
+    width: 100%;
+    background-color: #1890ff;
+    border-color: #1890ff;
+    color: #fff;
+    font-size: 18px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.create-book-button:hover {
+    background-color: #40a9ff !important;
+    border-color: #40a9ff !important;
+    color: #fff;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.limit-input-container {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin-left: 16px;
+}
+
+.limit-input-container span {
+    margin-right: 8px;
+}
+
+.book-table .ant-table-thead > tr > th {
+    background-color: #001529;
+    color: #fff;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.book-table .ant-table-tbody > tr > td {
+    background-color: #fff;
+    color: #000;
+    font-size: 14px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.expanded-book-card {
+    margin: -17px;
+    border-radius: 0px 0px 8px 8px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+    background-color: #efefef;
+}
+
+.expanded-book-card:hover {
+    transform: scale(1.01);
+
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    background-color: white;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.book-pagination {
+    margin-right: 16px;
+}
+
+.delete-modal .ant-modal-content {
+    border-radius: 8px;
+}
+
+.delete-modal .ant-modal-header {
+    background-color: #ff4d4f;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+}
+
+.delete-modal .ant-modal-footer {
+    border-radius: 0 0 8px 8px;
+}
+
+.delete-modal .ant-btn-primary {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    color: #fff;
+}
+
+.delete-modal .ant-btn-primary:hover {
+    background-color: #ff7875;
+    border-color: #ff7875;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .create-book-button {
+        font-size: 16px;
+    }
+
+    .book-table .ant-table-thead > tr > th,
+    .book-table .ant-table-tbody > tr > td {
+        font-size: 12px;
+    }
+
+    .expanded-book-card {
+        padding: 10px;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+    }
+
+    .limit-input-container {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}

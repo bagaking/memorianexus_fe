@@ -7,22 +7,11 @@ const axiosAuth = axios.create({
     },
 });
 
-export const login = (data: {
-                          username: string;
-                          password: string;
-                      }
-) => {
-    return axiosAuth.post('/auth/login', data).then(resp => {
-        localStorage.setItem('ACCESS_TOKEN', resp.data.token);
-        return resp
-    });
+// 由 authContext 负责和 storage/cookie交互, token 位于 resp.data.token
+export const login = (data: {username: string; password: string}) => {
+    return axiosAuth.post('/auth/login', data);
 };
 
-export const register = (data: {
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-}) => {
+export const register = (data: { username: string; email: string; password: string; confirmPassword: string }) => {
     return axiosAuth.post('/auth/register', data);
 };

@@ -1,0 +1,62 @@
+/* Navbar.css */
+.navbar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #001529;
+    padding: 0 20px;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.navbar-title {
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.menu-button {
+    display: none;
+}
+
+.navbar-menu {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+    background-color: #1890ff;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+    background-color: #40a9ff;
+}
+
+.ant-menu-item a {
+    color: #fff;
+    font-size: 16px;
+}
+
+.ant-menu-item .anticon {
+    font-size: 18px;
+}
+
+@media (max-width: 768px) {
+    .navbar-menu {
+        display: none;
+    }
+    .menu-button {
+        display: inline-block;
+    }
+}

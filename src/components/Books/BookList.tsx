@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card, Modal } from 'antd';
+import { Table, message, Button, Card, Modal, Pagination, InputNumber } from 'antd';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getBooks, deleteBook } from '../../api/books';
+import './BookList.css';
 
 interface Book {
     id: string;
@@ -16,13 +17,25 @@ const BookList: React.FC = () => {
     const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalBooks, setTotalBooks] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [limit, setLimit] = useState(10);
 
-    const fetchBooks = async () => {
+    const fetchBooks = async (page: number, limit: number) => {
+        setLoading(true);
         try {
-            const response = await getBooks();
+            const response = await getBooks({ page, limit });
             const data = response.data.data;
             if (Array.isArray(data)) {
                 setBooks(data);
+                if (response.data.total) {
+                    setTotalBooks(response.data.total);
+                } else if (data.length >= response.data.limit){
+                    setTotalBooks(currentPage * limit + 1);
+                } else {
+                    setTotalBooks((currentPage -1) * limit + data.length);
+                }
             } else {
                 console.log("books resp", response);
                 message.error('Invalid books data format');
@@ -30,12 +43,14 @@ const BookList: React.FC = () => {
         } catch (error) {
             console.error(error);
             message.error('Failed to fetch books');
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchBooks();
-    }, []);
+        fetchBooks(currentPage, limit);
+    }, [currentPage, limit]);
 
     const handleExpand = (record: Book) => {
         setExpandedRowKeys(prevKeys =>
@@ -53,7 +68,7 @@ const BookList: React.FC = () => {
             try {
                 await deleteBook(bookToDelete.id);
                 message.success('Book deleted successfully');
-                fetchBooks();
+                fetchBooks(currentPage, limit);
             } catch (error) {
                 console.error(error);
                 message.error('Failed to delete book');
@@ -61,6 +76,21 @@ const BookList: React.FC = () => {
                 setDeleteModalVisible(false);
                 setBookToDelete(null);
             }
+        }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const handleLimitChange = (value: number | null) => {
+        setLimit(value || 10);
+        setCurrentPage(1); // 重置到第一页
+    };
+
+    const handleLimitKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleLimitChange(Number((event.target as HTMLInputElement).value));
         }
     };
 
@@ -107,21 +137,18 @@ const BookList: React.FC = () => {
     ];
 
     const expandedRowRender = (record: Book) => (
-        <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
+        <Card key={record.id} className="expanded-book-card">
             <h2>{record.title}</h2>
             <ReactMarkdown className="markdown-content">{record.description}</ReactMarkdown>
         </Card>
     );
 
     return (
-        <div>
-
-            <h2>Items</h2>
-
-                <Link to="/books/new">
-                    <Button type="primary" style={{marginBottom: '16px', width: "100%"}}>Create New Book</Button>
-                </Link>
-
+        <div className="book-list-container">
+            <h2>Books</h2>
+            <Link to="/books/new">
+                <Button type="primary" className="create-book-button">Create New Book</Button>
+            </Link>
             <Table
                 columns={columns}
                 dataSource={books}
@@ -131,12 +158,36 @@ const BookList: React.FC = () => {
                     onClick: () => handleExpand(record),
                 })}
                 expandable={{ expandedRowRender }}
+                pagination={false}
+                loading={loading}
+                className="book-table"
             />
+            <div className="pagination-container">
+                <Pagination
+                    current={currentPage}
+                    total={totalBooks}
+                    pageSize={limit}
+                    onChange={handlePageChange}
+                    className="book-pagination"
+                />
+                <div className="limit-input-container">
+                    <span>Items per page: </span>
+                    <InputNumber
+                        min={1}
+                        max={100}
+                        value={limit}
+                        // onChange={handleLimitChange}
+                        onPressEnter={handleLimitKeyPress}
+                        onBlur={(event) => handleLimitChange(Number((event.target as HTMLInputElement).value))}
+                    />
+                </div>
+            </div>
             <Modal
                 title="Confirm Deletion"
                 visible={deleteModalVisible}
                 onOk={handleDelete}
                 onCancel={() => setDeleteModalVisible(false)}
+                className="delete-modal"
             >
                 <p>Are you sure you want to delete this book?</p>
             </Modal>
