@@ -1,8 +1,12 @@
+// src/components/Items/ItemList.tsx
 import React, { useEffect, useState } from 'react';
-import {Table, message, Button, Card, Modal, Tooltip, Badge} from 'antd';
+import { Table, message, Button, Card } from 'antd';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getItems, deleteItem } from '../../api/items';
+import { PageLayout } from '../Common/PageLayout';
+import { DeleteModal } from '../Common/DeleteModal';
+import '../Common/CommonStyles.css';
 
 interface Item {
     id: string;
@@ -94,7 +98,7 @@ const ItemList: React.FC = () => {
                     <Button type="link" size="small">
                         <Link to={`/items/${record.id}`}>Detail</Link>
                     </Button>
-                    <Button type="link"  size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
+                    <Button type="link" size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
                         Delete
                     </Button>
                 </>
@@ -102,24 +106,18 @@ const ItemList: React.FC = () => {
         },
     ];
 
-
     const expandedRowRender = (record: Item) => (
-        <Card key={record.id} style={{margin: '-17px', borderRadius: '0px 0px 8px 8px '}}>
+        <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
             <small>&{record.type}</small>
             <br/>
             <ReactMarkdown className="markdown-content">{record.content}</ReactMarkdown>
-
         </Card>
     );
 
     return (
-        <div>
-            <h2>
-                <img src="/item_icon.png" alt="Logo" className="menu-logo-48"/>
-                Items
-            </h2>
+        <PageLayout title="Items" icon="/item_icon.png">
             <Link to="/items/new">
-                <Button type="primary" style={{marginBottom: '16px', width: "100%"}}>Create New Item</Button>
+                <Button type="primary" style={{ marginBottom: '16px', width: "100%" }} className="create-new-one-button">Create New Item</Button>
             </Link>
             <Table
                 columns={columns}
@@ -131,15 +129,8 @@ const ItemList: React.FC = () => {
                 })}
                 expandable={{ expandedRowRender }}
             />
-            <Modal
-                title="Confirm Deletion"
-                visible={deleteModalVisible}
-                onOk={handleDelete}
-                onCancel={() => setDeleteModalVisible(false)}
-            >
-                <p>Are you sure you want to delete this item?</p>
-            </Modal>
-        </div>
+            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+        </PageLayout>
     );
 };
 

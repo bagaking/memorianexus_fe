@@ -24,7 +24,7 @@ const App: React.FC = () => {
                 <Header>
                     <Navbar />
                 </Header>
-                <Content style={{ padding: '20px' }}>
+                <Content style={{ padding: '8px' }}>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/register" element={<Register />} />

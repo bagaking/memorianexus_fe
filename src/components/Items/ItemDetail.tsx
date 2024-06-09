@@ -1,11 +1,16 @@
+// src/components/Items/ItemDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Select, message, Modal } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, message } from 'antd';
 import MdEditor from 'react-markdown-editor-lite';
 import MarkdownIt from 'markdown-it';
 import 'react-markdown-editor-lite/lib/index.css';
 import { getItemDetail, updateItem, createItem, deleteItem } from '../../api/items';
+import { PageLayout } from '../Common/PageLayout';
+import { TypeField, BookIdsField, TagsField } from '../Common/FormFields';
+import { ActionButtons } from '../Common/ActionButtons';
+import { DeleteModal } from '../Common/DeleteModal';
+import '../Common/CommonStyles.css';
 
 interface Item {
     id?: string;
@@ -14,8 +19,6 @@ interface Item {
     book_ids?: number[];
     tags?: string[];
 }
-
-const { Option } = Select;
 
 const ItemDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -86,60 +89,28 @@ const ItemDetail: React.FC = () => {
     };
 
     if (!item) {
-        return <div>  <img src="/item_icon.png" alt="Logo" className="menu-logo-32"/> Loading...</div>;
+        return <div>Loading...</div>;
     }
 
     return (
-        <div>
-            <Button type="link" onClick={() => navigate('/items')} style={{marginBottom: '16px'}}>
-                <ArrowLeftOutlined/> Back
-            </Button>
-            <h2>
-                <img src="/item_icon.png" alt="Logo" className="menu-logo-48"/>
-                {(id && id !== 'new') ? (`Edit Item (id: ${id})`) : 'Create Item'}
-            </h2>
+        <PageLayout title={(id && id !== 'new') ? `Edit Item (id: ${id})` : 'Create Item'} backUrl="/items" icon="/item_icon.png">
             <Form form={form} onFinish={handleSubmit}>
-                <Form.Item name="type" rules={[{required: true, message: 'Please select the item type!'}]}>
-                    <Select placeholder="Select a type">
-                        <Option value="flashcard">Flashcard</Option>
-                        <Option value="multiple_choice">Multiple Choice</Option>
-                        <Option value="fill_in_the_blank">Fill in the Blank</Option>
-                    </Select>
-                </Form.Item>
-                <Form.Item name="book_ids">
-                    <Input placeholder="Book IDs (comma separated)"/>
-                </Form.Item>
-                <Form.Item name="tags">
-                    <Input placeholder="Tags (comma separated)"/>
-                </Form.Item>
+                <TypeField />
+                <BookIdsField />
+                <TagsField />
                 <Form.Item>
                     <MdEditor
                         value={markdown}
-                        style={{height: '480px', width: "100%"}}
+                        style={{ height: '480px', width: "100%" }}
                         renderHTML={(text) => new MarkdownIt().render(text)}
                         onChange={handleEditorChange}
                     />
                 </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">Save</Button>
-                    {id && id !== 'new' && (
-                        <Button type="primary" danger onClick={showDeleteModal} style={{marginLeft: '8px'}}>
-                            Delete
-                        </Button>
-                    )}
-                </Form.Item>
+                <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
             </Form>
-            <Modal
-                title="Confirm Deletion"
-                visible={deleteModalVisible}
-                onOk={handleDelete}
-                onCancel={() => setDeleteModalVisible(false)}
-            >
-                <p>Are you sure you want to delete this item?</p>
-            </Modal>
-        </div>
+            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+        </PageLayout>
     );
 };
 
 export default ItemDetail;
-

@@ -1,6 +1,7 @@
 entry = [
     "./api/item*",
     "./src/components/Items/**/*",
+    "./src/components/Common/**/*"
 ]
 
 exclude = [

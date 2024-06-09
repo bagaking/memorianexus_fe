@@ -1,10 +1,14 @@
+// src/components/Books/BookDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Form, Input, Button, message, Modal } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, message } from 'antd';
 import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
+import { PageLayout } from '../Common/PageLayout';
+import { TitleField, DescriptionField, TagsField } from '../Common/FormFields';
+import { ActionButtons } from '../Common/ActionButtons';
+import { DeleteModal } from '../Common/DeleteModal';
 import EmbedItemList from './EmbedItemList';
-import './BookDetail.css';
+import '../Common/CommonStyles.css';
 
 interface Book {
     id?: string;
@@ -98,49 +102,19 @@ const BookDetail: React.FC = () => {
     }
 
     return (
-        <div className="book-detail-container">
-            <Button type="link" onClick={() => navigate(`/books?page=${currentPage}&limit=${limit}`)} style={{ marginBottom: '16px' }}>
-                <ArrowLeftOutlined /> Back
-            </Button>
-            <div className="book-detail-content">
-                <h2>
-                    <img src="/book_icon.png" alt="Logo" className="menu-logo-48" />
-                    {(id && id !== 'new') ? (`Edit Book (id: ${id})`) : 'Create Book'}
-                </h2>
-                <Form form={form} onFinish={handleSubmit}>
-                    <Form.Item name="title" rules={[{ required: true, message: 'Please enter the title!' }]}>
-                        <Input placeholder="Title" />
-                    </Form.Item>
-                    <Form.Item name="description" rules={[{ required: true, message: 'Please enter the description!' }]}>
-                        <Input.TextArea placeholder="Description" rows={4} />
-                    </Form.Item>
-                    <Form.Item name="tags">
-                        <Input placeholder="Tags (comma separated)" />
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">Save</Button>
-                        {id && id !== 'new' && (
-                            <Button type="primary" danger onClick={showDeleteModal} style={{ marginLeft: '8px' }}>
-                                Delete
-                            </Button>
-                        )}
-                    </Form.Item>
-                </Form>
-                <Modal
-                    title="Confirm Deletion"
-                    visible={deleteModalVisible}
-                    onOk={handleDelete}
-                    onCancel={() => setDeleteModalVisible(false)}
-                >
-                    <p>Are you sure you want to delete this book?</p>
-                </Modal>
-
-                <div className="book-items-container">
-                    <h2>Items</h2>
-                    {id && <EmbedItemList bookId={id} />}
-                </div>
+        <PageLayout title={(id && id !== 'new') ? `Edit Book (id: ${id})` : 'Create Book'} backUrl={`/books?page=${currentPage}&limit=${limit}`} icon="/book_icon.png">
+            <Form form={form} onFinish={handleSubmit}>
+                <TitleField />
+                <DescriptionField />
+                <TagsField />
+                <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
+            </Form>
+            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+            <div className="book-items-container">
+                <h2>Items</h2>
+                {id && <EmbedItemList bookId={id} />}
             </div>
-        </div>
+        </PageLayout>
     );
 };
 
