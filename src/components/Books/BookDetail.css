@@ -80,6 +80,21 @@
     color: #fff;
 }
 
+/* 子模块样式 */
+.book-items-container {
+    margin-top: 40px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.book-items-container h2 {
+    font-size: 28px;
+    color: #001529;
+    margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
     .book-detail-container h2 {
         font-size: 24px;
@@ -97,5 +112,13 @@
     .book-detail-content .ant-btn-danger {
         width: 100%;
         margin-bottom: 8px;
+    }
+
+    .book-items-container {
+        padding: 16px;
+    }
+
+    .book-items-container h2 {
+        font-size: 24px;
     }
 }

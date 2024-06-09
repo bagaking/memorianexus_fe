@@ -23,3 +23,26 @@ export const updateBook = async (id: string, data: { title: string; description:
 export const deleteBook = async (id: string) => {
     return axios.delete(`/books/${id}`);
 };
+
+export const getBookItems = async (data: { bookId: string, page: number, limit: number }) => {
+    let {bookId, page, limit } = data
+    return axios.get(`/books/${bookId}/items?page=${page}&limit=${limit}`);
+}
+
+export const addBookItem = (data: {bookId: string, itemId: string}) => {
+    let {bookId, itemId } = data
+    return axios.post(`/books/${bookId}/items`, { "item_ids": [ itemId ] });
+};
+
+export const addBookItems = (data: {bookId: string, itemIds: string[]}) => {
+    let {bookId, itemIds } = data
+    return axios.post(`/books/${bookId}/items`, { "item_ids": itemIds });
+};
+
+export const removeBookItems = (data: {bookId: string, itemIds: string[]}) => {
+    let {bookId, itemIds } = data
+    if (!itemIds || !itemIds.length) {
+        return null;
+    }
+    return axios.delete(`/books/${bookId}/items`, { params: { item_ids: itemIds.join(',') } });
+};
