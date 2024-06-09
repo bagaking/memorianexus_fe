@@ -6,8 +6,8 @@ export const createItem = async (data: { content: string; type: string; book_ids
 };
 
 // 获取所有学习材料
-export const getItems = async () => {
-    return axios.get('/items');
+export const getItems = async (params: {page: number, limit: number}) => {
+    return axios.get('/items', {params});
 };
 
 // 获取学习材料详情

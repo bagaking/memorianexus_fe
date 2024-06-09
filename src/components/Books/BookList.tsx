@@ -1,8 +1,10 @@
+// src/components/Books/BookList.tsx
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card, Modal, Pagination, InputNumber } from 'antd';
+import { Table, message, Button, Card, Modal } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getBooks, deleteBook } from '../../api/books';
+import PaginationComponent from '../Common/PaginationComponent';
 import './BookList.css';
 
 interface Book {
@@ -88,17 +90,10 @@ const BookList: React.FC = () => {
         navigate(`/books?page=${page}&limit=${limit}`);
     };
 
-    const handleLimitChange = (value: number | null) => {
-        const newLimit = value || 10;
+    const handleLimitChange = (newLimit: number) => {
         setLimit(newLimit);
         setCurrentPage(1); // 重置到第一页
         navigate(`/books?page=1&limit=${newLimit}`);
-    };
-
-    const handleLimitKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            handleLimitChange(Number((event.target as HTMLInputElement).value));
-        }
     };
 
     const columns = [
@@ -164,7 +159,6 @@ const BookList: React.FC = () => {
                 <Button type="primary" className="create-book-button">Create New Book</Button>
             </Link>
 
-
             <Table
                 columns={columns}
                 dataSource={books}
@@ -178,25 +172,13 @@ const BookList: React.FC = () => {
                 loading={loading}
                 className="book-table"
             />
-            <div className="pagination-container">
-                <Pagination
-                    current={currentPage}
-                    total={totalBooks}
-                    pageSize={limit}
-                    onChange={handlePageChange}
-                    className="book-pagination"
-                />
-                <div className="limit-input-container">
-                    <span>Items per page: </span>
-                    <InputNumber
-                        min={1}
-                        max={100}
-                        value={limit}
-                        onPressEnter={handleLimitKeyPress}
-                        onBlur={(event) => handleLimitChange(Number((event.target as HTMLInputElement).value))}
-                    />
-                </div>
-            </div>
+            <PaginationComponent
+                currentPage={currentPage}
+                totalItems={totalBooks}
+                limit={limit}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+            />
             <Modal
                 title="Confirm Deletion"
                 visible={deleteModalVisible}

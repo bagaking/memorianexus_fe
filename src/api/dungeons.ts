@@ -11,8 +11,8 @@ export const createCampaign = async (data: { title: string; description: string;
 };
 
 // 获取所有复习计划
-export const getDungeons = async () => {
-    return axios.get('/dungeon/dungeons');
+export const getDungeons = async (params: {page: number, limit: number}) => {
+    return axios.get('/dungeon/dungeons', {params});
 };
 
 // 获取复习计划详情

@@ -1,6 +1,8 @@
+// src/components/Books/EmbedItemList.tsx
 import React, { useEffect, useState } from 'react';
-import { Table, Pagination, message, Button, Modal, Form, Input, InputNumber, Checkbox } from 'antd';
+import { Table, message, Button, Modal, Form, Input } from 'antd';
 import { getBookItems, addBookItems, removeBookItems } from '../../api/books';
+import PaginationComponent from '../Common/PaginationComponent';
 import ReactMarkdown from "react-markdown";
 
 interface Item {
@@ -63,16 +65,9 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
         setCurrentItemsPage(page);
     };
 
-    const handleLimitChange = (value: number | null) => {
-        const newLimit = value || 10;
+    const handleLimitChange = (newLimit: number) => {
         setItemsLimit(newLimit);
         setCurrentItemsPage(1); // 重置到第一页
-    };
-
-    const handleLimitKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            handleLimitChange(Number((event.target as HTMLInputElement).value));
-        }
     };
 
     const showAddModal = () => {
@@ -150,7 +145,7 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
             <Button type="primary" onClick={showAddModal} style={{ marginBottom: '16px' }}>
                 Add Items
             </Button>
-            <Button  type="primary" danger onClick={handleDelete} disabled={!selectedRowKeys.length} style={{ marginBottom: '16px', marginLeft: '8px' }}>
+            <Button type="primary" danger onClick={handleDelete} disabled={!selectedRowKeys.length} style={{ marginBottom: '16px', marginLeft: '8px' }}>
                 Delete Selected
             </Button>
             <Table
@@ -161,25 +156,13 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
                 loading={loading}
                 rowSelection={rowSelection}
             />
-            <div className="pagination-container">
-                <Pagination
-                    current={currentItemsPage}
-                    total={totalItems}
-                    pageSize={itemsLimit}
-                    onChange={handleItemsPageChange}
-                    className="book-pagination"
-                />
-                <div className="limit-input-container">
-                    <span>Items per page: </span>
-                    <InputNumber
-                        min={1}
-                        max={100}
-                        value={itemsLimit}
-                        onPressEnter={handleLimitKeyPress}
-                        onBlur={(event) => handleLimitChange(Number((event.target as HTMLInputElement).value))}
-                    />
-                </div>
-            </div>
+            <PaginationComponent
+                currentPage={currentItemsPage}
+                totalItems={totalItems}
+                limit={itemsLimit}
+                onPageChange={handleItemsPageChange}
+                onLimitChange={handleLimitChange}
+            />
             <Modal
                 title="Add Items"
                 visible={addModalVisible}

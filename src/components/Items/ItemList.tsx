@@ -1,11 +1,12 @@
 // src/components/Items/ItemList.tsx
 import React, { useEffect, useState } from 'react';
 import { Table, message, Button, Card } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getItems, deleteItem } from '../../api/items';
 import { PageLayout } from '../Common/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
+import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';
 
 interface Item {
@@ -19,13 +20,29 @@ const ItemList: React.FC = () => {
     const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
+    const [totalItems, setTotalItems] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const fetchItems = async () => {
+    const queryParams = new URLSearchParams(location.search);
+    const [currentPage, setCurrentPage] = useState(Number(queryParams.get('page')) || 1);
+    const [limit, setLimit] = useState(Number(queryParams.get('limit')) || 10);
+
+    const fetchItems = async (page: number, limit: number) => {
+        setLoading(true);
         try {
-            const response = await getItems();
+            const response = await getItems({ page, limit });
             const data = response.data.data;
             if (Array.isArray(data)) {
                 setItems(data);
+                if (response.data.total) {
+                    setTotalItems(response.data.total);
+                } else if (data.length >= response.data.limit) {
+                    setTotalItems(currentPage * limit + 1);
+                } else {
+                    setTotalItems((currentPage - 1) * limit + data.length);
+                }
             } else {
                 console.log("items resp", response);
                 message.error('Invalid items data format');
@@ -33,12 +50,14 @@ const ItemList: React.FC = () => {
         } catch (error) {
             console.error(error);
             message.error('Failed to fetch items');
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchItems();
-    }, []);
+        fetchItems(currentPage, limit);
+    }, [currentPage, limit]);
 
     const handleExpand = (record: Item) => {
         setExpandedRowKeys(prevKeys =>
@@ -61,7 +80,7 @@ const ItemList: React.FC = () => {
             try {
                 await deleteItem(itemToDelete.id);
                 message.success('Item deleted successfully');
-                fetchItems();
+                fetchItems(currentPage, limit);
             } catch (error) {
                 console.error(error);
                 message.error('Failed to delete item');
@@ -70,6 +89,17 @@ const ItemList: React.FC = () => {
                 setItemToDelete(null);
             }
         }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        navigate(`/items?page=${page}&limit=${limit}`);
+    };
+
+    const handleLimitChange = (newLimit: number) => {
+        setLimit(newLimit);
+        setCurrentPage(1); // 重置到第一页
+        navigate(`/items?page=1&limit=${newLimit}`);
     };
 
     const columns = [
@@ -128,6 +158,15 @@ const ItemList: React.FC = () => {
                     onClick: () => handleExpand(record),
                 })}
                 expandable={{ expandedRowRender }}
+                pagination={false}
+                loading={loading}
+            />
+            <PaginationComponent
+                currentPage={currentPage}
+                totalItems={totalItems}
+                limit={limit}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
             />
             <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
         </PageLayout>
