@@ -114,9 +114,12 @@ const ItemList: React.FC = () => {
 
     return (
         <div>
-            <h2>Items</h2>
+            <h2>
+                <img src="/item_icon.png" alt="Logo" className="menu-logo-48"/>
+                Items
+            </h2>
             <Link to="/items/new">
-                <Button type="primary" style={{ marginBottom: '16px', width:"100%" }}>Create New Item</Button>
+                <Button type="primary" style={{marginBottom: '16px', width: "100%"}}>Create New Item</Button>
             </Link>
             <Table
                 columns={columns}

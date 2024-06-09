@@ -1,0 +1,10 @@
+entry = [
+    "./api/book*",
+    "./src/components/Books/**/*",
+]
+
+exclude = [
+    ".bundle.txt",
+    "./script",
+    "node_modules/**"
+]

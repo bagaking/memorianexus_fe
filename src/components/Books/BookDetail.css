@@ -1,0 +1,101 @@
+/* BookDetail.css */
+.book-detail-container {
+    padding: 20px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
+
+.book-detail-container h2 {
+    font-size: 32px;
+    color: #001529;
+    margin-bottom: 20px;
+}
+
+.book-detail-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.book-detail-content:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.book-detail-content h2 {
+    margin-top: 0;
+}
+
+.book-detail-content .ant-form-item {
+    margin-bottom: 16px;
+}
+
+.book-detail-content .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.book-detail-content .ant-btn-primary:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+}
+
+.book-detail-content .ant-btn-danger {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.book-detail-content .ant-btn-danger:hover {
+    background-color: #ff7875;
+    border-color: #ff7875;
+}
+
+.delete-modal .ant-modal-content {
+    border-radius: 8px;
+}
+
+.delete-modal .ant-modal-header {
+    background-color: #ff4d4f;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+}
+
+.delete-modal .ant-modal-footer {
+    border-radius: 0 0 8px 8px;
+}
+
+.delete-modal .ant-btn-primary {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    color: #fff;
+}
+
+.delete-modal .ant-btn-primary:hover {
+    background-color: #ff7875;
+    border-color: #ff7875;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .book-detail-container h2 {
+        font-size: 24px;
+    }
+
+    .book-detail-content {
+        padding: 16px;
+    }
+
+    .book-detail-content .ant-form-item {
+        margin-bottom: 12px;
+    }
+
+    .book-detail-content .ant-btn-primary,
+    .book-detail-content .ant-btn-danger {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}

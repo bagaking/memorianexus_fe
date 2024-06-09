@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, message, Button, Card, Modal, Pagination, InputNumber } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getBooks, deleteBook } from '../../api/books';
 import './BookList.css';
@@ -17,10 +17,14 @@ const BookList: React.FC = () => {
     const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
     const [totalBooks, setTotalBooks] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [limit, setLimit] = useState(10);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const queryParams = new URLSearchParams(location.search);
+    const [currentPage, setCurrentPage] = useState(Number(queryParams.get('page')) || 1);
+    const [limit, setLimit] = useState(Number(queryParams.get('limit')) || 10);
 
     const fetchBooks = async (page: number, limit: number) => {
         setLoading(true);
@@ -81,11 +85,14 @@ const BookList: React.FC = () => {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
+        navigate(`/books?page=${page}&limit=${limit}`);
     };
 
     const handleLimitChange = (value: number | null) => {
-        setLimit(value || 10);
+        const newLimit = value || 10;
+        setLimit(newLimit);
         setCurrentPage(1); // 重置到第一页
+        navigate(`/books?page=1&limit=${newLimit}`);
     };
 
     const handleLimitKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -126,7 +133,7 @@ const BookList: React.FC = () => {
             render: (_: any, record: Book) => (
                 <>
                     <Button type="link" size="small">
-                        <Link to={`/books/${record.id}`}>Details</Link>
+                        <Link to={`/books/${record.id}`} state={{page:currentPage, limit}}>Details</Link>
                     </Button>
                     <Button type="link" size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
                         Delete
@@ -143,12 +150,21 @@ const BookList: React.FC = () => {
         </Card>
     );
 
+    if (!books) {
+        return <div>  <img src="/book_icon.png" alt="Logo" className="menu-logo-32"/> Loading...</div>;
+    }
+
     return (
         <div className="book-list-container">
-            <h2>Books</h2>
-            <Link to="/books/new">
+            <h2>
+                <img src="/book_icon.png" alt="Logo" className="menu-logo-48"/>
+                Books
+            </h2>
+            <Link to={`/books/new`} state={{page: currentPage, limit}}>
                 <Button type="primary" className="create-book-button">Create New Book</Button>
             </Link>
+
+
             <Table
                 columns={columns}
                 dataSource={books}
@@ -157,7 +173,7 @@ const BookList: React.FC = () => {
                 onRow={(record) => ({
                     onClick: () => handleExpand(record),
                 })}
-                expandable={{ expandedRowRender }}
+                expandable={{expandedRowRender}}
                 pagination={false}
                 loading={loading}
                 className="book-table"
@@ -176,7 +192,6 @@ const BookList: React.FC = () => {
                         min={1}
                         max={100}
                         value={limit}
-                        // onChange={handleLimitChange}
                         onPressEnter={handleLimitKeyPress}
                         onBlur={(event) => handleLimitChange(Number((event.target as HTMLInputElement).value))}
                     />

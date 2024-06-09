@@ -86,17 +86,20 @@ const ItemDetail: React.FC = () => {
     };
 
     if (!item) {
-        return <div>Loading...</div>;
+        return <div>  <img src="/item_icon.png" alt="Logo" className="menu-logo-32"/> Loading...</div>;
     }
 
     return (
         <div>
-            <Button type="link" onClick={() => navigate('/items')} style={{ marginBottom: '16px' }}>
-                <ArrowLeftOutlined /> Back
+            <Button type="link" onClick={() => navigate('/items')} style={{marginBottom: '16px'}}>
+                <ArrowLeftOutlined/> Back
             </Button>
-            <h2>{(id && id !== 'new') ?  (`Edit Item (id: ${id})` ) : 'Create Item'}</h2>
+            <h2>
+                <img src="/item_icon.png" alt="Logo" className="menu-logo-48"/>
+                {(id && id !== 'new') ? (`Edit Item (id: ${id})`) : 'Create Item'}
+            </h2>
             <Form form={form} onFinish={handleSubmit}>
-                <Form.Item name="type" rules={[{ required: true, message: 'Please select the item type!' }]}>
+                <Form.Item name="type" rules={[{required: true, message: 'Please select the item type!'}]}>
                     <Select placeholder="Select a type">
                         <Option value="flashcard">Flashcard</Option>
                         <Option value="multiple_choice">Multiple Choice</Option>
@@ -104,15 +107,15 @@ const ItemDetail: React.FC = () => {
                     </Select>
                 </Form.Item>
                 <Form.Item name="book_ids">
-                    <Input placeholder="Book IDs (comma separated)" />
+                    <Input placeholder="Book IDs (comma separated)"/>
                 </Form.Item>
                 <Form.Item name="tags">
-                    <Input placeholder="Tags (comma separated)" />
+                    <Input placeholder="Tags (comma separated)"/>
                 </Form.Item>
                 <Form.Item>
                     <MdEditor
                         value={markdown}
-                        style={{ height: '480px', width: "100%" }}
+                        style={{height: '480px', width: "100%"}}
                         renderHTML={(text) => new MarkdownIt().render(text)}
                         onChange={handleEditorChange}
                     />
@@ -120,7 +123,7 @@ const ItemDetail: React.FC = () => {
                 <Form.Item>
                     <Button type="primary" htmlType="submit">Save</Button>
                     {id && id !== 'new' && (
-                        <Button type="primary" danger onClick={showDeleteModal} style={{ marginLeft: '8px' }}>
+                        <Button type="primary" danger onClick={showDeleteModal} style={{marginLeft: '8px'}}>
                             Delete
                         </Button>
                     )}
