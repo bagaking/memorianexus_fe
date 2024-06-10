@@ -1,4 +1,3 @@
-// src/components/Dungeons/CampaignList.tsx
 import React, { useEffect, useState } from 'react';
 import { Table, message, Button, Card } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -123,6 +122,9 @@ const CampaignList: React.FC = () => {
                 <>
                     <Button type="link" size="small">
                         <Link to={`/campaigns/${record.id}`}>Detail</Link>
+                    </Button>
+                    <Button type="link" size="small">
+                        <Link to={`/campaigns/${record.id}/monsters`}>Monsters</Link>
                     </Button>
                     <Button type="link" size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
                         Delete

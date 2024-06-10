@@ -21,10 +21,9 @@ const EditProfile: React.FC = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await getProfile();
-                const data = response.data.data
-                setProfile(data);
-                form.setFieldsValue(data);
+                const profile = await getProfile();
+                setProfile(profile);
+                form.setFieldsValue(profile);
             } catch (error) {
                 console.error(error);
                 message.error('Failed to edit profile');

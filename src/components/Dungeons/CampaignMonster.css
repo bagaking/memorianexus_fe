@@ -1,0 +1,35 @@
+/* DungeonMonsters.css */
+.dungeon-monsters-container {
+    padding: 20px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
+
+.dungeon-monsters-container h2 {
+    font-size: 32px;
+    color: #001529;
+    margin-bottom: 20px;
+}
+
+.dungeon-monsters-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.dungeon-monsters-content:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.dungeon-monsters-content h2 {
+    margin-top: 0;
+}
+
+.dungeon-monsters-content .ant-table {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

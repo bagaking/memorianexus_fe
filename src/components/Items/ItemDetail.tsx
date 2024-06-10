@@ -10,10 +10,6 @@ import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import '../Common/CommonStyles.css';
 
-import MdEditor from 'react-markdown-editor-lite';
-import MarkdownIt from 'markdown-it';
-import 'react-markdown-editor-lite/lib/index.css';
-
 interface Item {
     id?: string;
     content: string;
@@ -95,7 +91,8 @@ const ItemDetail: React.FC = () => {
     return (
         <PageLayout title={(id && id !== 'new') ? `Edit Item (id: ${id})` : 'Create Item'} backUrl="/items" icon="/item_icon.png">
             <Form form={form} onFinish={handleSubmit}>
-                <MarkdownField name={"content"} form={form} />
+                <MarkdownField name={"content"} rules={[{ required: true, message: 'Please enter the content!' }]}/>
+
                 <EditableTagField name={"tags"} form={form} />
                 <TypeField />
                 <BookIdsField />

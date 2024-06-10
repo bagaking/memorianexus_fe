@@ -1,5 +1,7 @@
 entry = [
     "./api/dungeon*",
+    "./api/campaign*",
+    "./api/axios*",
     "./src/components/Dungeons/**/*",
     "./src/components/Common/**/*"
 ]

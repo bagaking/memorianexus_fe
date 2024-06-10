@@ -1,7 +1,6 @@
-// src/api/profile.ts
-import axios from 'axios';
+import axios from './axios';
 
-interface Profile {
+export interface IProfile {
     id: number;
     nickname: string;
     email: string;
@@ -10,19 +9,19 @@ interface Profile {
     created_at: string;
 }
 
-interface Points {
+export interface IPoints {
     cash: number;
     gem: number;
     vip_score: number;
 }
 
-interface SettingsMemorization {
+export interface ISettingsMemorization {
     review_interval_setting: string; // Adjust the type according to your actual settings
     difficulty_preference: number;
     quiz_mode: string;
 }
 
-interface SettingsAdvance {
+export interface ISettingsAdvance {
     theme: string;
     language: string;
     email_notifications: boolean;
@@ -30,34 +29,34 @@ interface SettingsAdvance {
 }
 
 
-export const getProfile = async (): Promise<Profile> => {
+export const getProfile = async (): Promise<IProfile> => {
     const response = await axios.get('/profile/me');
     return response.data.data;
 };
 
-export const updateProfile = async (profile: Partial<Profile>): Promise<void> => {
+export const updateProfile = async (profile: Partial<IProfile>): Promise<void> => {
     await axios.put('/profile/me', profile);
 };
 
-export const getPoints = async (): Promise<Points> => {
+export const getPoints = async (): Promise<IPoints> => {
     const response = await axios.get('/profile/points');
     return response.data.data;
 };
 
-export const getMemorizationSettings = async (): Promise<SettingsMemorization> => {
+export const getMemorizationSettings = async (): Promise<ISettingsMemorization> => {
     const response = await axios.get('/profile/settings/memorization');
     return response.data.data;
 };
 
-export const updateMemorizationSettings = async (settings: Partial<SettingsMemorization>): Promise<void> => {
+export const updateMemorizationSettings = async (settings: Partial<ISettingsMemorization>): Promise<void> => {
     await axios.put('/profile/settings/memorization', settings);
 };
 
-export const getAdvanceSettings = async (): Promise<SettingsAdvance> => {
+export const getAdvanceSettings = async (): Promise<ISettingsAdvance> => {
     const response = await axios.get('/profile/settings/advance');
     return response.data.data;
 };
 
-export const updateAdvanceSettings = async (settings: Partial<SettingsAdvance>): Promise<void> => {
+export const updateAdvanceSettings = async (settings: Partial<ISettingsAdvance>): Promise<void> => {
     await axios.put('/profile/settings/advance', settings);
 };

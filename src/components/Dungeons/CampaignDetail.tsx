@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, } from 'react-router-dom';
-import { Form, Input, Button, message, Modal } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import {getDungeonDetail, updateDungeon, deleteDungeon, createCampaign} from '../../api/dungeons';
-
-interface Dungeon {
-    id?: string;
-    title: string;
-    description: string;
-    rule: string;
-    books?: number[];
-    items?: number[];
-    tag_names?: string[]
-}
+import { useParams, useNavigate } from 'react-router-dom';
+import {Form, Input, message, Button, Table, Avatar} from 'antd';
+import { Dungeon, getDungeonDetail, updateDungeon, deleteDungeon, createCampaign, getDungeonItemsId, addDungeonItems, removeDungeonItems } from '../../api/dungeons';
+import { PageLayout } from '../Layout/PageLayout';
+import { TitleField, MarkdownField } from '../Common/FormFields';
+import { ActionButtons } from '../Common/ActionButtons';
+import { DeleteModal } from '../Common/DeleteModal';
+import { EditableTagField } from '../Common/EditableTagGroup';
+import AppendEntitiesModal from '../Common/AppendEntitiesModal';
+import '../Common/CommonStyles.css';
+import './CampaignDetail.css';
+import {getItems} from "../../api/items";
+import {DungeonMonster} from "../Common/dto";
 
 const CampaignDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [dungeon, setDungeon] = useState<Dungeon | null>(null);
+    const [items, setItems] = useState<DungeonMonster[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [addEntitiesModalVisible, setAddEntitiesModalVisible] = useState(false);
 
     useEffect(() => {
         const fetchDungeon = async () => {
@@ -29,8 +30,13 @@ const CampaignDetail: React.FC = () => {
                     const data = response.data.data;
                     setDungeon(data);
                     form.setFieldsValue(data);
+
+                    // 获取 campaign items
+                    const itemIDsResponse = await getDungeonItemsId(id);
+                    setItems(itemIDsResponse.data.data);
                 } else {
                     setDungeon({
+                        id: '',
                         title: '',
                         description: '',
                         rule: ''
@@ -49,15 +55,15 @@ const CampaignDetail: React.FC = () => {
         try {
             if (id && id !== "new") {
                 await updateDungeon(id, values);
-                message.success('campaign updated successfully');
+                message.success('Campaign updated successfully');
             } else {
                 await createCampaign(values);
-                message.success('campaign created successfully');
+                message.success('Campaign created successfully');
             }
             navigate('/campaigns');
         } catch (error) {
             console.error(error);
-            message.error(`Failed to ${id && id !== "new" ? 'update' : 'create'} campaigns`);
+            message.error(`Failed to ${id && id !== "new" ? 'update' : 'create'} campaign`);
         }
     };
 
@@ -74,56 +80,109 @@ const CampaignDetail: React.FC = () => {
             }
         } catch (error) {
             console.error(error);
-            message.error('Failed to delete dungeon');
+            message.error('Failed to delete campaign');
         } finally {
             setDeleteModalVisible(false);
         }
     };
 
+    const handleItemDelete = async (itemIds: string[]) => {
+        try {
+            await removeDungeonItems(id!, itemIds);
+            message.success('Items deleted successfully');
+            setItems(items.filter(item => !itemIds.includes(item.item_id)));
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to delete items');
+        }
+    };
+
+    const handleAddEntitiesSubmit = async (entityIds: string[]) => {
+        try {
+            await addDungeonItems(id!, entityIds);
+            message.success('Items added successfully');
+            const itemsResponse = await getDungeonItemsId(id!);
+            setItems(itemsResponse.data.data);
+            setAddEntitiesModalVisible(false);
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to add items');
+        }
+    };
+
+    const fetchEntities = async (page: number) => {
+        // 假设我们有一个 API 可以分页获取 items
+        const response = await getItems({ page, limit: 10 });
+        return {
+            entities: response.data?.data,
+            total: response.data.total,
+        };
+    };
+
+    const columns = [
+        {
+            title: 'Avatar',
+            dataIndex: 'avatar',
+            key: 'avatar',
+            render: (text: string) => <Avatar src={text} />
+        },
+        {
+            title: 'Item ID',
+            dataIndex: 'item_id',
+            key: 'item_id',
+        },
+        {
+            title: 'Practice At',
+            dataIndex: 'practice_at',
+            key: 'practice_at',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_: any, record: DungeonMonster) => (
+                <>
+                    <Button type="link" size="small" danger onClick={() => handleItemDelete([record.item_id])}>
+                        Delete
+                    </Button>
+                </>
+            ),
+        },
+    ];
+
     if (!dungeon) {
-        return <div>CAMPAIGN Loading...</div>;
+        return <div>Loading...</div>;
     }
 
     return (
-        <div>
-            <Button type="link" onClick={() => navigate('/campaigns')} style={{ marginBottom: '16px' }}>
-                <ArrowLeftOutlined /> Back
-            </Button>
-            <h2>{(id && id !== 'new') ? (`Edit Campaign (id: ${id})` ) : 'Create Campaign'}</h2>
-            <Form form={form} onFinish={handleSubmit}>
-                <Form.Item name="title" rules={[{ required: true, message: 'Please enter the name!' }]}>
-                    <Input placeholder="Title" />
-                </Form.Item>
-                <Form.Item name="description" rules={[{ required: true, message: 'Please enter the description!' }]}>
-                    <Input.TextArea placeholder="Description" rows={4} />
-                </Form.Item>
-                <Form.Item name="tags">
-                    <Input placeholder="Tags (comma separated)" />
-                </Form.Item>
+        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/campaign_dungeon_icon.png">
+
+            <Button type="primary" onClick={() => navigate(`/campaigns/${id}/monsters`)}>View Monsters</Button>
+
+            <Form form={form} onFinish={handleSubmit} className="campaign-detail-content">
+                <TitleField />
+                <MarkdownField name="description" placeholder="Description" rules={[{ required: true, message: 'Please enter the description!' }]} />
+                <EditableTagField name="tags" />
                 <Form.Item name="book_ids">
                     <Input placeholder="Books (comma separated)" />
                 </Form.Item>
-                <Form.Item name="item_ids">
-                    <Input placeholder="Items (comma separated)" />
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">Save</Button>
-                    {id && id !== 'new' && (
-                        <Button type="primary" danger onClick={showDeleteModal} style={{ marginLeft: '8px' }}>
-                            Delete
-                        </Button>
-                    )}
-                </Form.Item>
+                <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
             </Form>
-            <Modal
-                title="Confirm Deletion"
-                visible={deleteModalVisible}
-                onOk={handleDelete}
-                onCancel={() => setDeleteModalVisible(false)}
-            >
-                <p>Are you sure you want to delete this dungeon?</p>
-            </Modal>
-        </div>
+
+            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+
+            <div className="campaign-items-container">
+                <h2>Campaign Items</h2>
+                <Table className="min-height-table" columns={columns} dataSource={items} rowKey="item_id"/>
+                <Button type="primary" onClick={() => setAddEntitiesModalVisible(true)}>Add Items</Button>
+            </div>
+
+            <AppendEntitiesModal
+                visible={addEntitiesModalVisible}
+                onCancel={() => setAddEntitiesModalVisible(false)}
+                onSubmit={handleAddEntitiesSubmit}
+                fetchEntities={fetchEntities}
+            />
+        </PageLayout>
     );
 };
 

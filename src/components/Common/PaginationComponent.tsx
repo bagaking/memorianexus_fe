@@ -26,7 +26,6 @@ const PaginationComponent: React.FC<PaginationComponentProps> = ({ currentPage, 
                 onChange={onPageChange}
                 onShowSizeChange={handlePageSizeChange}
                 showSizeChanger
-                className="book-pagination"
             />
         </div>
     );

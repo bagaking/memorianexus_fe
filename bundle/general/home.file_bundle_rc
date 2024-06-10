@@ -1,0 +1,11 @@
+entry = [
+    "./src/components/Home/**/*",
+    "./src/components/Common/**/*",
+    "./src/components/Layout/**/*"
+]
+
+exclude = [
+    ".bundle.txt",
+    "./script",
+    "node_modules/**"
+]

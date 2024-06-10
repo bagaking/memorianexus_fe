@@ -1,22 +1,24 @@
 import axios from './axios';
 
-interface Dungeon {
-    id: number;
+export interface Dungeon {
+    id: string;
     title: string;
     description: string;
     rule: string;
-    books: number[];
-    items: number[];
-    tag_names: string[];
-    created_at: string;
-    updated_at: string;
+    books?: string[];
+    items?: string[];
+    tag_names?: string[];
+    created_at?: string;
+    updated_at?: string;
 }
 
-interface PracticeResult {
+export interface PracticeResult {
     monster_id: number;
     result: "defeat" | "miss" | "hit" | "kill" | "complete"
 }
 
+
+// 创建复习计划
 export const createCampaign = async (data: Partial<Dungeon>) => {
     (data as any).type = "campaign"
     return axios.post('/dungeon/dungeons', data);
@@ -26,7 +28,6 @@ export const createCampaign = async (data: Partial<Dungeon>) => {
 export const createDungeon = async (data: Partial<Dungeon>) => {
     return axios.post('/dungeon/dungeons', data);
 };
-
 
 // 获取所有复习计划
 export const getDungeons = async (params: {page: number, limit: number}) => {
@@ -64,17 +65,17 @@ export const removeDungeonBooks = async (dungeonId: string, books: number[]) => 
 };
 
 // 获取复习计划的 Items
-export const getDungeonItems = async (dungeonId: string) => {
-    return axios.get(`/dungeon/dungeons/${dungeonId}/items`);
+export const getDungeonItemsId = async (dungeonId: string, params?: {page?: number, limit?: number}) => {
+    return axios.get(`/dungeon/dungeons/${dungeonId}/items`, {params});
 };
 
 // 向现有复习计划添加学习材料
-export const addDungeonItems = async (dungeonId: string, items: number[]) => {
+export const addDungeonItems = async (dungeonId: string, items: string[]) => {
     return axios.post(`/dungeon/dungeons/${dungeonId}/items`, { items });
 };
 
 // 删除复习计划的 Items
-export const removeDungeonItems = async (dungeonId: string, items: number[]) => {
+export const removeDungeonItems = async (dungeonId: string, items: string[]) => {
     return axios.delete(`/dungeon/dungeons/${dungeonId}/items`, { data: { items } });
 };
 
@@ -89,7 +90,7 @@ export const addDungeonTags = async (dungeonId: string, tags: string[]) => {
 };
 
 // 删除复习计划的 Tags
-export const removeDungeonTags = async (dungeonId: string, tags: number[]) => {
+export const removeDungeonTags = async (dungeonId: string, tags: string[]) => {
     return axios.delete(`/dungeon/dungeons/${dungeonId}/tags`, { data: { tags } });
 };
 
@@ -107,3 +108,4 @@ export const submitPracticeResult = async (dungeonId: string, result: PracticeRe
 export const getPracticeResults = async (dungeonId: string) => {
     return axios.get(`/dungeon/campaigns/${dungeonId}/results`);
 };
+

@@ -14,6 +14,7 @@ import DungeonDetail from './components/Dungeons/CampaignDetail';
 import Home from './components/Home/Home';
 import Navbar from './components/Layout/Navbar';
 import { AuthProvider } from './context/AuthContext';
+import DungeonMonsters from "./components/Dungeons/CampaignMonster";
 
 const { Header, Content } = Layout;
 
@@ -21,10 +22,10 @@ const App: React.FC = () => {
     return (
         <AuthProvider>
             <Layout>
-                <Header>
+                {/*<Header>*/}
                     <Navbar />
-                </Header>
-                <Content style={{ padding: '8px' }}>
+                {/*</Header>*/}
+                <Content>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/register" element={<Register />} />
@@ -37,6 +38,7 @@ const App: React.FC = () => {
                         <Route path="/items/:id" element={<ItemDetail />} />
                         <Route path="/campaigns" element={<CampaignList />} />
                         <Route path="/campaigns/:id" element={<DungeonDetail />} />
+                        <Route path="/campaigns/:id/monsters" element={<DungeonMonsters />} />
                     </Routes>
                 </Content>
             </Layout>

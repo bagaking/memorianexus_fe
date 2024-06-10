@@ -4,31 +4,29 @@ import { Form, Input, Select, FormInstance } from 'antd';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
+import type {Rule} from "rc-field-form/lib/interface";
 
 interface MarkdownEditorProps {
     name: string;
-    initialValue?: string;
-    required?: boolean;
-    message?: string;
+    label?: string;
     placeholder?: string;
-    shouldUpdate?: boolean;
-    form?: FormInstance;
+    rules?: Rule[]
+    value?: string;
+    onChange?: (value: string) => void;
 }
 
 const mdParser = new MarkdownIt();
-const { Option } = Select;
 
-
-export const MarkdownField: React.FC<MarkdownEditorProps> = ({ name, form , required = false, message = 'Please enter!', placeholder = 'Description' }) => {
-    return <Form.Item name={name} rules={[{required, message}]} shouldUpdate >
-        {(!form) ?
-            <Input style={{height: '300px', width: '100%'}}  /> :
-            <MdEditor value={form.getFieldValue(name)}
-                      style={{height: '300px', width: '100%'}}
-                      renderHTML={(text) => mdParser.render(text)}
-                    onChange={({text}) => form.setFieldsValue({[name]: text})}></MdEditor>
-        }
-    </Form.Item>
+export const MarkdownField: React.FC<MarkdownEditorProps> = (
+    {name,label, rules, placeholder = 'Description',
+                                                                 value, onChange, ...rest}
+) => {
+   return   <Form.Item name={name} label={label} rules={rules} valuePropName="value" getValueFromEvent={(e) => e.text}>
+                <MdEditor value={value} placeholder={placeholder} onChange={e => onChange && onChange(e.text)}
+                          renderHTML={(text) => mdParser.render(text)} style={{height: '300px', width: '100%'}}
+                          {...rest}
+                ></MdEditor>
+            </Form.Item>
 }
 
 
@@ -39,6 +37,7 @@ export const TitleField: React.FC = () => (
 )
 
 
+const { Option } = Select;
 export const TypeField: React.FC = () => (
     <Form.Item name="type" rules={[{ required: true, message: 'Please select the item type!' }]}>
         <Select placeholder="Select a type">

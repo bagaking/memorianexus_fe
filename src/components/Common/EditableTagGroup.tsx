@@ -3,27 +3,22 @@ import React, { useState, useRef } from 'react';
 import {Tag, Input, Tooltip, InputRef, Form, FormInstance} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import './EditableTagGroup.css';
-import MdEditor from "react-markdown-editor-lite";
+import {Rule} from "rc-field-form/lib/interface";
 
 interface EditableTagGroupProps {
-    tags: string[];
-    onChange: (tags: string[]) => void;
+    value?: string[];
+    onChange?: (tags: string[]) => void;
 }
 
-interface EditableTagFormItemProps {
-    name: string;
-    form: FormInstance;
-}
-
-export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChange }) => {
+export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ value, onChange }) => {
     const [inputVisible, setInputVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const inputRef = useRef<InputRef>(null);
 
     const handleClose = (removedTag: string) => {
-        const newTags = tags.filter(tag => tag !== removedTag);
-        onChange(newTags);
+        const newTags = (value || []).filter(tag => tag !== removedTag);
+        onChange && onChange(newTags);
     };
 
     const showInput = () => {
@@ -38,12 +33,12 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChan
     };
 
     const handleInputConfirm = () => {
-        if (inputValue && editIndex === null && !tags.includes(inputValue)) {
-            onChange([...tags, inputValue]);
+        if (inputValue && editIndex === null && !(value || []).includes(inputValue)) {
+            onChange && onChange([...(value || []), inputValue]);
         } else if (inputValue && editIndex !== null) {
-            const newTags = [...tags];
+            const newTags = [...(value || [])];
             newTags[editIndex] = inputValue;
-            onChange(newTags);
+            onChange && onChange(newTags);
         }
         setInputVisible(false);
         setInputValue('');
@@ -52,23 +47,18 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChan
 
     const handleTagClick = (index: number) => {
         setEditIndex(index);
-        setInputValue(tags[index]);
+        setInputValue((value || [])[index]);
         setInputVisible(true);
         setTimeout(() => inputRef.current?.focus(), 0);
     };
 
     return (
         <div className="editable-tag-group">
-            {tags.map((tag, index) => {
-                const isLongTag = tag.length > 20;
+            {(value || []).map((tag, index) => {
+                const isLongTag: boolean = tag.length > 20;
                 const tagElem = (
-                    <Tag
-                        key={tag}
-                        closable
-                        onClose={() => handleClose(tag)}
-                        className="editable-tag"
-                        onClick={() => handleTagClick(index)}
-                    >
+                    <Tag key={tag} closable className="editable-tag"
+                         onClose={() => handleClose(tag)} onClick={() => handleTagClick(index)}>
                         {isLongTag ? `${tag.slice(0, 20)}...` : tag}
                     </Tag>
                 );
@@ -81,16 +71,8 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChan
                 );
             })}
             {inputVisible && (
-                <Input
-                    ref={inputRef}
-                    type="text"
-                    size="small"
-                    className="editable-tag-input"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onBlur={handleInputConfirm}
-                    onPressEnter={handleInputConfirm}
-                />
+                <Input ref={inputRef} type="text" size="small" className="editable-tag-input" value={inputValue}
+                       onChange={handleInputChange} onBlur={handleInputConfirm} onPressEnter={handleInputConfirm}/>
             )}
             {!inputVisible && (
                 <Tag onClick={showInput} className="site-tag-plus">
@@ -101,21 +83,37 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChan
     );
 };
 
-export const EditableTagField: React.FC<EditableTagFormItemProps> = ({ name, form }) => {
+
+interface EditableTagGroupFormItemProps {
+    name: string;
+    label?: string;
+    rules?: Rule[];
+    value?: string[];
+    onChange?: (tags: string[]) => void;
+    [key: string]: any; // 透传其他属性
+}
+
+export const EditableTagField: React.FC<EditableTagGroupFormItemProps> = (
+    {name, label, rules, value = [], onChange, ...rest}
+) => {
     return (
-        <Form.Item shouldUpdate={true}>
-            {() => {
-                if (!form) {
-                    return <Input></Input>
-                }
-                const tags = form.getFieldValue(name) || [];
-                return (
-                    <EditableTagGroup tags={tags} onChange={(newTags) => {
-                        form.setFieldsValue({ [name]: newTags })
-                        console.log("newTags", newTags, form.getFieldValue(name))
-                    }} />
-                );
-            }}
+        <Form.Item name={name} label={label} rules={rules} valuePropName="value" getValueFromEvent={(e) => {
+                console.log("e", e)
+                return e // 可以拿到
+            }}>
+            <EditableTagGroup value={value} onChange={v => {
+                console.log("v", v)
+                onChange && onChange(v)
+            }} {...rest} />
         </Form.Item>
     );
 };
+
+// export const MarkdownField: React.FC<MarkdownEditorProps> = ({name,label, rules, placeholder = 'Description', value, ...rest}) => {
+//     return   <Form.Item name={name} label={label} rules={rules} valuePropName="value" getValueFromEvent={(e) => e.text}>
+//         <MdEditor value={value} placeholder={placeholder}
+//                   renderHTML={(text) => mdParser.render(text)} style={{height: '300px', width: '100%'}}
+//                   {...rest}
+//         ></MdEditor>
+//     </Form.Item>
+// }

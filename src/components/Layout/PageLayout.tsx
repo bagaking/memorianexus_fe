@@ -1,4 +1,4 @@
-// src/components/Common/PageLayout.tsx
+// src/components/Layout/PageLayout.tsx
 import React from 'react';
 import { Layout, Button } from 'antd';
 import { Link } from 'react-router-dom';
@@ -16,7 +16,7 @@ interface PageLayoutProps {
 const { Header, Content } = Layout;
 export const PageLayout: React.FC<PageLayoutProps> = ({ title, backUrl, children, icon, bannerUrl }) => {
     return (
-        <Layout className="page-layout-container">
+        <Layout className="page-layout-container" style={{ padding: '72px 8px 8px 8px' }}>
             <Header className="page-layout-header" style={{ backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined }}>
                 {backUrl && (
                     <Link to={backUrl}>
@@ -30,7 +30,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ title, backUrl, children
                     {title}
                 </h1>
             </Header>
-            <Content className="page-layout-content">
+            <Content className="page-layout-content"> {/* 添加顶部内边距 */}
                 {children}
             </Content>
         </Layout>

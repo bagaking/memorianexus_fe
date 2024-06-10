@@ -1,10 +1,14 @@
-/* Navbar.css */
+/* src/components/Layout/Navbar.css */
 .navbar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #001529;
     padding: 0 20px;
+    position: fixed; /* 设置为固定位置 */
+    width: 100%; /* 占满宽度 */
+    top: 0; /* 固定在顶部 */
+    z-index: 1000; /* 确保在其他内容之上 */
 }
 
 .navbar-left {

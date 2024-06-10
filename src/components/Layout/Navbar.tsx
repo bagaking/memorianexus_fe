@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { Menu, Layout, Drawer, Button, Avatar } from 'antd';
 import { MenuOutlined, HomeOutlined, BookOutlined, FileOutlined, UserOutlined, AppstoreOutlined, UserAddOutlined, LoginOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import Points from '../Common/Points'
+import {getPoints, getProfile} from "../../api/profile";
 import './Navbar.css';
 
 const { Header } = Layout;
@@ -29,13 +30,11 @@ const Navbar: React.FC = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const profileResponse = await axios.get('/me');
-                const pointsResponse = await axios.get('/points');
-                const profileData = profileResponse.data.data;
-                const pointsData = pointsResponse.data.data;
+                const profile = await getProfile();
+                const points = await getPoints();
                 setUserProfile({
-                    ...profileData,
-                    points: pointsData,
+                    ...profile,
+                    points: points,
                 });
             } catch (error) {
                 console.error('Failed to fetch user profile:', error);
@@ -81,18 +80,25 @@ const Navbar: React.FC = () => {
                         <Menu.Item key="campaigns" icon={<AppstoreOutlined/>}>
                             <Link to="/campaigns">Campaigns</Link>
                         </Menu.Item>
-                        <Menu.Item key="profile" icon={<UserOutlined/>}>
-                            <Link to="/profile">Profile</Link>
+                        {userProfile ? (
+                        <Menu.Item key="profile" style={{width: '300px' }}>
+                            <Link to="/profile" style={{display: 'flex'}}>
+                                {userProfile.avatar_url ? <img src={userProfile.avatar_url} alt="" /> : <UserOutlined/>}
+                                <span>{userProfile.nickname || "Profile"}</span>
+                                <Points showName={false} style={{width: "100px", height: "48px", color: "#fff"}}
+                                        cash={userProfile.points.cash} gem={userProfile.points.gem}
+                                        vipScore={userProfile.points.vip_score}></Points>
+                            </Link>
                         </Menu.Item>
-                        {userProfile && (
-                            <Menu.Item key="user-info">
-                                <Avatar src={userProfile.avatar_url} />
-                                <span>{userProfile.nickname}</span>
-                                <span>Cash: {userProfile.points.cash}</span>
-                                <span>Gem: {userProfile.points.gem}</span>
-                                <span>VIP: {userProfile.points.vip_score}</span>
+
+                        ) : (
+                            <Menu.Item key="profile" icon={<UserOutlined/>}>
+                                <Link to="/profile">Profile</Link>
                             </Menu.Item>
-                        )}
+                        )
+
+                        }
+
                     </>
                 ) : (
                     <>

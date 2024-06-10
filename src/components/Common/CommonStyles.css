@@ -113,6 +113,7 @@
     word-wrap: break-word;
 }
 
+
 .markdown-content h1, .markdown-content h2, .markdown-content h3 {
     margin-top: 1em;
     margin-bottom: 0.5em;
@@ -139,6 +140,11 @@
 /* 按钮样式 */
 .ant-btn-link {
     padding: 0;
+}
+
+
+.pagination-container {
+    padding: 16px 0 16px 0;
 }
 
 /* 响应式布局 */
