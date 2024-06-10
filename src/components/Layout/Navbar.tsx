@@ -1,15 +1,51 @@
-import React, { useState } from 'react';
+// src/components/Layout/Navbar.tsx
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Layout, Drawer, Button } from 'antd';
-import { MenuOutlined, HomeOutlined, BookOutlined, FileOutlined, UserOutlined, LogoutOutlined, LoginOutlined, UserAddOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Menu, Layout, Drawer, Button, Avatar } from 'antd';
+import { MenuOutlined, HomeOutlined, BookOutlined, FileOutlined, UserOutlined, AppstoreOutlined, UserAddOutlined, LoginOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 import './Navbar.css';
 
 const { Header } = Layout;
 
+interface Points {
+    cash: number;
+    gem: number;
+    vip_score: number;
+}
+
+interface UserProfile {
+    avatar_url: string;
+    nickname: string;
+    points: Points;
+}
+
 const Navbar: React.FC = () => {
     const [visible, setVisible] = useState(false);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const auth = useAuth();
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const profileResponse = await axios.get('/me');
+                const pointsResponse = await axios.get('/points');
+                const profileData = profileResponse.data.data;
+                const pointsData = pointsResponse.data.data;
+                setUserProfile({
+                    ...profileData,
+                    points: pointsData,
+                });
+            } catch (error) {
+                console.error('Failed to fetch user profile:', error);
+            }
+        };
+
+        if (auth?.isAuthenticated) {
+            fetchUserProfile();
+        }
+    }, [auth?.isAuthenticated]);
 
     const showDrawer = () => {
         setVisible(true);
@@ -48,12 +84,15 @@ const Navbar: React.FC = () => {
                         <Menu.Item key="profile" icon={<UserOutlined/>}>
                             <Link to="/profile">Profile</Link>
                         </Menu.Item>
-                        <Menu.Item key="logout" icon={<LogoutOutlined/>} onClick={() => {
-                            auth.logout();
-                            handleMenuClick();
-                        }}>
-                            Logout
-                        </Menu.Item>
+                        {userProfile && (
+                            <Menu.Item key="user-info">
+                                <Avatar src={userProfile.avatar_url} />
+                                <span>{userProfile.nickname}</span>
+                                <span>Cash: {userProfile.points.cash}</span>
+                                <span>Gem: {userProfile.points.gem}</span>
+                                <span>VIP: {userProfile.points.vip_score}</span>
+                            </Menu.Item>
+                        )}
                     </>
                 ) : (
                     <>
@@ -90,12 +129,6 @@ const Navbar: React.FC = () => {
                             </Menu.Item>
                             <Menu.Item key="profile" icon={<UserOutlined/>}>
                                 <Link to="/profile">Profile</Link>
-                            </Menu.Item>
-                            <Menu.Item key="logout" icon={<LogoutOutlined/>} onClick={() => {
-                                auth.logout();
-                                handleMenuClick();
-                            }}>
-                                Logout
                             </Menu.Item>
                         </>
                     ) : (

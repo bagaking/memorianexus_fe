@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, message, Button, Card } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getDungeons, deleteDungeon } from '../../api/dungeons';
-import { PageLayout } from '../Common/PageLayout';
+import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';

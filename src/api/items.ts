@@ -1,9 +1,5 @@
 import axios from './axios';
 
-// 创建学习材料
-export const createItem = async (data: { content: string; type: string; book_ids?: number[]; tags?: string[] }) => {
-    return axios.post('/items', data);
-};
 
 // 获取所有学习材料
 export const getItems = async (params: {page: number, limit: number}) => {
@@ -11,8 +7,14 @@ export const getItems = async (params: {page: number, limit: number}) => {
 };
 
 // 获取学习材料详情
-export const getItemDetail = async (id: string) => {
+export const getItemById = async (id: string) => {
     return axios.get(`/items/${id}`);
+};
+
+
+// 创建学习材料
+export const createItem = async (data: { content: string; type: string; book_ids?: number[]; tags?: string[] }) => {
+    return axios.post('/items', data);
 };
 
 // 更新学习材料信息

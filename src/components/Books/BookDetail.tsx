@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Form, message } from 'antd';
 import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
-import { PageLayout } from '../Common/PageLayout';
+import { PageLayout } from '../Layout/PageLayout';
 import {TitleField, MarkdownField} from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
@@ -43,6 +43,7 @@ const BookDetail: React.FC = () => {
                     } else if (!Array.isArray(data.tags)) {
                         data.tags = [];
                     }
+                    console.log("fetch book", data)
                     setBook(data); // 仅用来 Loading
                     form.setFieldsValue(data);
                 } else {

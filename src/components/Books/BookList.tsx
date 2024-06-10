@@ -1,11 +1,13 @@
 // src/components/Books/BookList.tsx
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card, Modal } from 'antd';
+import { Table, message, Button, Card } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getBooks, deleteBook } from '../../api/books';
+import { PageLayout } from '../Layout/PageLayout';
+import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
-import './BookList.css';
+import '../Common/CommonStyles.css';
 
 interface Book {
     id: string;
@@ -102,7 +104,6 @@ const BookList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 200,
-            render: (text: string) => <ReactMarkdown className="markdown-content">{text}</ReactMarkdown>,
         },
         {
             title: 'Title',
@@ -139,24 +140,16 @@ const BookList: React.FC = () => {
     ];
 
     const expandedRowRender = (record: Book) => (
-        <Card key={record.id} className="expanded-book-card">
+        <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
             <h2>{record.title}</h2>
             <ReactMarkdown className="markdown-content">{record.description}</ReactMarkdown>
         </Card>
     );
 
-    if (!books) {
-        return <div>  <img src="/book_icon.png" alt="Logo" className="menu-logo-32"/> Loading...</div>;
-    }
-
     return (
-        <div className="book-list-container">
-            <h2>
-                <img src="/book_icon.png" alt="Logo" className="menu-logo-48"/>
-                Books
-            </h2>
+        <PageLayout title="Books" icon="/book_icon.png">
             <Link to={`/books/new`} state={{page: currentPage, limit}}>
-                <Button type="primary" className="create-book-button">Create New Book</Button>
+                <Button type="primary" className="create-new-one-button">Create New Book</Button>
             </Link>
 
             <Table
@@ -170,7 +163,6 @@ const BookList: React.FC = () => {
                 expandable={{expandedRowRender}}
                 pagination={false}
                 loading={loading}
-                className="book-table"
             />
             <PaginationComponent
                 currentPage={currentPage}
@@ -179,16 +171,8 @@ const BookList: React.FC = () => {
                 onPageChange={handlePageChange}
                 onLimitChange={handleLimitChange}
             />
-            <Modal
-                title="Confirm Deletion"
-                visible={deleteModalVisible}
-                onOk={handleDelete}
-                onCancel={() => setDeleteModalVisible(false)}
-                className="delete-modal"
-            >
-                <p>Are you sure you want to delete this book?</p>
-            </Modal>
-        </div>
+            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+        </PageLayout>
     );
 };
 

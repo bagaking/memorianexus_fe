@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, message } from 'antd';
-import { getItemDetail, updateItem, createItem, deleteItem } from '../../api/items';
-import { PageLayout } from '../Common/PageLayout';
+import { getItemById, updateItem, createItem, deleteItem } from '../../api/items';
+import { PageLayout } from '../Layout/PageLayout';
 import {TypeField, BookIdsField, MarkdownField} from '../Common/FormFields';
 import {EditableTagField} from '../Common/EditableTagGroup'
 import { ActionButtons } from '../Common/ActionButtons';
@@ -33,7 +33,7 @@ const ItemDetail: React.FC = () => {
         const fetchItem = async () => {
             try {
                 if (id && id !== "new") {
-                    const response = await getItemDetail(id);
+                    const response = await getItemById(id);
                     const data = response.data.data;
                     setItem(data);
                     form.setFieldsValue(data);

@@ -1,7 +1,6 @@
 entry = [
-    "./src/api/book*",
-    "./src/api/item*",
-    "./src/components/Items/**/*",
+    "./src/profile*",
+    "./src/components/Dungeons/**/*",
     "./src/components/Common/**/*",
     "./src/components/Layout/**/*"
 ]

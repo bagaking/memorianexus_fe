@@ -4,7 +4,7 @@ import { Table, message, Button, Card } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getItems, deleteItem } from '../../api/items';
-import { PageLayout } from '../Common/PageLayout';
+import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';

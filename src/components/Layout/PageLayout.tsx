@@ -3,7 +3,7 @@ import React from 'react';
 import { Layout, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import './CommonStyles.css';
+import '../Common/CommonStyles.css';
 
 interface PageLayoutProps {
     title: string;
