@@ -85,9 +85,12 @@ const CampaignList: React.FC = () => {
         }
     };
 
-    const handlePageChange = (page: number) => {
+    const handlePageChange = (page: number, pageSize?: number) => {
         setCurrentPage(page);
-        navigate(`/campaigns?page=${page}&limit=${limit}`);
+        if (pageSize && pageSize !== limit) {
+            setLimit(pageSize);
+        }
+        navigate(`/campaigns?page=${page}&limit=${pageSize || limit}`);
     };
 
     const handleLimitChange = (newLimit: number) => {
@@ -138,7 +141,7 @@ const CampaignList: React.FC = () => {
     );
 
     return (
-        <PageLayout title="Campaigns" icon="/campaign_icon.png">
+        <PageLayout title="Campaigns" icon="/campaign_dungeon_icon.png">
             <Link to="/campaigns/new">
                 <Button type="primary" style={{ marginBottom: '16px', width: "100%" }} className="create-new-one-button">Create New Campaign Dungeon</Button>
             </Link>

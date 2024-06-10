@@ -4,10 +4,11 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Form, message } from 'antd';
 import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
 import { PageLayout } from '../Common/PageLayout';
-import { TitleField, DescriptionField, TagsField } from '../Common/FormFields';
+import { TitleField, DescriptionField } from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import EmbedItemList from './EmbedItemList';
+import { EditableTagFormItem } from '../Common/EditableTagGroup';
 import '../Common/CommonStyles.css';
 
 interface Book {
@@ -106,7 +107,7 @@ const BookDetail: React.FC = () => {
             <Form form={form} onFinish={handleSubmit}>
                 <TitleField />
                 <DescriptionField />
-                <TagsField />
+                <EditableTagFormItem name="tags" />
                 <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
             </Form>
             <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
