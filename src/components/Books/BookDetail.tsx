@@ -4,12 +4,13 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Form, message } from 'antd';
 import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
 import { PageLayout } from '../Common/PageLayout';
-import { TitleField, DescriptionField } from '../Common/FormFields';
+import {TitleField, MarkdownField} from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import EmbedItemList from './EmbedItemList';
-import { EditableTagFormItem } from '../Common/EditableTagGroup';
+import { EditableTagField } from '../Common/EditableTagGroup';
 import '../Common/CommonStyles.css';
+import './BookDetail.css';
 
 interface Book {
     id?: string;
@@ -42,7 +43,7 @@ const BookDetail: React.FC = () => {
                     } else if (!Array.isArray(data.tags)) {
                         data.tags = [];
                     }
-                    setBook(data);
+                    setBook(data); // 仅用来 Loading
                     form.setFieldsValue(data);
                 } else {
                     setBook({ title: '', description: '', tags: [] });
@@ -58,11 +59,9 @@ const BookDetail: React.FC = () => {
 
     const handleSubmit = async (values: Book) => {
         // 确保 tags 是一个数组
-        if (typeof values.tags === 'string') {
-            values.tags = (values.tags as string).split(',').map(tag => tag.trim());
-        } else if (!Array.isArray(values.tags)) {
-            values.tags = [];
-        }
+        console.log("values", values)
+        console.log("values.tags", values.tags)
+        values.tags =  values.tags || form.getFieldValue("tags")// todo: 这块 form 的机制有点莫名其妙，列表的变更似乎不会引起 dirty
 
         try {
             if (id && id !== 'new') {
@@ -106,8 +105,8 @@ const BookDetail: React.FC = () => {
         <PageLayout title={(id && id !== 'new') ? `Edit Book (id: ${id})` : 'Create Book'} backUrl={`/books?page=${currentPage}&limit=${limit}`} icon="/book_icon.png">
             <Form form={form} onFinish={handleSubmit}>
                 <TitleField />
-                <DescriptionField />
-                <EditableTagFormItem name="tags" />
+                <MarkdownField name="description" required={true} message="Please enter the description!" placeholder="description" form={form} />
+                <EditableTagField name="tags" form={form} />
                 <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
             </Form>
             <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />

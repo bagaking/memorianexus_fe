@@ -1,8 +1,9 @@
 // src/components/Common/EditableTagGroup.tsx
 import React, { useState, useRef } from 'react';
-import { Tag, Input, Tooltip, InputRef, Form } from 'antd';
+import {Tag, Input, Tooltip, InputRef, Form, FormInstance} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import './EditableTagGroup.css';
+import MdEditor from "react-markdown-editor-lite";
 
 interface EditableTagGroupProps {
     tags: string[];
@@ -11,6 +12,7 @@ interface EditableTagGroupProps {
 
 interface EditableTagFormItemProps {
     name: string;
+    form: FormInstance;
 }
 
 export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChange }) => {
@@ -99,16 +101,19 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ tags, onChan
     );
 };
 
-export const EditableTagFormItem: React.FC<EditableTagFormItemProps> = ({ name }) => {
+export const EditableTagField: React.FC<EditableTagFormItemProps> = ({ name, form }) => {
     return (
-        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues[name] !== currentValues[name]}>
-            {({ getFieldValue, setFieldsValue }) => {
-                const tags = getFieldValue(name) || [];
+        <Form.Item shouldUpdate={true}>
+            {() => {
+                if (!form) {
+                    return <Input></Input>
+                }
+                const tags = form.getFieldValue(name) || [];
                 return (
-                    <EditableTagGroup
-                        tags={tags}
-                        onChange={(newTags) => setFieldsValue({ [name]: newTags })}
-                    />
+                    <EditableTagGroup tags={tags} onChange={(newTags) => {
+                        form.setFieldsValue({ [name]: newTags })
+                        console.log("newTags", newTags, form.getFieldValue(name))
+                    }} />
                 );
             }}
         </Form.Item>
