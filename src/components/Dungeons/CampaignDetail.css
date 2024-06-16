@@ -5,10 +5,18 @@
     min-height: 100vh;
 }
 
-.campaign-detail-container h2 {
-    font-size: 32px;
-    color: #001529;
-    margin-bottom: 20px;
+.campaign-detail-card {
+    background: #fff;
+    padding: 24px;
+    margin-top: 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.campaign-detail-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .campaign-detail-content {
@@ -95,6 +103,20 @@
     margin-bottom: 20px;
 }
 
+.campaign-progress {
+    margin-top: 40px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.campaign-progress h3 {
+    font-size: 24px;
+    color: #001529;
+    margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
     .campaign-detail-container h2 {
         font-size: 24px;
@@ -120,5 +142,13 @@
 
     .campaign-items-container h2 {
         font-size: 24px;
+    }
+
+    .campaign-progress {
+        padding: 16px;
+    }
+
+    .campaign-progress h3 {
+        font-size: 20px;
     }
 }

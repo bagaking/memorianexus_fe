@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {Form, Input, message, Button, Table, Avatar} from 'antd';
+import { Form, Input, message, Button, Table, Avatar, Card, Progress, Select } from 'antd';
 import { Dungeon, getDungeonDetail, updateDungeon, deleteDungeon, createCampaign, getDungeonItemsId, addDungeonItems, removeDungeonItems } from '../../api/dungeons';
 import { PageLayout } from '../Layout/PageLayout';
 import { TitleField, MarkdownField } from '../Common/FormFields';
@@ -10,8 +10,11 @@ import { EditableTagField } from '../Common/EditableTagGroup';
 import AppendEntitiesModal from '../Common/AppendEntitiesModal';
 import '../Common/CommonStyles.css';
 import './CampaignDetail.css';
-import {getItems} from "../../api/items";
-import {DungeonMonster} from "../Common/dto";
+import { getItems } from "../../api/items";
+import { DungeonMonster } from "../Common/dto";
+import { getBookItems, getTagItems } from "../../api/books";
+
+const { Option } = Select;
 
 const CampaignDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,6 +24,8 @@ const CampaignDetail: React.FC = () => {
     const [items, setItems] = useState<DungeonMonster[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [addEntitiesModalVisible, setAddEntitiesModalVisible] = useState(false);
+    const [importType, setImportType] = useState<'book' | 'tag' | null>(null);
+    const [importValue, setImportValue] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchDungeon = async () => {
@@ -111,8 +116,15 @@ const CampaignDetail: React.FC = () => {
     };
 
     const fetchEntities = async (page: number) => {
-        // 假设我们有一个 API 可以分页获取 items
-        const response = await getItems({ page, limit: 10 });
+        // 根据 importType 和 importValue 来获取 items
+        let response;
+        if (importType === 'book' && importValue) {
+            response = await getBookItems({ page, limit: 10, bookId: importValue });
+        } else if (importType === 'tag' && importValue) {
+            response = await getTagItems({ page, limit: 10, tag: importValue });
+        } else {
+            response = await getItems({ page, limit: 10 });
+        }
         return {
             entities: response.data?.data,
             total: response.data.total,
@@ -156,32 +168,61 @@ const CampaignDetail: React.FC = () => {
     return (
         <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/campaign_dungeon_icon.png">
 
-            <Button type="primary" onClick={() => navigate(`/campaigns/${id}/monsters`)}>View Monsters</Button>
-
-            <Form form={form} onFinish={handleSubmit} className="campaign-detail-content">
-                <TitleField />
-                <MarkdownField name="description" placeholder="Description" rules={[{ required: true, message: 'Please enter the description!' }]} />
-                <EditableTagField name="tags" />
-                <Form.Item name="book_ids">
-                    <Input placeholder="Books (comma separated)" />
-                </Form.Item>
-                <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
-            </Form>
-
-            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
-
-            <div className="campaign-items-container">
-                <h2>Campaign Items</h2>
-                <Table className="min-height-table" columns={columns} dataSource={items} rowKey="item_id"/>
-                <Button type="primary" onClick={() => setAddEntitiesModalVisible(true)}>Add Items</Button>
+            <div className="campaign-progress">
+                <h3>Campaign Progress</h3>
+                <Button type="primary" onClick={() => navigate(`/campaigns/${id}/monsters`)}>View Monsters</Button>
+                <Progress percent={50} status="active"/>
             </div>
 
-            <AppendEntitiesModal
-                visible={addEntitiesModalVisible}
-                onCancel={() => setAddEntitiesModalVisible(false)}
-                onSubmit={handleAddEntitiesSubmit}
-                fetchEntities={fetchEntities}
-            />
+            <Card className="campaign-detail-card">
+                <Form form={form} onFinish={handleSubmit} className="campaign-detail-content">
+                    <TitleField/>
+                    <MarkdownField name="description" placeholder="Description"
+                                   rules={[{required: true, message: 'Please enter the description!'}]}/>
+                    <EditableTagField name="tags"/>
+                    <Form.Item name="book_ids">
+                        <Input placeholder="Books (comma separated)"/>
+                    </Form.Item>
+                    <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal}/>
+                </Form>
+
+                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete}
+                             onCancel={() => setDeleteModalVisible(false)}/>
+
+                <div className="campaign-items-container">
+                    <h2>Campaign Items</h2>
+                    <Table className="min-height-table" columns={columns} dataSource={items} rowKey="item_id"/>
+                    <Button type="primary" onClick={() => setAddEntitiesModalVisible(true)}>Add Items</Button>
+                    <Select placeholder="Import Type" style={{ width: 120, marginLeft: 8 }} onChange={value => setImportType(value)}>
+                        <Option value="book">Book</Option>
+                        <Option value="tag">Tag</Option>
+                    </Select>
+                    {importType && (
+                        <Input
+                            placeholder={`Enter ${importType} ID`}
+                            style={{ width: 200, marginLeft: 8 }}
+                            onChange={e => setImportValue(e.target.value)}
+                        />
+                    )}
+                    <Button
+                        type="primary"
+                        onClick={() => setAddEntitiesModalVisible(true)}
+                        disabled={!importValue}
+                        style={{ marginLeft: 8 }}
+                    >
+                        Import from {importType}
+                    </Button>
+                </div>
+
+                <AppendEntitiesModal
+                    visible={addEntitiesModalVisible}
+                    onCancel={() => setAddEntitiesModalVisible(false)}
+                    onSubmit={handleAddEntitiesSubmit}
+                    fetchEntities={fetchEntities}
+                    defaultSelected={items.map(item => item.item_id)}
+                />
+            </Card>
+
         </PageLayout>
     );
 };

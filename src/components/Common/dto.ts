@@ -13,3 +13,4 @@ export interface DungeonMonster {
     importance: string;
     created_at: string;
 }
+
