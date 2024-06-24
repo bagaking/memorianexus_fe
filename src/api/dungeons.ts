@@ -13,7 +13,7 @@ export interface Dungeon {
 }
 
 export interface PracticeResult {
-    monster_id: number;
+    monster_id: string;
     result: "defeat" | "miss" | "hit" | "kill" | "complete"
 }
 
@@ -68,6 +68,7 @@ export const removeDungeonBooks = async (dungeonId: string, books: number[]) => 
 export const getDungeonItemsId = async (dungeonId: string, params?: {page?: number, limit?: number}) => {
     return axios.get(`/dungeon/dungeons/${dungeonId}/items`, {params});
 };
+
 
 // 向现有复习计划添加学习材料
 export const addDungeonItems = async (dungeonId: string, items: string[]) => {

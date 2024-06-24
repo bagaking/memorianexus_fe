@@ -1,0 +1,86 @@
+/* 背景样式 */
+.campaign-challenge-background {
+    background-image: url('/src/assets/battlefield/battlefield_01.png');
+    background-size: contain;
+    /*padding: 20px;*/
+    border-radius: 15px;
+}
+
+/* 卡片样式 */
+.campaign-detail-card {
+    background: rgba(255, 255, 255, 0.05);
+    /*border-radius: 15px;*/
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+/* 怪物详情样式 */
+.monster-detail {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+/* 卡片内容样式 */
+.monster-card {
+    flex: 1;
+    margin: 12px;
+    width: 260px;
+    height: 480px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    background: #fff;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.monster-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+/* 按钮样式 */
+.attack-buttons {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.attack-buttons button {
+    margin-bottom: 10px;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.attack-buttons button:hover {
+    transform: scale(1.05);
+}
+
+.attack-buttons .defeat {
+    background-color: #ff4d4f;
+}
+
+.attack-buttons .miss {
+    background-color: #faad14;
+}
+
+.attack-buttons .hit {
+    background-color: #52c41a;
+}
+
+.attack-buttons .kill {
+    background-color: #f5222d;
+}
+
+.attack-buttons .complete {
+    background-color: #1890ff;
+}

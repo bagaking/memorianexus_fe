@@ -14,3 +14,10 @@ export interface DungeonMonster {
     created_at: string;
 }
 
+export interface Item {
+    id?: string;
+    content: string;
+    type: string;
+    book_ids?: number[];
+    tags?: string[];
+}

@@ -9,14 +9,8 @@ import {EditableTagField} from '../Common/EditableTagGroup'
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import '../Common/CommonStyles.css';
+import {Item} from "../Common/dto";
 
-interface Item {
-    id?: string;
-    content: string;
-    type: string;
-    book_ids?: number[];
-    tags?: string[];
-}
 
 const ItemDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();

@@ -15,6 +15,7 @@ import Home from './components/Home/Home';
 import Navbar from './components/Layout/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import DungeonMonsters from "./components/Dungeons/CampaignMonster";
+import CampaignChallenge from "./components/Dungeons/CampaignChallenge";
 
 const { Header, Content } = Layout;
 
@@ -39,6 +40,7 @@ const App: React.FC = () => {
                         <Route path="/campaigns" element={<CampaignList />} />
                         <Route path="/campaigns/:id" element={<DungeonDetail />} />
                         <Route path="/campaigns/:id/monsters" element={<DungeonMonsters />} />
+                        <Route path="/campaigns/:id/challenge" element={<CampaignChallenge />} />
                     </Routes>
                 </Content>
             </Layout>

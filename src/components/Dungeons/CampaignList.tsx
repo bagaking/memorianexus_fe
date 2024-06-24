@@ -116,16 +116,29 @@ const CampaignList: React.FC = () => {
             key: 'description',
         },
         {
-            title: 'Action',
+            title: 'Challenge',
             key: 'action',
+            render: (_: any, record: Dungeon) => (
+                <>
+                    <Button type="primary">
+                        <Link to={`/campaigns/${record.id}/challenge`}>Challenge</Link>
+                    </Button>
+
+                    <Button type="text">
+                        <Link to={`/campaigns/${record.id}/monsters`}>Check Monsters</Link>
+                    </Button>
+                </>
+            ),
+        },
+        {
+            title: 'Edit',
+            key: 'edit',
             render: (_: any, record: Dungeon) => (
                 <>
                     <Button type="link" size="small">
                         <Link to={`/campaigns/${record.id}`}>Detail</Link>
                     </Button>
-                    <Button type="link" size="small">
-                        <Link to={`/campaigns/${record.id}/monsters`}>Monsters</Link>
-                    </Button>
+
                     <Button type="link" size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
                         Delete
                     </Button>
