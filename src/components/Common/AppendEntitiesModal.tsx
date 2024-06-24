@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Table, Pagination, Button, List, Tooltip, Input } from 'antd';
-import Markdown from "react-markdown";
+import { Modal, Form, Table, Pagination, Button, List, Input } from 'antd';
 import { Key, RowSelectMethod, TableRowSelection } from "antd/es/table/interface";
+import FirstLine from "./Firstline";
 
 interface AppendEntitiesModalProps {
     visible: boolean;
@@ -26,11 +26,13 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
                 setTotalEntities(response.total);
             });
         }
+
     }, [visible, currentPage, fetchEntities]);
 
     useEffect(() => {
         if (visible) {
-            setEntities(defaultSelected);
+            // setEntities(defaultSelected); // 这句导致 Maximum update depth exceeded
+            form.setFieldsValue({ entities: defaultSelected });
         }
     }, [visible, defaultSelected]);
 
@@ -38,6 +40,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
         if (newEntity.trim() && !entities.includes(newEntity.trim())) {
             setEntities([...entities, newEntity.trim()]);
             setNewEntity('');
+
         }
     };
 
@@ -67,6 +70,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
             title: 'Name',
             dataIndex: 'content',
             key: 'name',
+            render: (text: string) => <FirstLine content={text}/>,
         },
         {
             title: 'Action',
@@ -103,7 +107,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
                     dataSource={entities}
                     renderItem={entity => (
                         <List.Item actions={[<Button type="link" danger onClick={() => handleRemoveEntity(entity)}>Remove</Button>]}>
-                            <Tooltip color="blue" title={<Markdown>{searchResults.find(x => x.id === entity)?.content}</Markdown>}>{entity}</Tooltip>
+                            <FirstLine content={searchResults.find(x => x.id === entity)?.content} showName={entity}/>
                         </List.Item>
                     )}
                 />

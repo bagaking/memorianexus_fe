@@ -118,12 +118,20 @@ const CampaignDetail: React.FC = () => {
     const fetchEntities = async (page: number) => {
         // 根据 importType 和 importValue 来获取 items
         let response;
-        if (importType === 'book' && importValue) {
-            response = await getBookItems({ page, limit: 10, bookId: importValue });
-        } else if (importType === 'tag' && importValue) {
-            response = await getTagItems({ page, limit: 10, tag: importValue });
+        if (!!importValue) {
+            if (importType === 'book') {
+                response = await getBookItems({ page, limit: 10, bookId: importValue });
+            } else if (importType === 'tag') {
+                response = await getTagItems({ page, limit: 10, tag: importValue });
+            }
         } else {
             response = await getItems({ page, limit: 10 });
+        }
+        if (!response) {
+            return {
+                entities: [],
+                total: 0,
+            }
         }
         return {
             entities: response.data?.data,
@@ -179,20 +187,32 @@ const CampaignDetail: React.FC = () => {
                     <TitleField/>
                     <MarkdownField name="description" placeholder="Description"
                                    rules={[{required: true, message: 'Please enter the description!'}]}/>
+
+                    <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal}/>
+                    {/*下边这俩还有必要吗?*/}
                     <EditableTagField name="tags"/>
                     <Form.Item name="book_ids">
                         <Input placeholder="Books (comma separated)"/>
                     </Form.Item>
-                    <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal}/>
+
                 </Form>
 
-                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete}
-                             onCancel={() => setDeleteModalVisible(false)}/>
+                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)}/>
 
+                {(id && id !== 'new') ?
                 <div className="campaign-items-container">
                     <h2>Campaign Items</h2>
-                    <Table className="min-height-table" columns={columns} dataSource={items} rowKey="item_id"/>
+                    <Table className="min-height-table" style={{marginBottom:"16px"}} columns={columns} dataSource={items} rowKey="item_id"/>
                     <Button type="primary" onClick={() => setAddEntitiesModalVisible(true)}>Add Items</Button>
+                    <span style={{margin:"10px"}}>OR</span>
+                    <Button
+                        type="primary"
+                        onClick={() => setAddEntitiesModalVisible(true)}
+                        disabled={!importValue}
+                        style={{ marginLeft: 8 }}
+                    >
+                        Import from {importType}
+                    </Button>
                     <Select placeholder="Import Type" style={{ width: 120, marginLeft: 8 }} onChange={value => setImportType(value)}>
                         <Option value="book">Book</Option>
                         <Option value="tag">Tag</Option>
@@ -204,15 +224,8 @@ const CampaignDetail: React.FC = () => {
                             onChange={e => setImportValue(e.target.value)}
                         />
                     )}
-                    <Button
-                        type="primary"
-                        onClick={() => setAddEntitiesModalVisible(true)}
-                        disabled={!importValue}
-                        style={{ marginLeft: 8 }}
-                    >
-                        Import from {importType}
-                    </Button>
-                </div>
+
+                </div> : <span style={{marginTop:"16px", paddingTop:"16px", color: "gray"}}>Item's can only be add to exist campaign</span> }
 
                 <AppendEntitiesModal
                     visible={addEntitiesModalVisible}

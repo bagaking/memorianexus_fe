@@ -32,7 +32,7 @@ export const getBookItems = async (data: { bookId: string, page: number, limit: 
 export const getTagItems = async (data: { tag: string, page: number, limit: number }) => {
     // todo: 后端还提供的接口还是 tag_id
     let {tag, page, limit } = data
-    return axios.get(`/tags/${tag}/items?page=${page}&limit=${limit}`);
+    return axios.get(`/tags/name/${tag}/items?page=${page}&limit=${limit}`);
 }
 
 export const addBookItem = (data: {bookId: string, itemId: string}) => {

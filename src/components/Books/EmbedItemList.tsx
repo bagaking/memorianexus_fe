@@ -1,9 +1,10 @@
-// src/components/Books/EmbedItemList.tsx
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Modal, Form, Input } from 'antd';
+import { Table, message, Button } from 'antd';
 import { getBookItems, addBookItems, removeBookItems } from '../../api/books';
 import PaginationComponent from '../Common/PaginationComponent';
-import ReactMarkdown from "react-markdown";
+import FirstLine from "../Common/Firstline";
+import AppendEntitiesModal from '../Common/AppendEntitiesModal';
+import {getItems} from "../../api/items";
 
 interface Item {
     id: string;
@@ -26,9 +27,8 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
     const [loading, setLoading] = useState(true);
     const [currentItemsPage, setCurrentItemsPage] = useState(1);
     const [itemsLimit, setItemsLimit] = useState(10);
-    const [addModalVisible, setAddModalVisible] = useState(false);
+    const [addEntitiesModalVisible, setAddEntitiesModalVisible] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [form] = Form.useForm();
 
     const fetchItems = async (bookId: string) => {
         setLoading(true);
@@ -70,21 +70,19 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
         setCurrentItemsPage(1); // 重置到第一页
     };
 
-    const showAddModal = () => {
-        setAddModalVisible(true);
+    const showAddEntitiesModal = () => {
+        setAddEntitiesModalVisible(true);
     };
 
-    const handleAdd = async (values: { itemIds: string }) => {
-        const itemIds = values.itemIds.split(',').map(id => id.trim());
+    const handleAddEntitiesSubmit = async (entityIds: string[]) => {
         try {
-            await addBookItems({ bookId, itemIds });
+            await addBookItems({ bookId, itemIds: entityIds });
             message.success('Items added successfully');
             fetchItems(bookId);
+            setAddEntitiesModalVisible(false);
         } catch (error) {
             console.error(error);
             message.error('Failed to add items to book');
-        } finally {
-            setAddModalVisible(false);
         }
     };
 
@@ -97,6 +95,14 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
             console.error(error);
             message.error('Failed to delete items from book');
         }
+    };
+
+    const fetchCandidateEntities = async (page: number) => {
+        const response = await getItems({ page, limit: 10 });
+        return {
+            entities: response.data.data,
+            total: response.data.total,
+        };
     };
 
     const itemsColumns = [
@@ -114,7 +120,7 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
             title: 'Content',
             dataIndex: 'content',
             key: 'content',
-            render: (text: string) => <ReactMarkdown className="markdown-content">{text}</ReactMarkdown>,
+            render: (text: string, record: Item) => <FirstLine content={text} link={"/items/" + record.id} />,
         },
         {
             title: 'Creator ID',
@@ -141,11 +147,16 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
     };
 
     return (
-        <div>
-            <Button type="primary" onClick={showAddModal} style={{ marginBottom: '16px' }}>
+        <div style={{
+            padding: "12px",
+            borderRadius: "8px",
+            background: "linear-gradient(135deg, #b6cce6 0%, #b0cce3 100%)"
+        }}>
+            <Button type="primary" onClick={showAddEntitiesModal} style={{marginBottom: '16px'}}>
                 Add Items
             </Button>
-            <Button type="primary" danger onClick={handleDelete} disabled={!selectedRowKeys.length} style={{ marginBottom: '16px', marginLeft: '8px' }}>
+            <Button type="primary" danger onClick={handleDelete} disabled={!selectedRowKeys.length}
+                    style={{marginBottom: '16px', marginLeft: '8px'}}>
                 Delete Selected
             </Button>
             <Table
@@ -163,18 +174,12 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
                 onPageChange={handleItemsPageChange}
                 onLimitChange={handleLimitChange}
             />
-            <Modal
-                title="Add Items"
-                visible={addModalVisible}
-                onCancel={() => setAddModalVisible(false)}
-                onOk={() => form.submit()}
-            >
-                <Form form={form} onFinish={handleAdd}>
-                    <Form.Item name="itemIds" rules={[{ required: true, message: 'Please enter the item IDs!' }]}>
-                        <Input placeholder="Item IDs (comma separated)" />
-                    </Form.Item>
-                </Form>
-            </Modal>
+            <AppendEntitiesModal
+                visible={addEntitiesModalVisible}
+                onCancel={() => setAddEntitiesModalVisible(false)}
+                onSubmit={handleAddEntitiesSubmit}
+                fetchEntities={fetchCandidateEntities}
+            />
         </div>
     );
 };
