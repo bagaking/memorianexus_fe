@@ -8,8 +8,8 @@
 
 /* 卡片样式 */
 .campaign-detail-card {
-    background: rgba(255, 255, 255, 0.05);
-    /*border-radius: 15px;*/
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s;
 }
@@ -29,10 +29,26 @@
     height: 480px;
     cursor: pointer;
     transition: transform 0.2s;
+    padding: 12px;
     background: #fff;
     border-radius: 10px;
     text-align: center;
 }
+
+/* 按钮样式 */
+.attack-buttons {
+    flex: 1;
+    margin: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 12px;
+    background: #fff;
+    border-radius: 10px;
+
+}
+
+
 
 .monster-card img {
     width: 100%;
@@ -42,45 +58,3 @@
     margin-top: 10px;
 }
 
-/* 按钮样式 */
-.attack-buttons {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 20px;
-    background: #fff;
-    border-radius: 10px;
-}
-
-.attack-buttons button {
-    margin-bottom: 10px;
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.attack-buttons button:hover {
-    transform: scale(1.05);
-}
-
-.attack-buttons .defeat {
-    background-color: #ff4d4f;
-}
-
-.attack-buttons .miss {
-    background-color: #faad14;
-}
-
-.attack-buttons .hit {
-    background-color: #52c41a;
-}
-
-.attack-buttons .kill {
-    background-color: #f5222d;
-}
-
-.attack-buttons .complete {
-    background-color: #1890ff;
-}

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, message, Card, Progress } from 'antd';
+import {message, Card, Progress, Button} from 'antd';
 import { getPracticeMonsters, submitPracticeResult, getItemById } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
-import {DungeonMonster, Item} from '../Common/dto';
+import { DungeonMonster, Item } from '../Common/dto';
 import '../Common/CommonStyles.css';
 import './CampaignChallenge.css';
 import Markdown from 'react-markdown';
 import { CloseCircleOutlined, StopOutlined, CheckCircleOutlined, FireOutlined, TrophyOutlined } from '@ant-design/icons';
+import SkillCard from './SkillCard';
 
 const CampaignChallenge: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -72,7 +73,7 @@ const CampaignChallenge: React.FC = () => {
     const firstNonEmptyLine = currentItemDetail?.content.trim().split('\n').find(line => line.trim() !== '');
 
     return (
-        <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png" >
+        <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
             <div className="campaign-challenge-background">
                 <Card className="campaign-detail-card">
                     <div className="monster-detail">
@@ -91,16 +92,38 @@ const CampaignChallenge: React.FC = () => {
                             )}
                         </Card>
 
-                        <Card className="attack-buttons">
-                            <h3 style={{ textAlign: 'center' }}>Attack</h3>
-                            <div>
-                                <Button icon={<CloseCircleOutlined />} className="defeat" onClick={() => handleAttackResult("defeat")}>Defeat</Button>
-                                <Button icon={<StopOutlined />} className="miss" onClick={() => handleAttackResult("miss")}>Miss</Button>
-                                <Button icon={<CheckCircleOutlined />} className="hit" onClick={() => handleAttackResult("hit")}>Hit</Button>
-                                <Button icon={<FireOutlined />} className="kill" onClick={() => handleAttackResult("kill")}>Kill</Button>
-                                <Button icon={<TrophyOutlined />} className="complete" onClick={() => handleAttackResult("complete")}>Complete</Button>
-                            </div>
-                        </Card>
+                        <div className="attack-buttons">
+                            <SkillCard
+                                icon={<CloseCircleOutlined />}
+                                buttonProps={{ onClick: () => handleAttackResult("defeat") }}
+                                resultType="defeat"
+                                title="Defeat"
+                            />
+                            <SkillCard
+                                icon={<StopOutlined />}
+                                buttonProps={{ onClick: () => handleAttackResult("miss") }}
+                                resultType="miss"
+                                title="Miss"
+                            />
+                            <SkillCard
+                                icon={<CheckCircleOutlined />}
+                                buttonProps={{ onClick: () => handleAttackResult("hit") }}
+                                resultType="hit"
+                                title="Hit"
+                            />
+                            <SkillCard
+                                icon={<FireOutlined />}
+                                buttonProps={{ onClick: () => handleAttackResult("kill") }}
+                                resultType="kill"
+                                title="Kill"
+                            />
+                            <SkillCard
+                                icon={<TrophyOutlined />}
+                                buttonProps={{ onClick: () => handleAttackResult("complete") }}
+                                resultType="complete"
+                                title="Complete"
+                            />
+                        </div>
                     </div>
                     <Progress percent={50} status="active" style={{ marginTop: '20px' }} />
                 </Card>
