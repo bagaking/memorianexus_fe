@@ -2,14 +2,13 @@
 .campaign-challenge-background {
     background-image: url('/src/assets/battlefield/battlefield_01.png');
     background-size: contain;
-    /*padding: 20px;*/
-    border-radius: 15px;
+    border-radius: 12px;
+    margin: -4px;
 }
 
 /* 卡片样式 */
 .campaign-detail-card {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
+    border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s;
 }
@@ -18,7 +17,7 @@
 .monster-detail {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
+    /*padding: 20px;*/
 }
 
 /* 卡片内容样式 */
@@ -26,10 +25,10 @@
     flex: 1;
     margin: 12px;
     width: 260px;
-    height: 480px;
+    height: 614px;
     cursor: pointer;
     transition: transform 0.2s;
-    padding: 12px;
+
     background: #fff;
     border-radius: 10px;
     text-align: center;
@@ -44,17 +43,36 @@
     justify-content: space-around;
     padding: 12px;
     background: #fff;
-    border-radius: 10px;
-
+    border-radius: 12px;
+    height: 100%;
 }
 
+/* 华丽的怪物图片容器样式 */
+.monster-image-container {
+    position: relative;
+    width: 100%;
+    height: 522px; /* 根据需要调整高度 */
+    overflow: hidden;
+    border-radius: 12px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
 
-
-.monster-card img {
+.monster-image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 10px;
-    margin-top: 10px;
+    object-position: top;
+    transition: transform 0.3s;
+    border-radius: 0;
 }
 
+.monster-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(244, 190, 44, 0.3), rgba(26, 46, 58, 0.1));
+    border-radius: 10px;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {message, Card, Progress, Button} from 'antd';
+import { message, Card, Progress, Button } from 'antd';
 import { getPracticeMonsters, submitPracticeResult, getItemById } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
 import { DungeonMonster, Item } from '../Common/dto';
@@ -78,65 +78,67 @@ const CampaignChallenge: React.FC = () => {
                 <Card className="campaign-detail-card">
                     <div className="monster-detail">
                         <Card className="monster-card" onClick={() => setShowFullContent(!showFullContent)}>
+                            <Progress percent={50} status="active" style={{ marginBottom: '20px',  }} />
                             {showFullContent ? (
                                 <Markdown>
                                     {currentItemDetail?.content || ''}
                                 </Markdown>
                             ) : (
-                                <>
+                                <div className="monster-image-container">
                                     <Markdown>{firstNonEmptyLine || ''}</Markdown>
-                                    <div className="monster-image-container">
-                                        <img src="/src/assets/portraits/skeleton_warrior_01.png" alt="Monster Avatar" />
-                                    </div>
-                                </>
+                                    <img src="/portraits/skeleton_warrior_01.png" alt="Monster Avatar" />
+                                </div>
+                            )}
+                            {showFullContent && (
+                                <Button type="primary" style={{ marginTop: '20px' }} onClick={() => {
+                                    setShowFullContent(false);
+                                    if (currentMonsterIndex < monsters.length - 1) {
+                                        setCurrentMonsterIndex(currentMonsterIndex + 1);
+                                    }
+                                }}>
+                                    Skip & Next
+                                </Button>
                             )}
                         </Card>
 
                         <div className="attack-buttons">
                             <SkillCard
                                 icon={<CloseCircleOutlined />}
-                                buttonProps={{ onClick: () => handleAttackResult("defeat") }}
+                                onClick={() => handleAttackResult("defeat") }
                                 resultType="defeat"
                                 title="Defeat"
                             />
                             <SkillCard
                                 icon={<StopOutlined />}
-                                buttonProps={{ onClick: () => handleAttackResult("miss") }}
+                                onClick={() => handleAttackResult("miss") }
                                 resultType="miss"
                                 title="Miss"
                             />
                             <SkillCard
                                 icon={<CheckCircleOutlined />}
-                                buttonProps={{ onClick: () => handleAttackResult("hit") }}
+                                onClick={() => handleAttackResult("hit") }
                                 resultType="hit"
                                 title="Hit"
                             />
                             <SkillCard
                                 icon={<FireOutlined />}
-                                buttonProps={{ onClick: () => handleAttackResult("kill") }}
+                                onClick={() => handleAttackResult("kill") }
                                 resultType="kill"
                                 title="Kill"
                             />
                             <SkillCard
                                 icon={<TrophyOutlined />}
                                 buttonProps={{ onClick: () => handleAttackResult("complete") }}
+                                onClick={() => handleAttackResult("complete") }
                                 resultType="complete"
                                 title="Complete"
                             />
+
                         </div>
                     </div>
-                    <Progress percent={50} status="active" style={{ marginTop: '20px' }} />
+
                 </Card>
-                {showFullContent && (
-                    <Button type="primary" style={{ marginTop: '20px' }} onClick={() => {
-                        setShowFullContent(false);
-                        if (currentMonsterIndex < monsters.length - 1) {
-                            setCurrentMonsterIndex(currentMonsterIndex + 1);
-                        }
-                    }}>
-                        Next
-                    </Button>
-                )}
+
             </div>
         </PageLayout>
     );
