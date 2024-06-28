@@ -17,18 +17,15 @@
 .monster-detail {
     display: flex;
     justify-content: space-between;
-    /*padding: 20px;*/
+    flex-wrap: wrap; /* 确保在小屏幕上换行 */
 }
 
 /* 卡片内容样式 */
 .monster-card {
     flex: 1;
     margin: 12px;
-    width: 260px;
-    height: 614px;
     cursor: pointer;
     transition: transform 0.2s;
-
     background: #fff;
     border-radius: 10px;
     text-align: center;
@@ -41,17 +38,25 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    padding: 12px;
+    /*padding: 12px;*/
     background: #fff;
     border-radius: 12px;
-    height: 100%;
+    /*height: 100%;*/
+}
+
+/* 技能卡片容器样式 */
+.skill-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
 }
 
 /* 华丽的怪物图片容器样式 */
 .monster-image-container {
     position: relative;
     width: 100%;
-    height: 522px; /* 根据需要调整高度 */
+    height: auto; /* 根据需要调整高度 */
+    max-height: 60vh;
     overflow: hidden;
     border-radius: 12px;
     transition: transform 0.3s, box-shadow 0.3s;
@@ -59,9 +64,9 @@
 
 .monster-image-container img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
+    height: auto;
+    object-fit: contain; /* 确保立绘高度适配 */
+    object-position: center; /* 确保背景图居中显示 */
     transition: transform 0.3s;
     border-radius: 0;
 }
@@ -75,4 +80,36 @@
     height: 100%;
     background: linear-gradient(135deg, rgba(244, 190, 44, 0.3), rgba(26, 46, 58, 0.1));
     border-radius: 10px;
+}
+
+/* 立绘样式 */
+.left-portrait {
+    max-height: 100%; /* 确保立绘高度适配 */
+    object-fit: contain; /* 保持比例 */
+}
+
+/* 媒体查询：在手机上调整布局 */
+@media (max-width: 768px) {
+    .monster-detail {
+        flex-direction: column; /* 垂直排列 */
+        align-items: center; /* 居中对齐 */
+    }
+
+    .attack-buttons {
+        flex-direction: row; /* 水平排列 */
+        flex-wrap: wrap; /* 换行 */
+        justify-content: center; /* 居中对齐 */
+    }
+
+    .skill-cards-container {
+        flex-direction: row; /* 水平排列 */
+        flex-wrap: wrap; /* 换行 */
+        justify-content: center; /* 居中对齐 */
+        gap: 12px; /* 调整间距 */
+    }
+
+    .monster-card {
+        width: 100%;
+        margin: 2px;
+    }
 }

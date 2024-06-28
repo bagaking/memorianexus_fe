@@ -16,11 +16,11 @@ interface PageLayoutProps {
 const { Header, Content } = Layout;
 export const PageLayout: React.FC<PageLayoutProps> = ({ title, backUrl, children, icon, bannerUrl }) => {
     return (
-        <Layout className="page-layout-container" style={{ padding: '72px 8px 8px 8px' }}>
+        <Layout className="page-layout-container" >
             <Header className="page-layout-header" style={{ backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined }}>
                 {backUrl && (
                     <Link to={backUrl}>
-                        <Button type="link" className="back-button">
+                        <Button type="text" className="back-button">
                             <ArrowLeftOutlined style={{ fontSize: '16px', color: '#fff' }} />
                         </Button>
                     </Link>

@@ -5,6 +5,8 @@
     width: 100%;
     min-height: 100vh;
     background-color: #f0f2f5;
+
+    padding: 72px 8px 8px 8px;
 }
 
 /* 页头样式 */
@@ -58,19 +60,15 @@
     position: absolute;
     top: 16px;
     left: 16px;
-    color: #fff;
-    font-size: 16px;
     display: flex;
     align-items: center;
     z-index: 1;
-    background: rgba(0, 0, 0, 0.5); /* 添加背景色 */
     padding: 8px;
-    border-radius: 4px;
-    transition: background 0.3s;
+    transition: transform 0.1s;
 }
 
 .back-button:hover {
-    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
 }
 
 .create-new-one-button {
@@ -85,17 +83,8 @@
 
 /* 页面内容样式 */
 .page-layout-content {
-    background: #fff;
-    padding: 12px;
-    margin: 12px 0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.page-layout-content:hover {
-    /*transform: scale(1.01);*/
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    padding: 6px;
+    margin: 6px 0;
 }
 
 .page-layout-content h2 {
@@ -112,7 +101,6 @@
     color: #333;
     word-wrap: break-word;
 }
-
 
 .markdown-content h1, .markdown-content h2, .markdown-content h3 {
     margin-top: 1em;
@@ -150,8 +138,12 @@
 /* 响应式布局 */
 @media (max-width: 768px) {
     .page-layout-content {
-        padding: 16px;
-        margin: 16px;
+        padding: 4px;
+        margin: 0 2px;
+    }
+
+    .page-layout-container {
+        padding: 72px 2px 2px 2px;
     }
 
     .page-layout-header {
@@ -168,5 +160,10 @@
 
     .markdown-content {
         font-size: 14px;
+    }
+
+    .page-layout-header {
+        height: 68px;
+        border-radius: 4px;
     }
 }

@@ -3,7 +3,6 @@ import React, { useState, useRef } from 'react';
 import {Tag, Input, Tooltip, InputRef, Form, FormInstance} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import './EditableTagGroup.css';
-import {Rule} from "rc-field-form/lib/interface";
 
 interface EditableTagGroupProps {
     value?: string[];
@@ -87,7 +86,7 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ value, onCha
 interface EditableTagGroupFormItemProps {
     name: string;
     label?: string;
-    rules?: Rule[];
+    rules?: any;
     value?: string[];
     onChange?: (tags: string[]) => void;
     [key: string]: any; // 透传其他属性

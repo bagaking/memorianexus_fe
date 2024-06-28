@@ -75,18 +75,20 @@ const CampaignChallenge: React.FC = () => {
     return (
         <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
             <div className="campaign-challenge-background">
-                <Card className="campaign-detail-card">
+                <div className="campaign-detail-card">
                     <div className="monster-detail">
                         <Card className="monster-card" onClick={() => setShowFullContent(!showFullContent)}>
-                            <Progress percent={50} status="active" style={{ marginBottom: '20px',  }} />
+                            <Progress percent={50} status="active" style={{ marginBottom: '20px' }} />
                             {showFullContent ? (
-                                <Markdown>
-                                    {currentItemDetail?.content || ''}
-                                </Markdown>
+                                <div style={{ textAlign: 'left' }}>
+                                    <Markdown>
+                                        {currentItemDetail?.content || ''}
+                                    </Markdown>
+                                </div>
                             ) : (
                                 <div className="monster-image-container">
                                     <Markdown>{firstNonEmptyLine || ''}</Markdown>
-                                    <img src="/portraits/skeleton_warrior_01.png" alt="Monster Avatar" />
+                                    <img className="left-portrait" src="/portraits/skeleton_warrior_01.png" alt="Monster Avatar" />
                                 </div>
                             )}
                             {showFullContent && (
@@ -102,43 +104,42 @@ const CampaignChallenge: React.FC = () => {
                         </Card>
 
                         <div className="attack-buttons">
-                            <SkillCard
-                                icon={<CloseCircleOutlined />}
-                                onClick={() => handleAttackResult("defeat") }
-                                resultType="defeat"
-                                title="Defeat"
-                            />
-                            <SkillCard
-                                icon={<StopOutlined />}
-                                onClick={() => handleAttackResult("miss") }
-                                resultType="miss"
-                                title="Miss"
-                            />
-                            <SkillCard
-                                icon={<CheckCircleOutlined />}
-                                onClick={() => handleAttackResult("hit") }
-                                resultType="hit"
-                                title="Hit"
-                            />
-                            <SkillCard
-                                icon={<FireOutlined />}
-                                onClick={() => handleAttackResult("kill") }
-                                resultType="kill"
-                                title="Kill"
-                            />
-                            <SkillCard
-                                icon={<TrophyOutlined />}
-                                buttonProps={{ onClick: () => handleAttackResult("complete") }}
-                                onClick={() => handleAttackResult("complete") }
-                                resultType="complete"
-                                title="Complete"
-                            />
-
+                            <div className="skill-cards-container">
+                                <SkillCard
+                                    icon={<CloseCircleOutlined />}
+                                    onClick={() => handleAttackResult("defeat")}
+                                    resultType="defeat"
+                                    title="Defeat"
+                                />
+                                <SkillCard
+                                    icon={<StopOutlined />}
+                                    onClick={() => handleAttackResult("miss")}
+                                    resultType="miss"
+                                    title="Miss"
+                                />
+                                <SkillCard
+                                    icon={<CheckCircleOutlined />}
+                                    onClick={() => handleAttackResult("hit")}
+                                    resultType="hit"
+                                    title="Hit"
+                                />
+                                <SkillCard
+                                    icon={<FireOutlined />}
+                                    onClick={() => handleAttackResult("kill")}
+                                    resultType="kill"
+                                    title="Kill"
+                                />
+                                <SkillCard
+                                    icon={<TrophyOutlined />}
+                                    buttonProps={{ onClick: () => handleAttackResult("complete") }}
+                                    onClick={() => handleAttackResult("complete")}
+                                    resultType="complete"
+                                    title="Complete"
+                                />
+                            </div>
                         </div>
                     </div>
-
-                </Card>
-
+                </div>
             </div>
         </PageLayout>
     );

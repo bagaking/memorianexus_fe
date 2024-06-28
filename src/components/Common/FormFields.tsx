@@ -4,27 +4,30 @@ import { Form, Input, Select, FormInstance } from 'antd';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
-import type {Rule} from "rc-field-form/lib/interface";
 
 interface MarkdownEditorProps {
     name: string;
     label?: string;
     placeholder?: string;
-    rules?: Rule[]
     value?: string;
+    rules: any
     onChange?: (value: string) => void;
 }
 
 const mdParser = new MarkdownIt();
 
-export const MarkdownField: React.FC<MarkdownEditorProps> = (
-    {name,label, rules, placeholder = 'Description',
-                                                                 value, onChange, ...rest}
-) => {
-   return   <Form.Item name={name} label={label} rules={rules} valuePropName="value" getValueFromEvent={(e) => e.text}>
+export const MarkdownField: React.FC<MarkdownEditorProps> = ({
+        name,
+        label,
+        placeholder = 'Description',
+        value,
+        onChange,
+        rules,
+        ...rest
+}) => {
+   return   <Form.Item name={name} label={label} valuePropName="value" getValueFromEvent={(e) => e.text} rules={rules}>
                 <MdEditor value={value} placeholder={placeholder} onChange={e => onChange && onChange(e.text)}
-                          renderHTML={(text) => mdParser.render(text)} style={{height: '300px', width: '100%'}}
-                          {...rest}
+                          renderHTML={(text) => mdParser.render(text)} style={{height: '300px', width: '100%'}} {...rest}
                 ></MdEditor>
             </Form.Item>
 }
