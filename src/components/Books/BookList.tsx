@@ -28,15 +28,12 @@ const BookList: React.FC = () => {
         setLoading(true);
         try {
             const response = await getBooks({ page, limit });
-            const data = response.data.data;
-            if (Array.isArray(data)) {
-                setBooks(data);
-                if (response.data.total) {
-                    setTotalBooks(response.data.total);
-                } else if (data.length >= response.data.limit){
-                    setTotalBooks(currentPage * limit + 1);
-                } else {
-                    setTotalBooks((currentPage -1) * limit + data.length);
+            const data = response.data;
+            const booksData = data.data;
+            if (Array.isArray(booksData)) {
+                setBooks(booksData);
+                if (!!data.total) {
+                    setTotalBooks(data.total);
                 }
             } else {
                 console.log("books resp", response);
@@ -161,6 +158,7 @@ const BookList: React.FC = () => {
             <PaginationComponent
                 currentPage={currentPage}
                 totalItems={totalBooks}
+                pageDataLength={books.length}
                 limit={limit}
                 onPageChange={handlePageChange}
                 onLimitChange={handleLimitChange}

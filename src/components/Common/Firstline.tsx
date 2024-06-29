@@ -10,9 +10,10 @@ interface FirstLineProps {
     placement?: TooltipPlacement;
     showName?: string;
     link?: string;
+    [key: string]: any;
 }
 
-const FirstLine: React.FC<FirstLineProps> = ({ content, color, placement, showName, link }) => {
+const FirstLine: React.FC<FirstLineProps> = ({ content, color, placement, showName, link, ...rest }) => {
     const firstLine = (content || "").split('\n')[0]; // 提取首行内容
 
     return (
@@ -29,7 +30,7 @@ const FirstLine: React.FC<FirstLineProps> = ({ content, color, placement, showNa
             placement={placement || "topLeft"}
             overlayStyle={{ maxWidth: '500px' }} // 设置 Tooltip 的最大宽度
         >
-            <div style={{ marginBottom: '8px', height: 'auto', lineHeight: 'normal' }} // 设置卡片高度和一般文本差不多
+            <div style={{ marginBottom: '8px', height: 'auto', lineHeight: 'normal' }} {...rest} // 设置卡片高度和一般文本差不多
             >
                 {showName || firstLine}
             </div>

@@ -36,10 +36,6 @@ const CampaignList: React.FC = () => {
                 setDungeons(data);
                 if (response.data.total) {
                     setTotalDungeons(response.data.total);
-                } else if (data.length >= response.data.limit) {
-                    setTotalDungeons(currentPage * limit + 1);
-                } else {
-                    setTotalDungeons((currentPage - 1) * limit + data.length);
                 }
             } else {
                 console.log("dungeons resp", response);
@@ -176,6 +172,7 @@ const CampaignList: React.FC = () => {
                 currentPage={currentPage}
                 totalItems={totalDungeons}
                 limit={limit}
+                pageDataLength={dungeons.length}
                 onPageChange={handlePageChange}
                 onLimitChange={handleLimitChange}
             />

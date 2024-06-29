@@ -8,11 +8,12 @@ import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
 import AppendEntitiesModal from '../Common/AppendEntitiesModal';
-import '../Common/CommonStyles.css';
-import './CampaignDetail.css';
 import { getItems } from "../../api/items";
 import { DungeonMonster } from "../Common/dto";
 import { getBookItems, getTagItems } from "../../api/books";
+
+import '../Common/CommonStyles.css';
+import './CampaignDetail.css';
 
 const { Option } = Select;
 
@@ -115,27 +116,32 @@ const CampaignDetail: React.FC = () => {
         }
     };
 
-    const fetchEntities = async (page: number) => {
+    const fetchEntities = async (page: number, limit:number = 10) => {
         // 根据 importType 和 importValue 来获取 items
         let response;
         if (!!importValue) {
             if (importType === 'book') {
-                response = await getBookItems({ page, limit: 10, bookId: importValue });
+                response = await getBookItems({ page, limit, bookId: importValue });
             } else if (importType === 'tag') {
-                response = await getTagItems({ page, limit: 10, tag: importValue });
+                response = await getTagItems({ page, limit, tag: importValue });
             }
         } else {
-            response = await getItems({ page, limit: 10 });
+            response = await getItems({ page, limit });
         }
-        if (!response) {
+        if (!response || !response.data) {
             return {
                 entities: [],
                 total: 0,
+                offset: 0,
+                limit: limit,
             }
         }
+        const data = response.data;
         return {
-            entities: response.data?.data,
-            total: response.data.total,
+            entities: data.data,
+            total: data.total,
+            offset: data.offset,
+            limit: data.limit,
         };
     };
 

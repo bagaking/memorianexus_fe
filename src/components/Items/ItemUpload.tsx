@@ -58,8 +58,11 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className }) =
         }
     };
 
-    const fetchBooks = async (page: number) => {
-        const response = await getBooks({ page, limit: 10 });
+    const fetchBooks = async (page: number, limit: number = 10) => {
+        if (!limit || limit < 0) {
+            limit = 10
+        }
+        const response = await getBooks({ page, limit });
         const data = response.data;
         const books = data.data as Book[];
         return {

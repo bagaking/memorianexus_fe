@@ -39,10 +39,6 @@ const ItemList: React.FC = () => {
                 setItems(data);
                 if (response.data.total) {
                     setTotalItems(response.data.total);
-                } else if (data.length >= response.data.limit) {
-                    setTotalItems(currentPage * limit + 1);
-                } else {
-                    setTotalItems((currentPage - 1) * limit + data.length);
                 }
             } else {
                 console.log("items resp", response);
@@ -171,6 +167,7 @@ const ItemList: React.FC = () => {
                 currentPage={currentPage}
                 totalItems={totalItems}
                 limit={limit}
+                pageDataLength={items.length}
                 onPageChange={handlePageChange}
                 onLimitChange={handleLimitChange}
             />

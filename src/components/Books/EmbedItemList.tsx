@@ -37,14 +37,8 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
             const data = response.data.data;
             if (Array.isArray(data)) {
                 setItems(data);
-                if (response.data.total) {
+                if (!!response.data.total) {
                     setTotalItems(response.data.total);
-                } else if (data.length === response.data.limit){
-                    setTotalItems(currentItemsPage * itemsLimit + 1);
-                } else if (data.length > 0) {
-                    setTotalItems((currentItemsPage -1) * itemsLimit + data.length);
-                } else { // 最后一页
-                    setTotalItems((currentItemsPage -1) * itemsLimit + 1);
                 }
             } else {
                 message.error('Invalid items data format');
@@ -97,11 +91,14 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
         }
     };
 
-    const fetchCandidateEntities = async (page: number) => {
-        const response = await getItems({ page, limit: 10 });
+    const fetchCandidateEntities = async (page: number, limit: number = 10) => {
+        const response = await getItems({ page, limit });
+        const data = response.data;
         return {
-            entities: response.data.data,
-            total: response.data.total,
+            entities: data.data,
+            total: data.total,
+            limit: data.limit,
+            offset: data.offset,
         };
     };
 
@@ -159,6 +156,14 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
                     style={{marginBottom: '16px', marginLeft: '8px'}}>
                 Delete Selected
             </Button>
+            <PaginationComponent
+                currentPage={currentItemsPage}
+                totalItems={totalItems}
+                pageDataLength={items.length}
+                limit={itemsLimit}
+                onPageChange={handleItemsPageChange}
+                onLimitChange={handleLimitChange}
+            />
             <Table
                 columns={itemsColumns}
                 dataSource={items}
@@ -167,14 +172,9 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
                 loading={loading}
                 rowSelection={rowSelection}
             />
-            <PaginationComponent
-                currentPage={currentItemsPage}
-                totalItems={totalItems}
-                limit={itemsLimit}
-                onPageChange={handleItemsPageChange}
-                onLimitChange={handleLimitChange}
-            />
+
             <AppendEntitiesModal
+                title={"选择要添加到这本书里的 items"}
                 visible={addEntitiesModalVisible}
                 onCancel={() => setAddEntitiesModalVisible(false)}
                 onSubmit={handleAddEntitiesSubmit}

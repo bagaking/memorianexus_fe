@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Table, Pagination, Button, List, Input } from 'antd';
+import { Modal, Form, Table, Button, List, Input } from 'antd';
 import { Key, RowSelectMethod, TableRowSelection } from "antd/es/table/interface";
 import FirstLine from "./Firstline";
+import PaginationComponent from "./PaginationComponent";
 
 interface AppendEntitiesModalProps {
+    title?: React.ReactNode
+    footer?: React.ReactNode
     visible: boolean;
     onCancel: () => void;
     onSubmit: (entityIds: string[]) => void;
-    fetchEntities?: (page: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
+    fetchEntities?: (page: number, limit?: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
     defaultSelected?: string[];
     maxCount?: number; // 新增 maxCount 属性
 }
@@ -17,18 +20,24 @@ export interface EntityModalDataModel{
     content: string
 }
 
-const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCancel, onSubmit, fetchEntities, defaultSelected = [], maxCount }) => {
+const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
+                                                                     title, footer, visible,
+                                                                     onCancel, onSubmit, fetchEntities,
+                                                                     defaultSelected = [], maxCount
+}) => {
     const [form] = Form.useForm();
     const [entities, setEntities] = useState<string[]>(defaultSelected);
     const [newEntity, setNewEntity] = useState<string>('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [totalEntities, setTotalEntities] = useState<number>(0);
+    const [totalEntities, setTotalEntities] = useState<number | undefined>(0);
+    const [reqLimit, setReqLimit] = useState<number>(10);
 
     useEffect(() => {
         if (visible && fetchEntities) {
-            fetchEntities(currentPage).then(response => {
+            fetchEntities(currentPage, reqLimit).then(response => {
                 setSearchResults(response.entities);
+                setReqLimit(response.limit || 10);
                 setTotalEntities(response.total);
             });
         }
@@ -94,8 +103,16 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
         },
     };
 
+    function handlePageChange(page_: number){
+        setCurrentPage(page_)
+    }
+
+    function handleLimitChange(limit_: number){
+        setReqLimit(limit_)
+        setCurrentPage(1); // 重置到第一页
+    }
     return (
-        <Modal title="Append Entities" visible={visible} onCancel={onCancel} footer={null}>
+        <Modal title={title || "Append Entities"} visible={visible} onCancel={onCancel} footer={footer}>
             <Form form={form} onFinish={handleFinish}>
                 <Form.Item>
                     <Input
@@ -133,6 +150,16 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
             {fetchEntities && (
                 <>
                     <h3>Search Results</h3>
+                    <PaginationComponent
+                        currentPage={currentPage}
+                        limit={reqLimit}
+                        totalItems={totalEntities}
+                        pageDataLength={searchResults.length}
+                        onPageChange={handlePageChange}
+                        onLimitChange={handleLimitChange}
+                        style={{ marginBottom: 6, textAlign: 'right' }}
+                        size="small"
+                    />
                     <Table
                         size="small"
                         dataSource={searchResults}
@@ -140,12 +167,6 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
                         pagination={false}
                         rowKey="id"
                         rowSelection={rowSelection}
-                    />
-                    <Pagination
-                        current={currentPage}
-                        total={totalEntities}
-                        onChange={page => setCurrentPage(page)}
-                        style={{ marginTop: 16, textAlign: 'right' }}
                     />
                 </>
             )}
