@@ -10,13 +10,8 @@ import { EditableTagField } from '../Common/EditableTagGroup';
 import '../Common/CommonStyles.css';
 import './BookDetail.css';
 import EmbedItemList from "./EmbedItemList";
+import {Book} from "../Common/dto";
 
-interface Book {
-    id?: string;
-    title: string;
-    description: string;
-    tags?: string[];
-}
 
 const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -45,7 +40,7 @@ const BookDetail: React.FC = () => {
                     setBook(data); // 仅用来 Loading
                     form.setFieldsValue(data);
                 } else {
-                    setBook({ title: '', description: '', tags: [] });
+                    setBook({ id: '', title: '', description: '', tags: [] });
                 }
             } catch (error) {
                 console.error(error);

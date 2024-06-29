@@ -28,10 +28,11 @@ export const deleteItem = async (id: string) => {
 };
 
 // 上传文件批量导入 items
-export const uploadItems = async (file: File) => {
+export const uploadItems = async (file: File, params: {book_id?: string}) => {
     const formData = new FormData();
     formData.append('file', file);
     return axios.post('/items/upload', formData, {
+        params,
         headers: {
             'Content-Type': 'multipart/form-data',
         },

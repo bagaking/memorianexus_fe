@@ -8,13 +8,7 @@ import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';
-
-interface Book {
-    id: string;
-    title: string;
-    description: string;
-    tags?: string[];
-}
+import {Book} from "../Common/dto";
 
 const BookList: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);

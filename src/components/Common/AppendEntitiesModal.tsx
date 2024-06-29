@@ -9,9 +9,15 @@ interface AppendEntitiesModalProps {
     onSubmit: (entityIds: string[]) => void;
     fetchEntities?: (page: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
     defaultSelected?: string[];
+    maxCount?: number; // 新增 maxCount 属性
 }
 
-const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCancel, onSubmit, fetchEntities, defaultSelected = [] }) => {
+export interface EntityModalDataModel{
+    id: string
+    content: string
+}
+
+const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCancel, onSubmit, fetchEntities, defaultSelected = [], maxCount }) => {
     const [form] = Form.useForm();
     const [entities, setEntities] = useState<string[]>(defaultSelected);
     const [newEntity, setNewEntity] = useState<string>('');
@@ -37,10 +43,9 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
     }, [visible, defaultSelected]);
 
     const handleAddEntity = () => {
-        if (newEntity.trim() && !entities.includes(newEntity.trim())) {
+        if (newEntity.trim() && !entities.includes(newEntity.trim()) && (!maxCount || entities.length < maxCount)) {
             setEntities([...entities, newEntity.trim()]);
             setNewEntity('');
-
         }
     };
 
@@ -55,7 +60,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
     };
 
     const handleAddFromSearch = (entityId: string) => {
-        if (!entities.includes(entityId)) {
+        if (!entities.includes(entityId) && (!maxCount || entities.length < maxCount)) {
             setEntities([...entities, entityId]);
         }
     };
@@ -76,7 +81,9 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
             title: 'Action',
             key: 'action',
             render: (text: string, record: any) =>
-                <Button type="link" onClick={() => handleAddFromSearch(record.id)} disabled={entities.includes(record.id)}>Add</Button>,
+                <Button type="link" onClick={() => handleAddFromSearch(record.id)} disabled={
+                    !!(entities.includes(record.id) || (maxCount && entities.length >= maxCount))
+                }>Add</Button>,
         },
     ];
 
@@ -96,9 +103,14 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({ visible, onCa
                         onChange={e => setNewEntity(e.target.value)}
                         placeholder="Enter entity ID"
                         onPressEnter={handleAddEntity}
+                        disabled={
+                            !!(maxCount && entities.length >= maxCount)
+                        } // 禁用输入框
                     />
 
-                    <Button type="dashed" onClick={handleAddEntity} style={{ marginTop: 8 }}>
+                    <Button type="dashed" onClick={handleAddEntity} style={{ marginTop: 8 }} disabled={
+                        !!(maxCount && entities.length >= maxCount)
+                    }>
                         Add Entity
                     </Button>
                 </Form.Item>

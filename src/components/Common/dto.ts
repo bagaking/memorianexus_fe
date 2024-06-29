@@ -21,3 +21,11 @@ export interface Item {
     book_ids?: number[];
     tags?: string[];
 }
+
+
+export interface Book {
+    id: string;
+    title: string;
+    description: string;
+    tags?: string[];
+}

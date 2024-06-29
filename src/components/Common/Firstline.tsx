@@ -13,7 +13,7 @@ interface FirstLineProps {
 }
 
 const FirstLine: React.FC<FirstLineProps> = ({ content, color, placement, showName, link }) => {
-    const firstLine = content.split('\n')[0]; // 提取首行内容
+    const firstLine = (content || "").split('\n')[0]; // 提取首行内容
 
     return (
         <Tooltip
