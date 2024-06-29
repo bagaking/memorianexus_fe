@@ -1,4 +1,3 @@
-// src/components/Items/ItemList.tsx
 import React, { useEffect, useState } from 'react';
 import { Table, message, Button, Card } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -7,7 +6,9 @@ import { getItems, deleteItem } from '../../api/items';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
+import ItemUpload from './ItemUpload'; // 引入 ItemUpload 组件
 import '../Common/CommonStyles.css';
+import './ItemList.css'; // 引入新的样式文件
 
 interface Item {
     id: string;
@@ -146,9 +147,14 @@ const ItemList: React.FC = () => {
 
     return (
         <PageLayout title="Items" icon="/item_icon.png">
-            <Link to="/items/new">
-                <Button type="primary" style={{ marginBottom: '16px', width: "100%" }} className="create-new-one-button">Create New Item</Button>
-            </Link>
+            <div className="action-cards-container">
+                <Link to="/items/new" className="action-card create-card">
+                    <Button type="primary" size="large" className="action-card-button">Create New Item</Button>
+                </Link>
+                <div className="action-card upload-card">
+                    <ItemUpload className="action-card-button" onUploadSuccess={() => fetchItems(currentPage, limit)} />
+                </div>
+            </div>
             <Table
                 columns={columns}
                 dataSource={items}

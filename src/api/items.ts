@@ -26,3 +26,14 @@ export const updateItem = async (id: string, data: { content: string; type: stri
 export const deleteItem = async (id: string) => {
     return axios.delete(`/items/${id}`);
 };
+
+// 上传文件批量导入 items
+export const uploadItems = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axios.post('/items/upload', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};

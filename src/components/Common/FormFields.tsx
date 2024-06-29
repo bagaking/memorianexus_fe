@@ -5,6 +5,10 @@ import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 
+const TyItemFlashCard      = "flash_card"
+const TyItemMultipleChoice = "multiple_choice"
+const TyItemCompletion     = "completion"
+
 interface MarkdownEditorProps {
     name: string;
     label?: string;
@@ -44,9 +48,9 @@ const { Option } = Select;
 export const TypeField: React.FC = () => (
     <Form.Item name="type" rules={[{ required: true, message: 'Please select the item type!' }]}>
         <Select placeholder="Select a type">
-            <Option value="flashcard">Flashcard</Option>
-            <Option value="multiple_choice">Multiple Choice</Option>
-            <Option value="fill_in_the_blank">Fill in the Blank</Option>
+            <Option value={TyItemFlashCard}>Flashcard</Option>
+            <Option value={TyItemMultipleChoice}>Multiple Choice</Option>
+            <Option value={TyItemCompletion}>Fill in the Blank</Option>
         </Select>
     </Form.Item>
 );

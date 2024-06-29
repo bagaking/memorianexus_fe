@@ -1,0 +1,63 @@
+/* src/components/Items/ItemList.css */
+
+.action-cards-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.action-card {
+    flex: 1;
+    margin: 0 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    height: 120px; /* 长宽比约为 1:0.618 */
+}
+
+.create-card {
+    background: linear-gradient(135deg, #f5222daa, #40a9ff);
+}
+
+.upload-card {
+    background: linear-gradient(135deg, #f5222daa, #52c41a);
+}
+
+.create-card:hover {
+    background: linear-gradient(135deg, #f5222daa, #40a9ff);
+}
+
+.upload-card:hover {
+    background: linear-gradient(135deg, #f5222daa, #52c41a);
+}
+
+.action-card-button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+@media (max-width: 768px) {
+    .action-card {
+        height: 48px;
+        border-radius: 4px;
+        margin: 0 2px;
+    }
+
+    .action-card-button {
+        font-size: 16px;
+    }
+}
