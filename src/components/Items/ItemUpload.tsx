@@ -4,7 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { uploadItems } from '../../api/items';
 import AppendEntitiesModal, { EntityModalDataModel } from '../Common/AppendEntitiesModal';
 import { getBooks } from '../../api/books';
-import { Book } from "../Common/dto";
+import { Book } from "../Basic/dto";
 
 interface ItemUploadProps {
     onUploadSuccess: () => void;

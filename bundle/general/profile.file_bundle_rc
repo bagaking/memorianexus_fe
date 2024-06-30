@@ -1,8 +1,10 @@
 entry = [
     "./src/profile*",
-    "./src/components/Dungeons/**/*",
+    "./src/components/Profile/**/*",
+
     "./src/components/Common/**/*",
-    "./src/components/Layout/**/*"
+    "./src/components/Basic/**/*",
+    "./src/components/Layout/**/*",
 ]
 
 exclude = [

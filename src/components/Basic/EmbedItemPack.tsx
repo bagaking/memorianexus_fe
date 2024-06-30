@@ -1,21 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import {Table, message, Button, Switch, List, Space, Card, Tooltip} from 'antd';
+import { Table, message, Button, Switch, List, Space } from 'antd';
 import PaginationComponent from '../Common/PaginationComponent';
-import FirstLine from "../Common/Firstline";
 import AppendEntitiesModal from '../Common/AppendEntitiesModal';
-import { Item } from "../Common/dto";
-import Markdown from "react-markdown";
-import ItemCard from "./ItemCard";
+import { ColumnsType } from "antd/es/table";
+import {ListGridType} from "antd/es/list";
 
-interface ItemListProps {
-    fetchItems: (page: number, limit: number) => Promise<{ entities: Item[], total: number, offset?: number, limit?: number, error?: string }>;
-    fetchItemsToAdd: (page: number, limit: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
+interface EmbedItemPackProps<T> {
+    fetchItems: (page: number, limit: number) => Promise<{ entities: T[], total: number, offset?: number, limit?: number, error?: string }>;
+
+    // for mod items
     addItems?: (entityIds: string[]) => Promise<void>;
+    fetchItemsToAdd: (page: number, limit: number) => Promise<{ entities: T[], total: number, offset?: number, limit?: number }>;
     deleteItems?: (entityIds: string[]) => Promise<void>;
+
+    // for card select & table index
+    rowKey: string,
+
+    // for table
+    itemsColumns?: ColumnsType<T>;
+
+    // for card list
+    renderItem?: (item: T, selected: boolean, onSelect: () => void) => React.ReactNode;
+    grid?: ListGridType,
 }
 
-const EmbedItemList: React.FC<ItemListProps> = ({ fetchItems, fetchItemsToAdd, addItems, deleteItems }) => {
-    const [items, setItems] = useState<Item[]>([]);
+const EmbedItemPack = <T extends {}>({
+                                                     fetchItems,
+                                                     fetchItemsToAdd,
+                                                     addItems,
+                                                     deleteItems,
+                                                     itemsColumns,
+                                                     renderItem,
+                                                     rowKey,
+                                                     grid,
+                                                 }: EmbedItemPackProps<T>) => {
+    const [items, setItems] = useState<T[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(true);
 
@@ -65,40 +84,6 @@ const EmbedItemList: React.FC<ItemListProps> = ({ fetchItems, fetchItemsToAdd, a
     const showAddEntitiesModal = () => {
         setAddEntitiesModalVisible(true);
     };
-
-    const itemsColumns = [
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-        },
-        {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-        },
-        {
-            title: 'Content',
-            dataIndex: 'content',
-            key: 'content',
-            render: (text: string, record: Item) => <FirstLine content={text} link={"/items/" + record.id} />,
-        },
-        {
-            title: 'Creator ID',
-            dataIndex: 'creator_id',
-            key: 'creator_id',
-        },
-        {
-            title: 'Difficulty',
-            dataIndex: 'difficulty',
-            key: 'difficulty',
-        },
-        {
-            title: 'Importance',
-            dataIndex: 'importance',
-            key: 'importance',
-        },
-    ];
 
     const rowSelection = {
         selectedRowKeys,
@@ -181,28 +166,27 @@ const EmbedItemList: React.FC<ItemListProps> = ({ fetchItems, fetchItemsToAdd, a
                 onPageChange={handleItemsPageChange}
                 onLimitChange={handleLimitChange}
             />
-            {viewMode === 'table' ? (
+            {(itemsColumns && viewMode === 'table') ? (
                 <Table
                     columns={itemsColumns}
                     dataSource={items}
-                    rowKey="id"
+                    rowKey={rowKey}
                     pagination={false}
                     loading={loading}
                     rowSelection={rowSelection}
                 />
             ) : (
                 <List
-                    grid={{ gutter: 12, column: 5 }}
+                    grid={grid || { gutter: 12, column: 5 }}
                     dataSource={items}
                     renderItem={item => (
                         <List.Item>
-                            <Tooltip title={()=><Markdown>{item.content}</Markdown>}>
-                                <ItemCard
-                                    item={item}
-                                    onClick={() => handleCardSelect(item.id)}
-                                    selected={selectedRowKeys.includes(item.id)}
-                                />
-                            </Tooltip>
+                            {renderItem && renderItem(
+                                item,
+                                selectedRowKeys.includes((item as any)[rowKey]),
+                                () => handleCardSelect((item as any)[rowKey]),
+                                )
+                            }
                         </List.Item>
                     )}
                 />
@@ -218,4 +202,4 @@ const EmbedItemList: React.FC<ItemListProps> = ({ fetchItems, fetchItemsToAdd, a
     );
 };
 
-export default EmbedItemList;
+export default EmbedItemPack;

@@ -2,8 +2,10 @@ entry = [
     "./src/api/book*",
     "./src/api/item*",
     "./src/components/Items/**/*",
+
     "./src/components/Common/**/*",
-    "./src/components/Layout/**/*"
+    "./src/components/Basic/**/*",
+    "./src/components/Layout/**/*",
 ]
 
 exclude = [

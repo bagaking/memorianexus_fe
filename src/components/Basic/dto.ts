@@ -11,7 +11,7 @@ export interface DungeonMonster {
     familiarity: number;
     difficulty: string;
     importance: string;
-    created_at: string;
+    created_at?: string;
 }
 
 export interface Item {

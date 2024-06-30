@@ -3,7 +3,10 @@ entry = [
     "./api/campaign*",
     "./api/axios*",
     "./src/components/Dungeons/**/*",
-    "./src/components/Common/**/*"
+
+    "./src/components/Common/**/*",
+    "./src/components/Basic/**/*",
+    "./src/components/Layout/**/*",
 ]
 
 exclude = [

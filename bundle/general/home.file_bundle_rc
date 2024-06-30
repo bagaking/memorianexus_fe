@@ -1,7 +1,9 @@
 entry = [
     "./src/components/Home/**/*",
+
     "./src/components/Common/**/*",
-    "./src/components/Layout/**/*"
+    "./src/components/Basic/**/*",
+    "./src/components/Layout/**/*",
 ]
 
 exclude = [

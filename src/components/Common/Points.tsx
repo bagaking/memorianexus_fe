@@ -1,6 +1,5 @@
 // src/components/Common/Points.tsx
 import React from 'react';
-import { Card } from 'antd';
 import gemIcon from '../../assets/icons/gem_icon.png';
 import goldIcon from '../../assets/icons/gold_icon.png';
 import vipIcon from '../../assets/icons/vip_icon.png';

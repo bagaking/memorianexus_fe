@@ -5,9 +5,10 @@ import Markdown from "react-markdown";
 import "./ItemCard.css";
 import Meta from "antd/es/card/Meta";
 import {Link} from "react-router-dom";
+import {Item} from "./dto";
 
 interface ItemCardProps {
-    item: { id: string, content: string };
+    item: Item;
     onClick?: () => void;
     selected?: boolean;
 }

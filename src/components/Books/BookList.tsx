@@ -8,7 +8,8 @@ import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';
-import {Book} from "../Common/dto";
+import {Book, Item} from "../Basic/dto";
+import FirstLine from "../Common/Firstline";
 
 const BookList: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
@@ -129,6 +130,8 @@ const BookList: React.FC = () => {
             ),
         },
     ];
+
+
 
     const expandedRowRender = (record: Book) => (
         <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>

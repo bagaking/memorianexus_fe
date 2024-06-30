@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { message, Card, Progress, Button } from 'antd';
 import { getPracticeMonsters, submitPracticeResult, getItemById } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
-import { DungeonMonster, Item } from '../Common/dto';
+import { DungeonMonster, Item } from '../Basic/dto';
 import '../Common/CommonStyles.css';
 import './CampaignChallenge.css';
 import Markdown from 'react-markdown';

@@ -7,11 +7,11 @@ import { TitleField, MarkdownField } from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
+import {Book} from "../Basic/dto";
+import BookItemList from "./BookItemList";
+
 import '../Common/CommonStyles.css';
 import './BookDetail.css';
-import EmbedItemList from "./EmbedItemList";
-import {Book} from "../Common/dto";
-import BookItemList from "./BookItemList";
 
 
 const BookDetail: React.FC = () => {

@@ -1,39 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Table, message, Avatar } from 'antd';
-import { getCampaignMonsters } from '../../api/campaigns';
 import { PageLayout } from '../Layout/PageLayout';
+import {DungeonMonster} from "../Basic/dto";
+import EmbedItemPack from "../Basic/EmbedItemPack";
+import {addDungeonItems, getItems, getCampaignMonsters, removeDungeonItems} from "../../api";
+import MonsterCard from "./MonsterCard";
 import '../Common/CommonStyles.css';
-import {DungeonMonster} from "../Common/dto";
-
 
 const DungeonMonsters: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [monsters, setMonsters] = useState<DungeonMonster[]>([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchMonsters = async () => {
-            try {
-                const response = await getCampaignMonsters(id!);
-                setMonsters(response.data.data);
-            } catch (error) {
-                console.error(error);
-                message.error('Failed to fetch monsters');
-            } finally {
-                setLoading(false);
-            }
+    const fetchItems = async (page: number, limit: number = 10) => {
+        const response = await getCampaignMonsters(id!, page, limit);
+        return {
+            entities: response.data.data,
+            total: response.data.total,
+            offset: response.data.offset,
+            limit: response.data.limit,
+            error: response.data.error,
         };
+    };
 
-        fetchMonsters();
-    }, [id]);
+    const fetchItemsToAdd = async (page: number, limit: number) => {
+        const response = await getItems({page, limit});
+        return {
+            entities: response.data.data,
+            total: response.data.total,
+            offset: response.data.offset,
+            limit: response.data.limit,
+        };
+    };
+
+    const addItems = async (itemIds: string[]) => {
+        await addDungeonItems(id!, itemIds);
+    };
+
+    const deleteItems = async (itemIds: string[]) => {
+        await removeDungeonItems(id!, itemIds);
+    };
 
     const columns = [
         {
             title: 'Avatar',
             dataIndex: 'avatar',
             key: 'avatar',
-            render: (text: string) => <Avatar src={text} />
+            render: (text: string) => <Avatar src={text || "/portraits/skeleton_warrior_01.png"} />
         },
         {
             title: 'Item ID',
@@ -71,6 +83,11 @@ const DungeonMonsters: React.FC = () => {
             key: 'importance',
         },
         {
+            title: 'Practice At',
+            dataIndex: 'practice_at',
+            key: 'practice_at',
+        },
+        {
             title: 'Created At',
             dataIndex: 'created_at',
             key: 'created_at',
@@ -79,12 +96,19 @@ const DungeonMonsters: React.FC = () => {
 
     return (
         <PageLayout title="Campaign Monsters" backUrl={`/campaigns/${id}`} icon="/campaign_dungeon_icon.png">
-            <Table
-                columns={columns}
-                dataSource={monsters}
+
+            <EmbedItemPack<DungeonMonster>
+                fetchItems={fetchItems}
+                fetchItemsToAdd={fetchItemsToAdd}
+                addItems={addItems}
+                deleteItems={deleteItems}
+                itemsColumns={columns}
+                renderItem={(monster, selected, onSelect) => <MonsterCard
+                    monster={monster}
+                    onClick={onSelect}
+                    selected={selected}
+                />}
                 rowKey="item_id"
-                loading={loading}
-                pagination={{ pageSize: 10 }}
             />
         </PageLayout>
     );

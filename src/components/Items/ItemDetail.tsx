@@ -8,7 +8,7 @@ import {TypeField, BookIdsField, MarkdownField} from '../Common/FormFields';
 import {EditableTagField} from '../Common/EditableTagGroup'
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
-import {DefaultItem, Item} from "../Common/dto";
+import {DefaultItem, Item} from "../Basic/dto";
 import '../Common/CommonStyles.css';
 
 

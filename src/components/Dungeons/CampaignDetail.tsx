@@ -9,11 +9,12 @@ import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
 import AppendEntitiesModal from '../Common/AppendEntitiesModal';
 import { getItems } from "../../api/items";
-import { DungeonMonster } from "../Common/dto";
+import { DungeonMonster } from "../Basic/dto";
 import { getBookItems, getTagItems } from "../../api/books";
 
 import '../Common/CommonStyles.css';
 import './CampaignDetail.css';
+import EmbedItemPack from "../Basic/EmbedItemPack";
 
 const { Option } = Select;
 
@@ -206,6 +207,7 @@ const CampaignDetail: React.FC = () => {
                 <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)}/>
 
                 {(id && id !== 'new') ?
+
                 <div className="campaign-items-container">
                     <h2>Campaign Items</h2>
                     <Table className="min-height-table" style={{marginBottom:"16px"}} columns={columns} dataSource={items} rowKey="item_id"/>
