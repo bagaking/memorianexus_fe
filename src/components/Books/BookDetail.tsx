@@ -11,6 +11,7 @@ import '../Common/CommonStyles.css';
 import './BookDetail.css';
 import EmbedItemList from "./EmbedItemList";
 import {Book} from "../Common/dto";
+import BookItemList from "./BookItemList";
 
 
 const BookDetail: React.FC = () => {
@@ -104,7 +105,7 @@ const BookDetail: React.FC = () => {
 
                 <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
                 {(id && id !== "new") &&
-                    <EmbedItemList bookId={id} />
+                    <BookItemList bookId={id} />
                 }
 
         </PageLayout>

@@ -1,0 +1,33 @@
+/* ItemCard.css */
+.item-card {
+    height: 200px; /* 固定高度 */
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s ease; /* 添加过渡效果 */
+    cursor: pointer;
+}
+
+.item-preview-container {
+    height: 168px;
+    overflow: hidden;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.item-card:hover {
+    width: auto;
+    min-height: 180px;
+    min-width: 100%;
+    z-index: 1; /* 提升 z-index 以避免被其他元素遮挡 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+}
+
+.item-card.selected {
+    background-color: #88ea8d; /* 选中卡片的背景颜色 */
+    border-color: #95fbef;
+}
+
+.item-card-content {
+    max-height: 90%; /* 确保内容不超出卡片 */
+    overflow: hidden;
+}

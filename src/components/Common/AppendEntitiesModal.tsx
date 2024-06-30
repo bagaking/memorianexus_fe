@@ -10,7 +10,7 @@ interface AppendEntitiesModalProps {
     visible: boolean;
     onCancel: () => void;
     onSubmit: (entityIds: string[]) => void;
-    fetchEntities?: (page: number, limit?: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
+    fetchEntities?: (page: number, limit: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
     defaultSelected?: string[];
     maxCount?: number; // 新增 maxCount 属性
 }

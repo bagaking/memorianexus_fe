@@ -23,7 +23,7 @@ const FirstLine: React.FC<FirstLineProps> = ({ content, color, placement, showNa
                     margin: 0, padding: 0, height: 'auto', lineHeight: 'normal', background:"transparent", border: "none"
                 }}>
                     <Markdown>{content}</Markdown>
-                    {link && <Link to={link}>跳转</Link>}
+                    {link && <Link to={link} target="_blank">跳转</Link>}
                 </Card>
             }
             color={color || "lightblue"}

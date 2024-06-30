@@ -15,13 +15,25 @@ export interface DungeonMonster {
 }
 
 export interface Item {
-    id?: string;
-    content: string;
+    id: string;
     type: string;
+    content: string;
+
+    creator_id?: string;
     book_ids?: number[];
     tags?: string[];
+
+    created_at?: string;
+    updated_at?: string;
+    difficulty?: number;
+    importance?: number;
 }
 
+export const DefaultItem: Item = {
+    id: "",
+    type: "",
+    content: "",
+}
 
 export interface Book {
     id: string;

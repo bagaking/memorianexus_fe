@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, message } from 'antd';
-import { getItemById, updateItem, createItem, deleteItem } from '../../api/items';
+import { getItemById, updateItem, createItem, deleteItem } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
 import {TypeField, BookIdsField, MarkdownField} from '../Common/FormFields';
 import {EditableTagField} from '../Common/EditableTagGroup'
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
+import {DefaultItem, Item} from "../Common/dto";
 import '../Common/CommonStyles.css';
-import {Item} from "../Common/dto";
 
 
 const ItemDetail: React.FC = () => {
@@ -28,7 +28,7 @@ const ItemDetail: React.FC = () => {
                     setItem(data);
                     form.setFieldsValue(data);
                 } else {
-                    setItem({ content: '', type: '' });
+                    setItem(DefaultItem);
                 }
             } catch (error) {
                 console.error(error);

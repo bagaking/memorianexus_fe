@@ -1,105 +1,69 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button } from 'antd';
-import { getBookItems, addBookItems, removeBookItems } from '../../api/books';
+import {Table, message, Button, Switch, List, Space, Card, Tooltip} from 'antd';
 import PaginationComponent from '../Common/PaginationComponent';
 import FirstLine from "../Common/Firstline";
 import AppendEntitiesModal from '../Common/AppendEntitiesModal';
-import {getItems} from "../../api/items";
-
-interface Item {
-    id: string;
-    creator_id: string;
-    type: string;
-    content: string;
-    created_at: string;
-    updated_at: string;
-    difficulty: number;
-    importance: number;
-}
+import { Item } from "../Common/dto";
+import Markdown from "react-markdown";
+import ItemCard from "./ItemCard";
 
 interface ItemListProps {
-    bookId: string;
+    fetchItems: (page: number, limit: number) => Promise<{ entities: Item[], total: number, offset?: number, limit?: number, error?: string }>;
+    fetchItemsToAdd: (page: number, limit: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
+    addItems?: (entityIds: string[]) => Promise<void>;
+    deleteItems?: (entityIds: string[]) => Promise<void>;
 }
 
-const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
+const EmbedItemList: React.FC<ItemListProps> = ({ fetchItems, fetchItemsToAdd, addItems, deleteItems }) => {
     const [items, setItems] = useState<Item[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(true);
+
     const [currentItemsPage, setCurrentItemsPage] = useState(1);
-    const [itemsLimit, setItemsLimit] = useState(10);
+    const [currentItemLimit, setCurrentItemLimit] = useState(10);
     const [addEntitiesModalVisible, setAddEntitiesModalVisible] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
-    const fetchItems = async (bookId: string) => {
+    const doFetch = async () => {
         setLoading(true);
         try {
-            const response = await getBookItems({ bookId, page: currentItemsPage, limit: itemsLimit });
-            const data = response.data.data;
+            const response = await fetchItems(currentItemsPage, currentItemLimit);
+            if (!!response.error) {
+                message.error('invalid items data, ' + response.error);
+            }
+            setItems(response.entities);
+            const data = response.entities;
             if (Array.isArray(data)) {
-                setItems(data);
-                if (!!response.data.total) {
-                    setTotalItems(response.data.total);
+                if (!!response.total) {
+                    setTotalItems(response.total);
                 }
             } else {
                 message.error('Invalid items data format');
             }
         } catch (error) {
             console.error(error);
-            message.error('Failed to fetch items of book ' + bookId + ', err= ' + error);
+            message.error('Failed to fetch items, err= ' + error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchItems(bookId);
-    }, [bookId, currentItemsPage, itemsLimit]);
+        doFetch();
+    }, [currentItemsPage, currentItemLimit]);
 
     const handleItemsPageChange = (page: number) => {
         setCurrentItemsPage(page);
     };
 
     const handleLimitChange = (newLimit: number) => {
-        setItemsLimit(newLimit);
+        setCurrentItemLimit(newLimit);
         setCurrentItemsPage(1); // 重置到第一页
     };
 
     const showAddEntitiesModal = () => {
         setAddEntitiesModalVisible(true);
-    };
-
-    const handleAddEntitiesSubmit = async (entityIds: string[]) => {
-        try {
-            await addBookItems({ bookId, itemIds: entityIds });
-            message.success('Items added successfully');
-            fetchItems(bookId);
-            setAddEntitiesModalVisible(false);
-        } catch (error) {
-            console.error(error);
-            message.error('Failed to add items to book');
-        }
-    };
-
-    const handleDelete = async () => {
-        try {
-            await removeBookItems({ bookId, itemIds: selectedRowKeys as string[] });
-            message.success('Items deleted successfully');
-            fetchItems(bookId);
-        } catch (error) {
-            console.error(error);
-            message.error('Failed to delete items from book');
-        }
-    };
-
-    const fetchCandidateEntities = async (page: number, limit: number = 10) => {
-        const response = await getItems({ page, limit });
-        const data = response.data;
-        return {
-            entities: data.data,
-            total: data.total,
-            limit: data.limit,
-            offset: data.offset,
-        };
     };
 
     const itemsColumns = [
@@ -143,38 +107,108 @@ const EmbedItemList: React.FC<ItemListProps> = ({ bookId }) => {
         },
     };
 
+    const handleDeleteEntities = async () => {
+        if (!deleteItems) return;
+        const selectedIds = selectedRowKeys.map(key => key.toString());
+        try {
+            await deleteItems(selectedIds);
+            message.success('items delete successfully');
+            doFetch();
+        } catch (error) {
+            message.error('Failed to delete items');
+        }
+    };
+
+    const handleAddEntitiesSubmit = async (selectedIds: string[]) => {
+        if (!addItems) return;
+        try {
+            await addItems(selectedIds);
+            message.success('Items added successfully');
+            setAddEntitiesModalVisible(false);
+            doFetch();
+        } catch (error) {
+            message.error('Failed to add items');
+        }
+    };
+
+    const fetchCandidateEntities = async (page: number, limit: number) => {
+        const response = await fetchItemsToAdd(page, limit);
+        return {
+            entities: response.entities,
+            total: response.total,
+            offset: response.offset,
+            limit: response.limit,
+        };
+    };
+
+    const handleCardSelect = (id: string) => {
+        const newSelectedRowKeys = selectedRowKeys.includes(id)
+            ? selectedRowKeys.filter(key => key !== id)
+            : [...selectedRowKeys, id];
+        setSelectedRowKeys(newSelectedRowKeys);
+    };
+
     return (
         <div style={{
             padding: "12px",
             borderRadius: "8px",
             background: "linear-gradient(135deg, #b6cce6 0%, #b0cce3 100%)"
         }}>
-            <Button type="primary" onClick={showAddEntitiesModal} style={{marginBottom: '16px'}}>
-                Add Items
-            </Button>
-            <Button type="primary" danger onClick={handleDelete} disabled={!selectedRowKeys.length}
-                    style={{marginBottom: '16px', marginLeft: '8px'}}>
-                Delete Selected
-            </Button>
+            <Space style={{ marginBottom: '16px' }}>
+                {addItems && (
+                    <Button type="primary" onClick={showAddEntitiesModal}>
+                        Add Items
+                    </Button>
+                )}
+                {deleteItems && (
+                    <Button type="primary" danger onClick={handleDeleteEntities} disabled={!selectedRowKeys.length}>
+                        Delete Selected {selectedRowKeys.length} Items
+                    </Button>
+                )}
+                <Switch
+                    checkedChildren="Grid"
+                    unCheckedChildren="Table"
+                    checked={viewMode === 'grid'}
+                    onChange={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
+                />
+            </Space>
+
             <PaginationComponent
                 currentPage={currentItemsPage}
                 totalItems={totalItems}
                 pageDataLength={items.length}
-                limit={itemsLimit}
+                limit={currentItemLimit}
                 onPageChange={handleItemsPageChange}
                 onLimitChange={handleLimitChange}
             />
-            <Table
-                columns={itemsColumns}
-                dataSource={items}
-                rowKey="id"
-                pagination={false}
-                loading={loading}
-                rowSelection={rowSelection}
-            />
-
+            {viewMode === 'table' ? (
+                <Table
+                    columns={itemsColumns}
+                    dataSource={items}
+                    rowKey="id"
+                    pagination={false}
+                    loading={loading}
+                    rowSelection={rowSelection}
+                />
+            ) : (
+                <List
+                    grid={{ gutter: 12, column: 5 }}
+                    dataSource={items}
+                    renderItem={item => (
+                        <List.Item>
+                            <Tooltip title={()=><Markdown>{item.content}</Markdown>}>
+                                <ItemCard
+                                    item={item}
+                                    onClick={() => handleCardSelect(item.id)}
+                                    selected={selectedRowKeys.includes(item.id)}
+                                />
+                            </Tooltip>
+                        </List.Item>
+                    )}
+                />
+            )}
             <AppendEntitiesModal
-                title={"选择要添加到这本书里的 items"}
+                title={"选择要添加的 items"}
                 visible={addEntitiesModalVisible}
                 onCancel={() => setAddEntitiesModalVisible(false)}
                 onSubmit={handleAddEntitiesSubmit}
