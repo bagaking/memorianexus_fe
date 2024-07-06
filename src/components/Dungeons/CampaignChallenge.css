@@ -13,22 +13,26 @@
     transition: transform 0.2s;
 }
 
-/* 怪物详情样式 */
-.monster-detail {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap; /* 确保在小屏幕上换行 */
-}
-
 /* 卡片内容样式 */
-.monster-card {
-    flex: 1;
+.campaign-challenge-monster-card {
+    /*flex: 1;*/
+    width: 50%;
     margin: 12px;
     cursor: pointer;
+    height: calc(max(100vw / 3, 56vh));
+    overflow: scroll;
     transition: transform 0.2s;
     background: #fff;
     border-radius: 10px;
     text-align: center;
+}
+
+/* 怪物详情样式 */
+.campaign-challenge-monster-detail {
+    display: flex;
+    justify-content: space-between;
+    /*height: calc(100vw / 3.4);*/
+    flex-wrap: wrap; /* 确保在小屏幕上换行 */
 }
 
 /* 按钮样式 */
@@ -49,20 +53,34 @@
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
+
 }
 
-/* 华丽的怪物图片容器样式 */
-.monster-image-container {
+.campaign-challenge-monster-text-container {
     position: relative;
     width: 100%;
-    height: auto; /* 根据需要调整高度 */
+    height: auto;
+    min-height: 240px;
     max-height: 60vh;
-    overflow: hidden;
+    overflow: scroll;
     border-radius: 12px;
+    text-align: left;
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.monster-image-container img {
+/* 华丽的怪物图片容器样式 */
+.campaign-challenge-monster-image-container {
+    position: relative;
+    width: 100%;
+    height: auto; /* 根据需要调整高度 */
+    max-height:60vh;
+    overflow: hidden;
+    border-radius: 12px;
+    text-align: left;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.campaign-challenge-monster-image-container img {
     width: 100%;
     height: auto;
     object-fit: contain; /* 确保立绘高度适配 */
@@ -71,7 +89,7 @@
     border-radius: 0;
 }
 
-.monster-image-container::before {
+.campaign-challenge-monster-image-container::before {
     content: '';
     position: absolute;
     top: 0;
@@ -90,7 +108,7 @@
 
 /* 媒体查询：在手机上调整布局 */
 @media (max-width: 768px) {
-    .monster-detail {
+    .campaign-challenge-monster-detail {
         flex-direction: column; /* 垂直排列 */
         align-items: center; /* 居中对齐 */
     }
@@ -108,8 +126,10 @@
         gap: 12px; /* 调整间距 */
     }
 
-    .monster-card {
+    .campaign-challenge-monster-card {
         width: 100%;
         margin: 2px;
+        height: auto;
     }
+
 }

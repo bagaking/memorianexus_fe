@@ -1,8 +1,9 @@
 :root {
     --card-padding: 10px;
-    --card-height: 316px;
-    --card-width: 223px;
-    --card-radius: 24px;
+    --card-width: calc(100vw / 9);
+    --card-scale-rate: 1;
+    --card-height: calc(var(--card-width) / 0.7);
+    --card-radius: calc(24px * var(--card-scale-rate));
     --card-color-lv-1: linear-gradient(to top, #ff4d4faa, transparent);
     --card-color-lv-2: linear-gradient(to top, #faad14aa, transparent);
     --card-color-lv-3: linear-gradient(to top, #52c41aaa, transparent);
@@ -46,13 +47,13 @@
 }
 
 .skill-card-icon {
-    font-size: 24px;
-    margin-right: 8px;
+    font-size: calc(24px * var(--card-scale-rate));
+    margin-right: calc(8px * var(--card-scale-rate));
 }
 
 .skill-card-title {
+    font-size: calc(24px * var(--card-scale-rate));
     text-shadow: #0e2439 2px 4px 6px;
-    font-size: 24px;
     font-weight: bold;
     text-align: center;
 }
@@ -99,8 +100,8 @@
 /* 媒体查询：在手机上调整布局 */
 @media (max-width: 768px) {
     .skill-card {
-        height: calc(var(--card-height) / 4.3);
-        width: calc(var(--card-width) / 4.3);
+        width: calc(100vw / 7);
+        height: calc(100vw / 7 * 1.618);
         border-radius:  calc(var(--card-radius) / 3);
         padding: 6px; /* 调整技能卡片的内边距 */
     }
@@ -109,11 +110,11 @@
         padding: 1px; /* 调整技能卡片内容的内边距 */
     }
 
-    .skill-card-title {
-        font-size: 8px; /* 调整技能卡片标题的字体大小 */
-    }
+    /*.skill-card-title {*/
+    /*    font-size: 8px; !* 调整技能卡片标题的字体大小 *!*/
+    /*}*/
 
-    .skill-card-icon {
-        font-size: 8px; /* 调整技能卡片图标的字体大小 */
-    }
+    /*.skill-card-icon {*/
+    /*    font-size: 8px; !* 调整技能卡片图标的字体大小 *!*/
+    /*}*/
 }

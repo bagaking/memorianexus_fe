@@ -76,17 +76,17 @@ const CampaignChallenge: React.FC = () => {
         <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
             <div className="campaign-challenge-background">
                 <div className="campaign-detail-card">
-                    <div className="monster-detail">
-                        <Card className="monster-card" onClick={() => setShowFullContent(!showFullContent)}>
-                            <Progress percent={50} status="active" style={{ marginBottom: '20px' }} />
+                    <div className="campaign-challenge-monster-detail">
+                        <Card className="campaign-challenge-monster-card" onClick={() => setShowFullContent(!showFullContent)}>
+                            <Progress percent={currentMonster.familiarity} status="active" style={{ marginBottom: '20px' }} />
                             {showFullContent ? (
-                                <div style={{ textAlign: 'left' }}>
+                                <div className="campaign-challenge-monster-text-container" style={{ textAlign: 'left' }}>
                                     <Markdown>
                                         {currentItemDetail?.content || ''}
                                     </Markdown>
                                 </div>
                             ) : (
-                                <div className="monster-image-container">
+                                <div className="campaign-challenge-monster-image-container">
                                     <Markdown>{firstNonEmptyLine || ''}</Markdown>
                                     <img className="left-portrait" src="/portraits/skeleton_warrior_01.png" alt="Monster Avatar" />
                                 </div>
