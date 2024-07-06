@@ -13,6 +13,11 @@ const DungeonMonsters: React.FC = () => {
 
     const fetchItems = async (page: number, limit: number = 10) => {
         const response = await getCampaignMonsters(id!, page, limit);
+        // for (let i = 0; i < response.data.data.length; i ++ ){
+        //     if(!response.data.data[i].id) {
+        //         response.data.data[i].id = response.data.data[i].item_id
+        //     }
+        // }
         return {
             entities: response.data.data,
             total: response.data.total,

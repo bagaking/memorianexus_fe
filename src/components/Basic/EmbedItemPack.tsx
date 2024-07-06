@@ -10,7 +10,7 @@ interface EmbedItemPackProps<T> {
 
     // for mod items
     addItems?: (entityIds: string[]) => Promise<void>;
-    fetchItemsToAdd: (page: number, limit: number) => Promise<{ entities: T[], total: number, offset?: number, limit?: number }>;
+    fetchItemsToAdd: (page: number, limit: number, search?: string) => Promise<{ entities: T[], total: number, offset?: number, limit?: number }>;
     deleteItems?: (entityIds: string[]) => Promise<void>;
 
     // for card select & table index
@@ -116,8 +116,8 @@ const EmbedItemPack = <T extends {}>({
         }
     };
 
-    const fetchCandidateEntities = async (page: number, limit: number) => {
-        const response = await fetchItemsToAdd(page, limit);
+    const fetchCandidateEntities = async (page: number, limit: number, search?: string) => {
+        const response = await fetchItemsToAdd(page, limit, search);
         return {
             entities: response.entities,
             total: response.total,

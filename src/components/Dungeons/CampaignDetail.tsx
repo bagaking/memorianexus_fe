@@ -7,14 +7,13 @@ import { TitleField, MarkdownField } from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
-import AppendEntitiesModal from '../Common/AppendEntitiesModal';
 import { getItems } from "../../api/items";
 import { DungeonMonster } from "../Basic/dto";
 import { getBookItems, getTagItems } from "../../api/books";
+import AppendEntitiesModal from '../Common/AppendEntitiesModal';
 
 import '../Common/CommonStyles.css';
 import './CampaignDetail.css';
-import EmbedItemPack from "../Basic/EmbedItemPack";
 
 const { Option } = Select;
 
@@ -240,7 +239,7 @@ const CampaignDetail: React.FC = () => {
                     onCancel={() => setAddEntitiesModalVisible(false)}
                     onSubmit={handleAddEntitiesSubmit}
                     fetchEntities={fetchEntities}
-                    defaultSelected={items.map(item => item.item_id)}
+                    defaultSelected={items.map(monster => ({ id: monster.item_id, content: monster.description}))}
                 />
             </Card>
 

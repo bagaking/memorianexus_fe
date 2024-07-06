@@ -1,77 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Table, Button, List, Input } from 'antd';
+import { Modal, Form, Table, Button, List, Input, Space, Card } from 'antd';
 import { Key, RowSelectMethod, TableRowSelection } from "antd/es/table/interface";
 import FirstLine from "./Firstline";
 import PaginationComponent from "./PaginationComponent";
 
 interface AppendEntitiesModalProps {
-    title?: React.ReactNode
-    footer?: React.ReactNode
+    title?: React.ReactNode;
+    footer?: React.ReactNode;
     visible: boolean;
     onCancel: () => void;
     onSubmit: (entityIds: string[]) => void;
-    fetchEntities?: (page: number, limit: number) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
-    defaultSelected?: string[];
-    maxCount?: number; // 新增 maxCount 属性
+    fetchEntities?: (page: number, limit: number, search?: string) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
+    defaultSelected?: EntityModalDataModel[];
+    maxCount?: number;
+    enableSearch?: boolean;
 }
 
-export interface EntityModalDataModel{
-    id: string
-    content: string
+export interface EntityModalDataModel {
+    id: string;
+    content: string;
 }
 
 const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                                                                      title, footer, visible,
                                                                      onCancel, onSubmit, fetchEntities,
-                                                                     defaultSelected = [], maxCount
-}) => {
+                                                                     defaultSelected = [], maxCount, enableSearch
+                                                                 }) => {
     const [form] = Form.useForm();
-    const [entities, setEntities] = useState<string[]>(defaultSelected);
+    const [entities, setEntities] = useState<EntityModalDataModel[]>(defaultSelected);
     const [newEntity, setNewEntity] = useState<string>('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<EntityModalDataModel[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalEntities, setTotalEntities] = useState<number | undefined>(0);
     const [reqLimit, setReqLimit] = useState<number>(10);
+    const [searchKeyword, setSearchKeyword] = useState<string>('');
 
     useEffect(() => {
         if (visible && fetchEntities) {
-            fetchEntities(currentPage, reqLimit).then(response => {
+            fetchEntities(currentPage, reqLimit, searchKeyword).then(response => {
                 setSearchResults(response.entities);
                 setReqLimit(response.limit || 10);
                 setTotalEntities(response.total);
             });
         }
-
-    }, [visible, currentPage, fetchEntities, reqLimit]);
+    }, [visible, currentPage, fetchEntities, reqLimit, searchKeyword]);
 
     useEffect(() => {
         if (visible) {
-            // setEntities(defaultSelected); // 这句导致 Maximum update depth exceeded
-            form.setFieldsValue({ entities: defaultSelected });
+            form.setFieldsValue({ entities: defaultSelected.map(item => item.id) });
         }
     }, [visible, defaultSelected]);
 
     const handleAddEntity = () => {
-        if (newEntity.trim() && !entities.includes(newEntity.trim()) && (!maxCount || entities.length < maxCount)) {
-            setEntities([...entities, newEntity.trim()]);
+        if (newEntity.trim() && !entities.some(e => e.id === newEntity.trim()) && (!maxCount || entities.length < maxCount)) {
+            setEntities([...entities, { id: newEntity.trim(), content: '' }]);
             setNewEntity('');
         }
     };
 
-    const handleRemoveEntity = (entity: string) => {
-        setEntities(entities.filter(e => e !== entity));
+    const handleRemoveEntity = (entityId: string) => {
+        setEntities(entities.filter(e => e.id !== entityId));
     };
 
     const handleFinish = () => {
-        onSubmit(entities);
+        onSubmit(entities.map(e => e.id));
         setEntities([]);
         form.resetFields();
     };
 
-    const handleAddFromSearch = (entityId: string) => {
-        if (!entities.includes(entityId) && (!maxCount || entities.length < maxCount)) {
-            setEntities([...entities, entityId]);
+    const handleAddFromSearch = (entity: EntityModalDataModel) => {
+        if (!entities.some(e => e.id === entity.id) && (!maxCount || entities.length < maxCount)) {
+            setEntities([...entities, entity]);
         }
+    };
+
+    const resetStatus = () => {
+        setEntities(defaultSelected);
+        setNewEntity('');
+        setSearchResults([]);
+        setCurrentPage(1);
+        setTotalEntities(0);
+        setReqLimit(10);
+        setSearchKeyword('');
+        form.resetFields();
+        onCancel();
     };
 
     const columns = [
@@ -84,35 +96,53 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             title: 'Name',
             dataIndex: 'content',
             key: 'name',
-            render: (text: string) => <FirstLine content={text}/>,
+            render: (text: string) => <FirstLine content={text} />,
         },
         {
             title: 'Action',
             key: 'action',
-            render: (text: string, record: any) =>
-                <Button type="link" onClick={() => handleAddFromSearch(record.id)} disabled={
-                    !!(entities.includes(record.id) || (maxCount && entities.length >= maxCount))
+            render: (text: string, record: EntityModalDataModel) =>
+                <Button type="link" onClick={() => handleAddFromSearch(record)} disabled={
+                    !!(entities.some(e => e.id === record.id) || (maxCount && entities.length >= maxCount))
                 }>Add</Button>,
         },
     ];
 
     const rowSelection: TableRowSelection<any> = {
-        selectedRowKeys: entities,
+        selectedRowKeys: entities.map(e => e.id),
         onChange: (selectedRowKeys: Key[], selectedRows: any[], info: { type: RowSelectMethod }) => {
-            setEntities(selectedRowKeys as string[]);
+            const currentPageIds = searchResults.map(item => item.id);
+            const newEntities = entities.filter(entity => !currentPageIds.includes(entity.id)); // Keep entities not on the current page
+
+            selectedRows.forEach(row => {
+                if (!newEntities.some(e => e.id === row.id)) {
+                    newEntities.push(row);
+                }
+            });
+
+            setEntities(newEntities);
         },
     };
 
-    function handlePageChange(page_: number){
-        setCurrentPage(page_)
-    }
+    const handlePageChange = (page_: number) => {
+        setCurrentPage(page_);
+    };
 
-    function handleLimitChange(limit_: number){
-        setReqLimit(limit_)
+    const handleLimitChange = (limit_: number) => {
+        setReqLimit(limit_);
         setCurrentPage(1); // 重置到第一页
-    }
+    };
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchKeyword(e.target.value);
+        setCurrentPage(1); // 重置到第一页
+    };
+
     return (
-        <Modal title={title || "Append Entities"} visible={visible} onCancel={onCancel} footer={footer}>
+        <Modal title={title || "Append Entities"} open={visible} onCancel={() => {
+            resetStatus()
+            onCancel && onCancel()
+        }} footer={footer} width={960} >
             <Form form={form} onFinish={handleFinish}>
                 <Form.Item>
                     <Input
@@ -132,24 +162,34 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                     </Button>
                 </Form.Item>
                 <List
-                    size="small"
+                    grid={{ gutter: 2, column: 4 }}
                     dataSource={entities}
                     renderItem={entity => (
-                        <List.Item actions={[<Button type="link" danger onClick={() => handleRemoveEntity(entity)}>Remove</Button>]}>
-                            <FirstLine content={searchResults.find(x => x.id === entity)?.content} showName={entity}/>
-                        </List.Item>
+                        (() => {
+                            const content = entity.content || searchResults.find(x => x.id === entity.id)?.content || "";
+                            let title = content || "";
+                            if (content.length > 16) {
+                                title = content.substring(0, 13) + " ...";
+                            }
+                            return <List.Item>
+                                <Card
+                                    title={entity.id}
+                                    size="small"
+                                    extra={[<Button type="link" danger onClick={() => handleRemoveEntity(entity.id)}>Remove</Button>]}>
+                                    <FirstLine content={content} showName={title} />
+                                </Card>
+                            </List.Item>
+                        })()
                     )}
                 />
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" style={{ marginTop: 16 }}>
-                        Submit
-                    </Button>
+                    <Button type="primary" htmlType="submit" style={{ marginTop: 16 }}> Submit </Button>
                 </Form.Item>
             </Form>
 
             {fetchEntities && (
-                <>
-                    <h3>Search Results</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+
                     <PaginationComponent
                         currentPage={currentPage}
                         limit={reqLimit}
@@ -157,18 +197,26 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                         pageDataLength={searchResults.length}
                         onPageChange={handlePageChange}
                         onLimitChange={handleLimitChange}
-                        style={{ marginBottom: 6, textAlign: 'right' }}
                         size="small"
                     />
-                    <Table
-                        size="small"
-                        dataSource={searchResults}
-                        columns={columns}
-                        pagination={false}
-                        rowKey="id"
-                        rowSelection={rowSelection}
-                    />
-                </>
+                    {enableSearch && (
+                        <Input.Search
+                            placeholder="Search items"
+                            onChange={handleSearch}
+                            style={{ width: 200 }}
+                        />
+                    )}
+                </div>
+            )}
+            {fetchEntities && (
+                <Table
+                    size="small"
+                    dataSource={searchResults}
+                    columns={columns}
+                    pagination={false}
+                    rowKey="id"
+                    rowSelection={rowSelection}
+                />
             )}
         </Modal>
     );

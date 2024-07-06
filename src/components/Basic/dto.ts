@@ -8,6 +8,8 @@ export interface DungeonMonster {
     practice_count: number;
     visibility: number;
     avatar: string;
+    name: string;
+    description: string;
     familiarity: number;
     difficulty: string;
     importance: string;
