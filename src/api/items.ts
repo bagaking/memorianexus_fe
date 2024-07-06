@@ -2,7 +2,7 @@ import axios from './axios';
 
 
 // 获取所有学习材料
-export const getItems = async (params: {page: number, limit: number}) => {
+export const getItems = async (params: {page: number, limit: number, search?: string, user_id?: string}) => {
     return axios.get('/items', {params});
 };
 

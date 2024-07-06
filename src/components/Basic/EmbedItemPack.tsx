@@ -9,9 +9,12 @@ interface EmbedItemPackProps<T> {
     fetchItems: (page: number, limit: number) => Promise<{ entities: T[], total: number, offset?: number, limit?: number, error?: string }>;
 
     // for mod items
-    addItems?: (entityIds: string[]) => Promise<void>;
-    fetchItemsToAdd: (page: number, limit: number, search?: string) => Promise<{ entities: T[], total: number, offset?: number, limit?: number }>;
     deleteItems?: (entityIds: string[]) => Promise<void>;
+
+
+    fetchItemsToAdd: (page: number, limit: number, search?: string) => Promise<{ entities: T[], total: number, offset?: number, limit?: number }>;
+    enableSearchWhenAdd?: boolean
+    addItems?: (entityIds: string[]) => Promise<void>;
 
     // for card select & table index
     rowKey: string,
@@ -27,6 +30,7 @@ interface EmbedItemPackProps<T> {
 const EmbedItemPack = <T extends {}>({
                                                      fetchItems,
                                                      fetchItemsToAdd,
+                                                     enableSearchWhenAdd,
                                                      addItems,
                                                      deleteItems,
                                                      itemsColumns,
@@ -197,6 +201,7 @@ const EmbedItemPack = <T extends {}>({
                 onCancel={() => setAddEntitiesModalVisible(false)}
                 onSubmit={handleAddEntitiesSubmit}
                 fetchEntities={fetchCandidateEntities}
+                enableSearch={enableSearchWhenAdd || false}
             />
         </div>
     );

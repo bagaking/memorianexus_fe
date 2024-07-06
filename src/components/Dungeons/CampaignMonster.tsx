@@ -12,6 +12,7 @@ const DungeonMonsters: React.FC = () => {
     const { id } = useParams<{ id: string }>();
 
     const fetchItems = async (page: number, limit: number = 10) => {
+
         const response = await getCampaignMonsters(id!, page, limit);
         // for (let i = 0; i < response.data.data.length; i ++ ){
         //     if(!response.data.data[i].id) {
@@ -27,8 +28,9 @@ const DungeonMonsters: React.FC = () => {
         };
     };
 
-    const fetchItemsToAdd = async (page: number, limit: number) => {
-        const response = await getItems({page, limit});
+    const fetchItemsToAdd = async (page: number, limit: number, search?: string) => {
+
+        const response = await getItems({page, limit, search});
         return {
             entities: response.data.data,
             total: response.data.total,
@@ -104,8 +106,11 @@ const DungeonMonsters: React.FC = () => {
 
             <EmbedItemPack<DungeonMonster>
                 fetchItems={fetchItems}
+
                 fetchItemsToAdd={fetchItemsToAdd}
+                enableSearchWhenAdd={true}
                 addItems={addItems}
+
                 deleteItems={deleteItems}
                 itemsColumns={columns}
                 renderItem={(monster, selected, onSelect) => <MonsterCard

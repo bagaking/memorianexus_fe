@@ -22,8 +22,8 @@ const BookItemList: React.FC<ItemListProps> = ({bookId}) => {
         };
     };
 
-    const fetchItemsToAdd = async (page: number, limit: number) => {
-        const response = await getItems({page, limit});
+    const fetchItemsToAdd = async (page: number, limit: number, search = "") => {
+        const response = await getItems({page, limit, search});
         return {
             entities: response.data.data,
             total: response.data.total,
@@ -79,6 +79,7 @@ const BookItemList: React.FC<ItemListProps> = ({bookId}) => {
         <EmbedItemPack<Item>
             fetchItems={fetchItems}
             fetchItemsToAdd={fetchItemsToAdd}
+            enableSearchWhenAdd={true}
             addItems={addItems}
             deleteItems={deleteItems}
             itemsColumns={itemsColumns}

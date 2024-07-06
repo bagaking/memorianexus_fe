@@ -133,8 +133,8 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
         setCurrentPage(1); // 重置到第一页
     };
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchKeyword(e.target.value);
+    const handleSearch = (s: string) => {
+        setSearchKeyword(s);
         setCurrentPage(1); // 重置到第一页
     };
 
@@ -202,8 +202,9 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                     {enableSearch && (
                         <Input.Search
                             placeholder="Search items"
-                            onChange={handleSearch}
-                            style={{ width: 200 }}
+                            // onChange={handleSearch}
+                            onSearch={handleSearch}
+                            style={{ width: 120 }}
                         />
                     )}
                 </div>

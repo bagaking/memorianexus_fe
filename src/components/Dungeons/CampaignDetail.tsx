@@ -116,17 +116,17 @@ const CampaignDetail: React.FC = () => {
         }
     };
 
-    const fetchEntities = async (page: number, limit:number = 10) => {
+    const fetchEntities = async (page: number, limit:number = 10, search:string = "") => {
         // 根据 importType 和 importValue 来获取 items
         let response;
         if (!!importValue) {
             if (importType === 'book') {
-                response = await getBookItems({ page, limit, bookId: importValue });
+                response = await getBookItems({ page, limit, search, bookId: importValue });
             } else if (importType === 'tag') {
-                response = await getTagItems({ page, limit, tag: importValue });
+                response = await getTagItems({ page, limit, search, tag: importValue });
             }
         } else {
-            response = await getItems({ page, limit });
+            response = await getItems({ page, limit, search });
         }
         if (!response || !response.data) {
             return {
@@ -239,7 +239,10 @@ const CampaignDetail: React.FC = () => {
                     onCancel={() => setAddEntitiesModalVisible(false)}
                     onSubmit={handleAddEntitiesSubmit}
                     fetchEntities={fetchEntities}
-                    defaultSelected={items.map(monster => ({ id: monster.item_id, content: monster.description}))}
+                    defaultSelected={
+                        items.map(monster => ({ id: monster.item_id, content: monster.description}))
+                    }
+                    enableSearch={false}
                 />
             </Card>
 
