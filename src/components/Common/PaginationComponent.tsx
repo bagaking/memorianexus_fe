@@ -22,10 +22,11 @@ interface PaginationComponentProps {
 }
 
 const PaginationComponent: React.FC<PaginationComponentProps> = ({  totalItems, currentPage, limit, pageDataLength, onPageChange, onLimitChange, size, style }) => {
+
     function handlePageSizeChange (current: number, size: number) {
         onLimitChange(size);
         onPageChange(current, size);
-    };
+    }
 
    function countTotal(): number {
        let t = totalItems

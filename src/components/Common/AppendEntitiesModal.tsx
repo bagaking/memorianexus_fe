@@ -42,7 +42,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             });
         }
 
-    }, [visible, currentPage, fetchEntities]);
+    }, [visible, currentPage, fetchEntities, reqLimit]);
 
     useEffect(() => {
         if (visible) {
