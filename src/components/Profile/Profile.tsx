@@ -1,12 +1,13 @@
 // src/components/Profile/Profile.tsx
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, message, Avatar, Switch, Select, Layout, Menu, Modal, Divider, Anchor } from 'antd';
-import { IProfile, IPoints, ISettingsMemorization, ISettingsAdvance, getProfile, updateProfile, getPoints, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api/profile';
+import { Form, Input, Button, message, Switch, Select, Layout,Modal, Divider, Anchor } from 'antd';
+import { IProfile, ISettingsMemorization, ISettingsAdvance, getProfile, updateProfile, getPoints, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api/profile';
 import { useAuth } from '../../context/AuthContext';
 import { PageLayout } from '../Layout/PageLayout';
 import './Profile.css';
 import { MarkdownField } from "../Common/FormFields";
-import Points from "../Common/Points";
+import {Points} from "../Basic/dto";
+import PointsBar from "../Common/PointsBar";
 
 const { Option } = Select;
 const { Sider, Content } = Layout;
@@ -15,7 +16,7 @@ const { Link } = Anchor;
 const Profile: React.FC = () => {
     const [form] = Form.useForm();
     const [profile, setProfile] = useState<IProfile | null>(null);
-    const [points, setPoints] = useState<IPoints | null>(null);
+    const [points, setPoints] = useState<Points | null>(null);
     const [memorizationSettings, setMemorizationSettings] = useState<ISettingsMemorization | null>(null);
     const [advanceSettings, setAdvanceSettings] = useState<ISettingsAdvance | null>(null);
     const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -128,7 +129,7 @@ const Profile: React.FC = () => {
                 </Sider>
                 <Layout className="site-layout">
                     <Content className="site-layout-content">
-                        <Points cash={points.cash} gem={points.gem} vipScore={points.vip_score}></Points>
+                        <PointsBar ></PointsBar>
                         <Divider />
                         <div id="profile-section" className="profile-section">
                             <Form form={form} onFinish={handleProfileUpdate}>

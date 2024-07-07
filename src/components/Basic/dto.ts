@@ -16,6 +16,14 @@ export interface DungeonMonster {
     created_at?: string;
 }
 
+
+export interface Points {
+    cash: number ; // uint64 str
+    gem: number ; // uint64 str
+    vip_score: number ; // uint64 str
+}
+
+
 export interface Item {
     id: string;
     type: string;
@@ -57,7 +65,16 @@ export interface Book {
     tags?: string[];
 }
 
-export const ParsePercentage = (x: string | number | undefined) => {
+
+export const ParseUint64 = (x: string | number | undefined | null) => {
+    if (!x) return 0
+    if (typeof(x) == "number") {
+        return x
+    }
+    return Number.parseInt(x)
+}
+
+export const ParsePercentage = (x: string | number | undefined | null) => {
     if (!x) {
         return 0
     }

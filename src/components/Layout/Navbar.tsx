@@ -1,25 +1,19 @@
 // src/components/Layout/Navbar.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Layout, Drawer, Button, Avatar } from 'antd';
+import { Menu, Layout, Drawer, Button,  } from 'antd';
 import { MenuOutlined, HomeOutlined, BookOutlined, FileOutlined, UserOutlined, AppstoreOutlined, UserAddOutlined, LoginOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
-import Points from '../Common/Points'
-import {getPoints, getProfile} from "../../api/profile";
+import { useUserPoints } from '../../context/UserPointsContext';
+import { getProfile } from "../../api";
+import PointsBar from "../Common/PointsBar";
 import './Navbar.css';
 
 const { Header } = Layout;
 
-interface Points {
-    cash: number;
-    gem: number;
-    vip_score: number;
-}
-
 interface UserProfile {
     avatar_url: string;
     nickname: string;
-    points: Points;
 }
 
 const Navbar: React.FC = () => {
@@ -31,11 +25,7 @@ const Navbar: React.FC = () => {
         const fetchUserProfile = async () => {
             try {
                 const profile = await getProfile();
-                const points = await getPoints();
-                setUserProfile({
-                    ...profile,
-                    points: points,
-                });
+                setUserProfile(profile);
             } catch (error) {
                 console.error('Failed to fetch user profile:', error);
             }
@@ -81,24 +71,18 @@ const Navbar: React.FC = () => {
                             <Link to="/campaigns">Campaigns</Link>
                         </Menu.Item>
                         {userProfile ? (
-                        <Menu.Item key="profile" style={{width: '300px' }}>
-                            <Link to="/profile" style={{display: 'flex'}}>
-                                {userProfile.avatar_url ? <img src={userProfile.avatar_url} alt="" /> : <UserOutlined/>}
-                                <span>{userProfile.nickname || "Profile"}</span>
-                                <Points showName={false} style={{width: "100px", height: "48px", color: "#fff"}}
-                                        cash={userProfile.points.cash} gem={userProfile.points.gem}
-                                        vipScore={userProfile.points.vip_score}></Points>
-                            </Link>
-                        </Menu.Item>
-
+                            <Menu.Item key="profile" style={{width: '300px' }}>
+                                <Link to="/profile" style={{display: 'flex'}}>
+                                    {userProfile.avatar_url ? <img src={userProfile.avatar_url} alt="" /> : <UserOutlined/>}
+                                    <span>{userProfile.nickname || "Profile"}</span>
+                                    <PointsBar showName={false} style={{width: "100px", height: "48px", color: "#fff"}}></PointsBar>
+                                </Link>
+                            </Menu.Item>
                         ) : (
                             <Menu.Item key="profile" icon={<UserOutlined/>}>
                                 <Link to="/profile">Profile</Link>
                             </Menu.Item>
-                        )
-
-                        }
-
+                        )}
                     </>
                 ) : (
                     <>

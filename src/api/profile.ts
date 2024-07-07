@@ -1,4 +1,5 @@
 import axios from './axios';
+import {Points} from "../components/Basic/dto";
 
 export interface IProfile {
     id: number;
@@ -7,12 +8,6 @@ export interface IProfile {
     avatar_url: string;
     bio: string;
     created_at: string;
-}
-
-export interface IPoints {
-    cash: number;
-    gem: number;
-    vip_score: number;
 }
 
 export interface ISettingsMemorization {
@@ -38,7 +33,7 @@ export const updateProfile = async (profile: Partial<IProfile>): Promise<void> =
     await axios.put('/profile/me', profile);
 };
 
-export const getPoints = async (): Promise<IPoints> => {
+export const getPoints = async (): Promise<Points> => {
     const response = await axios.get('/profile/points');
     return response.data.data;
 };

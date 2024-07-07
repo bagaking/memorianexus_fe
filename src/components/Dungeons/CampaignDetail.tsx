@@ -182,10 +182,12 @@ const CampaignDetail: React.FC = () => {
     return (
         <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/campaign_dungeon_icon.png">
 
-            <div className="campaign-progress">
-                <h3>Campaign Progress</h3>
-                <Button type="primary" onClick={() => navigate(`/campaigns/${id}/monsters`)}>View Monsters</Button>
-                <Progress percent={50} status="active"/>
+            <div className="campaign-progress" style={{display:"flex", flexDirection:"row"}}>
+                <h2 style={{minWidth:228}}>Campaign Progress</h2>
+                <Progress percent={0} status="active"/>
+                {(id && id !== 'new') &&
+                <Button style={{minWidth:228}} type="link" onClick={() => navigate(`/campaigns/${id}/monsters`)}><h2 style={{color:"#3399FF"}}>View Monsters</h2></Button>
+                }
             </div>
 
             <Card className="campaign-detail-card">
@@ -232,7 +234,7 @@ const CampaignDetail: React.FC = () => {
                         />
                     )}
 
-                </div> : <span style={{marginTop:"16px", paddingTop:"16px", color: "gray"}}>Item's can only be add to exist campaign</span> }
+                </div> : <span style={{marginTop:"16px", paddingTop:"16px", color: "gray"}}>- items can only be add to exist campaign -</span> }
 
                 <AppendEntitiesModal
                     visible={addEntitiesModalVisible}

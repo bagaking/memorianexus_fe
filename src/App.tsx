@@ -16,34 +16,37 @@ import Navbar from './components/Layout/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import DungeonMonsters from "./components/Dungeons/CampaignMonster";
 import CampaignChallenge from "./components/Dungeons/CampaignChallenge";
+import {UserPointsProvider} from "./context/UserPointsContext";
 
 const { Header, Content } = Layout;
 
 const App: React.FC = () => {
     return (
         <AuthProvider>
-            <Layout>
-                {/*<Header>*/}
-                    <Navbar />
-                {/*</Header>*/}
-                <Content>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/profile/edit" element={<EditProfile />} />
-                        <Route path="/books" element={<BookList />} />
-                        <Route path="/books/:id" element={<BookDetail />} />
-                        <Route path="/items" element={<ItemList />} />
-                        <Route path="/items/:id" element={<ItemDetail />} />
-                        <Route path="/campaigns" element={<CampaignList />} />
-                        <Route path="/campaigns/:id" element={<DungeonDetail />} />
-                        <Route path="/campaigns/:id/monsters" element={<DungeonMonsters />} />
-                        <Route path="/campaigns/:id/challenge" element={<CampaignChallenge />} />
-                    </Routes>
-                </Content>
-            </Layout>
+            <UserPointsProvider>
+                <Layout>
+                    {/*<Header>*/}
+                        <Navbar />
+                    {/*</Header>*/}
+                    <Content>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/register" element={<Register />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/profile/edit" element={<EditProfile />} />
+                            <Route path="/books" element={<BookList />} />
+                            <Route path="/books/:id" element={<BookDetail />} />
+                            <Route path="/items" element={<ItemList />} />
+                            <Route path="/items/:id" element={<ItemDetail />} />
+                            <Route path="/campaigns" element={<CampaignList />} />
+                            <Route path="/campaigns/:id" element={<DungeonDetail />} />
+                            <Route path="/campaigns/:id/monsters" element={<DungeonMonsters />} />
+                            <Route path="/campaigns/:id/challenge" element={<CampaignChallenge />} />
+                        </Routes>
+                    </Content>
+                </Layout>
+            </UserPointsProvider>
         </AuthProvider>
     );
 };

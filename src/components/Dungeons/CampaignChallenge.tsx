@@ -9,6 +9,8 @@ import './CampaignChallenge.css';
 import Markdown from 'react-markdown';
 import { CloseCircleOutlined, StopOutlined, CheckCircleOutlined, FireOutlined, TrophyOutlined } from '@ant-design/icons';
 import SkillCard from './SkillCard';
+import goldIcon from '../../assets/icons/gold_icon.png';
+import {useUserPoints} from "../../context/UserPointsContext";
 
 const CampaignChallenge: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -17,45 +19,57 @@ const CampaignChallenge: React.FC = () => {
     const [itemDetails, setItemDetails] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
     const [showFullContent, setShowFullContent] = useState(false);
+    const { refreshPoints } = useUserPoints();
+
+
+    const fetchMonstersAndDetails = async () => {
+        try {
+            const response = await getPracticeMonsters(id!, 10);
+            const monstersData = response.data.data;
+
+            const detailsPromises = monstersData.map((monster: DungeonMonster) =>
+                getItemById(monster.item_id)
+            );
+
+            const detailsResponses = await Promise.all(detailsPromises);
+            const details = detailsResponses.map(res => res.data.data);
+
+            setMonsters(monstersData);
+            setItemDetails(details);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to fetch monsters');
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchMonstersAndDetails = async () => {
-            try {
-                const response = await getPracticeMonsters(id!, 10);
-                const monstersData = response.data.data;
-
-                const detailsPromises = monstersData.map((monster: DungeonMonster) =>
-                    getItemById(monster.item_id)
-                );
-
-                const detailsResponses = await Promise.all(detailsPromises);
-                const details = detailsResponses.map(res => res.data.data);
-
-                setMonsters(monstersData);
-                setItemDetails(details);
-                setLoading(false);
-            } catch (error) {
-                console.error(error);
-                message.error('Failed to fetch monsters');
-                setLoading(false);
-            }
-        };
-
         fetchMonstersAndDetails();
     }, [id]);
 
     const handleAttackResult = async (result: "defeat" | "miss" | "hit" | "kill" | "complete") => {
         try {
-            await submitPracticeResult(id!, {
+            const submitResult = await submitPracticeResult(id!, {
                 monster_id: monsters[currentMonsterIndex].item_id,
                 result: result,
             });
-            message.success('Attack result submitted successfully');
+
+            const resp = submitResult.data.data
+
+            if(!!resp && !!resp.points_update && resp.points_update.cash) {
+                message.success(<div>
+                    <img src={goldIcon} alt="Cash" className="point-icon"/> + {resp.points_update.cash}
+                </div>, 5);
+                refreshPoints(resp.points_update)
+            }
+
             if (currentMonsterIndex < monsters.length - 1) {
                 setCurrentMonsterIndex(currentMonsterIndex + 1);
                 setShowFullContent(false);
             } else {
-                message.success('All monsters defeated!');
+                fetchMonstersAndDetails()
+                console.log('All monsters defeated!');
             }
         } catch (error) {
             console.error(error);
@@ -76,7 +90,8 @@ const CampaignChallenge: React.FC = () => {
         <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
             <div className="campaign-challenge-background">
                 <div className="campaign-detail-card">
-                    {currentMonster && <div className="campaign-challenge-monster-detail">
+                    {!!currentMonster ?
+                        <div className="campaign-challenge-monster-detail">
                         <Card className="campaign-challenge-monster-card"
                               onClick={() => setShowFullContent(!showFullContent)}>
                             <Progress style={{marginBottom: '12px'}}
@@ -146,6 +161,11 @@ const CampaignChallenge: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                        : <Card title="All monsters defeated!">
+                            <p>这个副本里暂时没有存活的怪物了</p>
+                            <p>新的怪物稍后出现</p>
+                            <p>去其他地方看看吧</p>
+                        </Card>
                     }
                 </div>
             </div>
