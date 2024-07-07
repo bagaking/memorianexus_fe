@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { message, Card, Progress, Button } from 'antd';
 import { getPracticeMonsters, submitPracticeResult, getItemById } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
-import { DungeonMonster, Item } from '../Basic/dto';
+import {DungeonMonster, Item, ParsePercentage} from '../Basic/dto';
 import '../Common/CommonStyles.css';
 import './CampaignChallenge.css';
 import Markdown from 'react-markdown';
@@ -21,7 +21,7 @@ const CampaignChallenge: React.FC = () => {
     useEffect(() => {
         const fetchMonstersAndDetails = async () => {
             try {
-                const response = await getPracticeMonsters(id!, 15, 'classic');
+                const response = await getPracticeMonsters(id!, 10);
                 const monstersData = response.data.data;
 
                 const detailsPromises = monstersData.map((monster: DungeonMonster) =>
@@ -76,11 +76,14 @@ const CampaignChallenge: React.FC = () => {
         <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
             <div className="campaign-challenge-background">
                 <div className="campaign-detail-card">
-                    <div className="campaign-challenge-monster-detail">
-                        <Card className="campaign-challenge-monster-card" onClick={() => setShowFullContent(!showFullContent)}>
-                            <Progress percent={currentMonster.familiarity} status="active" style={{ marginBottom: '20px' }} />
+                    {currentMonster && <div className="campaign-challenge-monster-detail">
+                        <Card className="campaign-challenge-monster-card"
+                              onClick={() => setShowFullContent(!showFullContent)}>
+                            <Progress style={{marginBottom: '12px'}}
+                                      percent={ParsePercentage(currentMonster.familiarity)} status="active"/>
                             {showFullContent ? (
-                                <div className="campaign-challenge-monster-text-container" style={{ textAlign: 'left' }}>
+                                <div className="campaign-challenge-monster-text-container"
+                                     style={{textAlign: 'left'}}>
                                     <Markdown>
                                         {currentItemDetail?.content || ''}
                                     </Markdown>
@@ -88,14 +91,18 @@ const CampaignChallenge: React.FC = () => {
                             ) : (
                                 <div className="campaign-challenge-monster-image-container">
                                     <Markdown>{firstNonEmptyLine || ''}</Markdown>
-                                    <img className="left-portrait" src="/portraits/skeleton_warrior_01.png" alt="Monster Avatar" />
+                                    <img className="left-portrait" src="/portraits/skeleton_warrior_01.png"
+                                         alt="Monster Avatar"/>
                                 </div>
                             )}
                             {showFullContent && (
-                                <Button type="primary" style={{ marginTop: '20px' }} onClick={() => {
+                                <Button type="primary" style={{marginTop: '20px'}} onClick={() => {
                                     setShowFullContent(false);
                                     if (currentMonsterIndex < monsters.length - 1) {
                                         setCurrentMonsterIndex(currentMonsterIndex + 1);
+                                        console.log("skip to next monster", currentMonsterIndex, currentMonster, monsters);
+                                    } else {
+                                        console.log("cannot skip", currentMonsterIndex, currentMonster, monsters);
                                     }
                                 }}>
                                     Skip & Next
@@ -106,32 +113,32 @@ const CampaignChallenge: React.FC = () => {
                         <div className="attack-buttons">
                             <div className="skill-cards-container">
                                 <SkillCard
-                                    icon={<CloseCircleOutlined />}
+                                    icon={<CloseCircleOutlined/>}
                                     onClick={() => handleAttackResult("defeat")}
                                     resultType="defeat"
                                     title="Defeat"
                                 />
                                 <SkillCard
-                                    icon={<StopOutlined />}
+                                    icon={<StopOutlined/>}
                                     onClick={() => handleAttackResult("miss")}
                                     resultType="miss"
                                     title="Miss"
                                 />
                                 <SkillCard
-                                    icon={<CheckCircleOutlined />}
+                                    icon={<CheckCircleOutlined/>}
                                     onClick={() => handleAttackResult("hit")}
                                     resultType="hit"
                                     title="Hit"
                                 />
                                 <SkillCard
-                                    icon={<FireOutlined />}
+                                    icon={<FireOutlined/>}
                                     onClick={() => handleAttackResult("kill")}
                                     resultType="kill"
                                     title="Kill"
                                 />
                                 <SkillCard
-                                    icon={<TrophyOutlined />}
-                                    buttonProps={{ onClick: () => handleAttackResult("complete") }}
+                                    icon={<TrophyOutlined/>}
+                                    buttonProps={{onClick: () => handleAttackResult("complete")}}
                                     onClick={() => handleAttackResult("complete")}
                                     resultType="complete"
                                     title="Complete"
@@ -139,6 +146,7 @@ const CampaignChallenge: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                    }
                 </div>
             </div>
         </PageLayout>

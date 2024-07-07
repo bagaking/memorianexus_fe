@@ -96,8 +96,8 @@ export const removeDungeonTags = async (dungeonId: string, tags: string[]) => {
 };
 
 // 获取复习计划的 Monsters
-export const getPracticeMonsters = async (dungeonId: string, count: number, strategy: string) => {
-    return axios.get(`/dungeon/campaigns/${dungeonId}/practice`, { params: { count, strategy } });
+export const getPracticeMonsters = async (dungeonId: string, count: number) => {
+    return axios.get(`/dungeon/campaigns/${dungeonId}/practice`, { params: { count } });
 };
 
 // 上报复习计划的 Monster 结果

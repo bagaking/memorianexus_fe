@@ -4,12 +4,8 @@ import { Form, Input, Button, message, Avatar, Switch, Select, Layout, Menu, Mod
 import { IProfile, IPoints, ISettingsMemorization, ISettingsAdvance, getProfile, updateProfile, getPoints, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api/profile';
 import { useAuth } from '../../context/AuthContext';
 import { PageLayout } from '../Layout/PageLayout';
-import { UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import './Profile.css';
 import { MarkdownField } from "../Common/FormFields";
-import gemIcon from '../../assets/icons/gem_icon.png';
-import goldIcon from '../../assets/icons/gold_icon.png';
-import vipIcon from '../../assets/icons/vip_icon.png';
 import Points from "../Common/Points";
 
 const { Option } = Select;
@@ -27,13 +23,13 @@ const Profile: React.FC = () => {
 
     useEffect(() => {
         const fetchProfileData = async () => {
-            try {
-                const profile = await getProfile();
-                setProfile(profile);
-                form.setFieldsValue(profile);
-            } catch (error) {
-                message.error('Failed to fetch profile');
+            const profile = await getProfile();
+            if (!profile) {
+                throw new Error('fetch profile failed');
             }
+            setProfile(profile);
+            form.setFieldsValue(profile);
+            return profile
         };
 
         const fetchPointsData = async () => {
@@ -63,10 +59,14 @@ const Profile: React.FC = () => {
             }
         };
 
-        fetchProfileData();
-        fetchPointsData();
-        fetchMemorizationSettings();
-        fetchAdvanceSettings();
+        fetchProfileData().then((data) => {
+            fetchPointsData();
+            fetchMemorizationSettings();
+            fetchAdvanceSettings();
+        }).catch(err => {
+            message.error(`Failed to fetch profile, err=${err}` );
+        });
+
     }, [form]);
 
     const handleProfileUpdate = async (values: Partial<IProfile>) => {

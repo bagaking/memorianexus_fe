@@ -115,15 +115,9 @@ const CampaignList: React.FC = () => {
             title: 'Challenge',
             key: 'action',
             render: (_: any, record: Dungeon) => (
-                <>
-                    <Button type="primary">
-                        <Link to={`/campaigns/${record.id}/challenge`}>Challenge</Link>
-                    </Button>
-
-                    <Button type="text">
-                        <Link to={`/campaigns/${record.id}/monsters`}>Check Monsters</Link>
-                    </Button>
-                </>
+                <Button type="primary">
+                    <Link to={`/campaigns/${record.id}/challenge`}>Challenge</Link>
+                </Button>
             ),
         },
         {
@@ -131,12 +125,14 @@ const CampaignList: React.FC = () => {
             key: 'edit',
             render: (_: any, record: Dungeon) => (
                 <>
-                    <Button type="link" size="small">
-                        <Link to={`/campaigns/${record.id}`}>Detail</Link>
+                    <Button type="link" size="small" color="danger" style={{ marginLeft: '8px' }}>
+                        <Link to={`/campaigns/${record.id}`}>Info</Link>
                     </Button>
-
-                    <Button type="link" size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
-                        Delete
+                    <Button type="link" size="small" style={{ marginLeft: '8px' }}>
+                        <Link to={`/campaigns/${record.id}/monsters`}>Monsters</Link>
+                    </Button>
+                    <Button type="primary" danger size="small" onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
+                        Remove
                     </Button>
                 </>
             ),

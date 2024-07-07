@@ -102,7 +102,7 @@ const DungeonMonsters: React.FC = () => {
     ];
 
     return (
-        <PageLayout title="Campaign Monsters" backUrl={`/campaigns/${id}`} icon="/campaign_dungeon_icon.png">
+        <PageLayout title="Campaign Monsters" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
 
             <EmbedItemPack<DungeonMonster>
                 fetchItems={fetchItems}

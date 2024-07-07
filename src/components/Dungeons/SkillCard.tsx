@@ -21,7 +21,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ icon, buttonProps, title, resultT
 
         // const scaleRate = minScale + (cardWidth - minWidth) * (maxScale - minScale) / (maxWidth - minWidth);
         const realRate = Math.min(Math.max(rate, minScale), maxScale);
-        console.log("realRate", realRate)
+        // console.log("realRate", realRate)
         return realRate
     };
 

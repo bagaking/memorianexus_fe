@@ -35,7 +35,7 @@ const PaginationComponent: React.FC<PaginationComponentProps> = (
 
     useEffect(() => {
         const tCount = countTotal()
-        console.log("tCount", tCount, totalItems, limit, pageDataLength, currentPage)
+        // console.log("tCount", tCount, totalItems, limit, pageDataLength, currentPage)
         setTotalAssume(tCount)
     }, [totalItems, limit, pageDataLength, currentPage]);
 

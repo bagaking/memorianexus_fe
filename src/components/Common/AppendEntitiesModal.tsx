@@ -147,23 +147,23 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
     return (
         <Modal title={title || "Append Entities"} open={visible} onCancel={handleCancelModal} footer={footer} width={960} >
             <Form form={form} onFinish={handleFinish}>
-                <Form.Item>
-                    <Input
-                        value={newEntity}
-                        onChange={e => setNewEntity(e.target.value)}
-                        placeholder="Enter entity ID"
-                        onPressEnter={handleAddEntity}
-                        disabled={
-                            !!(maxCount && selectedEntities.length >= maxCount)
-                        } // 禁用输入框
-                    />
-
-                    <Button type="dashed" onClick={handleAddEntity} style={{ marginTop: 8 }} disabled={!!(maxCount && selectedEntities.length >= maxCount)}>
-                        Add Entity
-                    </Button>
+                <Form.Item >
+                        <Input
+                            value={newEntity}
+                            onChange={e => setNewEntity(e.target.value)}
+                            placeholder="Enter entity ID"
+                            onPressEnter={handleAddEntity}
+                            disabled={
+                                !!(maxCount && selectedEntities.length >= maxCount)
+                            } // 禁用输入框
+                        />
+                        <Button type="dashed" onClick={handleAddEntity} style={{marginTop: 8}}
+                                disabled={!!(maxCount && selectedEntities.length >= maxCount)}>
+                            Add Entity
+                        </Button>
                 </Form.Item>
                 <List
-                    grid={{ gutter: 2, column: 4 }}
+                    grid={{gutter: 2, column: 4}}
                     dataSource={
                         selectedEntities.filter(e => !isIdAborted(e.id))
                     }
