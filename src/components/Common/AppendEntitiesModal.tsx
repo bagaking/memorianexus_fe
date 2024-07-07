@@ -11,7 +11,8 @@ interface AppendEntitiesModalProps {
     onCancel: () => void;
     onSubmit: (entityIds: string[]) => void;
     fetchEntities?: (page: number, limit: number, search?: string) => Promise<{ entities: any[], total: number, offset?: number, limit?: number }>;
-    defaultSelected?: EntityModalDataModel[];
+    abortedItems?: EntityModalDataModel[];
+    defaultSelection?: EntityModalDataModel[];
     maxCount?: number;
     enableSearch?: boolean;
 }
@@ -24,10 +25,10 @@ export interface EntityModalDataModel {
 const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                                                                      title, footer, visible,
                                                                      onCancel, onSubmit, fetchEntities,
-                                                                     defaultSelected = [], maxCount, enableSearch
+                                                                     abortedItems = [], defaultSelection = [], maxCount, enableSearch
                                                                  }) => {
     const [form] = Form.useForm();
-    const [entities, setEntities] = useState<EntityModalDataModel[]>(defaultSelected);
+    const [selectedEntities, setSelectedEntities] = useState<EntityModalDataModel[]>([...abortedItems]);
     const [newEntity, setNewEntity] = useState<string>('');
     const [searchResults, setSearchResults] = useState<EntityModalDataModel[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -47,44 +48,35 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
 
     useEffect(() => {
         if (visible) {
-            form.setFieldsValue({ entities: defaultSelected.map(item => item.id) });
+            form.setFieldsValue({ entities: [...defaultSelection] });
         }
-    }, [visible, defaultSelected]);
+    }, [visible, abortedItems]);
+
+    const isIdAborted = (id: string) => abortedItems.some(e => e.id === id)
 
     const handleAddEntity = () => {
-        if (newEntity.trim() && !entities.some(e => e.id === newEntity.trim()) && (!maxCount || entities.length < maxCount)) {
-            setEntities([...entities, { id: newEntity.trim(), content: '' }]);
+        if (newEntity.trim() && !selectedEntities.some(e => e.id === newEntity.trim()) && (!maxCount || selectedEntities.length < maxCount)) {
+            setSelectedEntities([...selectedEntities, { id: newEntity.trim(), content: '' }]);
             setNewEntity('');
         }
     };
 
     const handleRemoveEntity = (entityId: string) => {
-        setEntities(entities.filter(e => e.id !== entityId));
+        setSelectedEntities(selectedEntities.filter(e => e.id !== entityId));
     };
 
     const handleFinish = () => {
-        onSubmit(entities.map(e => e.id));
-        setEntities([]);
+        onSubmit(selectedEntities.map(e => e.id));
+        setSelectedEntities([]);
         form.resetFields();
     };
 
     const handleAddFromSearch = (entity: EntityModalDataModel) => {
-        if (!entities.some(e => e.id === entity.id) && (!maxCount || entities.length < maxCount)) {
-            setEntities([...entities, entity]);
+        if (!selectedEntities.some(e => e.id === entity.id) && (!maxCount || selectedEntities.length < maxCount)) {
+            setSelectedEntities([...selectedEntities, entity]);
         }
     };
 
-    const resetStatus = () => {
-        setEntities(defaultSelected);
-        setNewEntity('');
-        setSearchResults([]);
-        setCurrentPage(1);
-        setTotalEntities(0);
-        setReqLimit(10);
-        setSearchKeyword('');
-        form.resetFields();
-        onCancel();
-    };
 
     const columns = [
         {
@@ -103,24 +95,25 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             key: 'action',
             render: (text: string, record: EntityModalDataModel) =>
                 <Button type="link" onClick={() => handleAddFromSearch(record)} disabled={
-                    !!(entities.some(e => e.id === record.id) || (maxCount && entities.length >= maxCount))
+                    !!(isIdAborted(record.id) || (maxCount && selectedEntities.length >= maxCount))
                 }>Add</Button>,
         },
     ];
 
     const rowSelection: TableRowSelection<any> = {
-        selectedRowKeys: entities.map(e => e.id),
+        selectedRowKeys: selectedEntities.map(e => e.id),
         onChange: (selectedRowKeys: Key[], selectedRows: any[], info: { type: RowSelectMethod }) => {
             const currentPageIds = searchResults.map(item => item.id);
-            const newEntities = entities.filter(entity => !currentPageIds.includes(entity.id)); // Keep entities not on the current page
+            // Keep selectedEntities not on the current page
+            const appendEntities = selectedEntities.filter(entity => !currentPageIds.includes(entity.id));
 
             selectedRows.forEach(row => {
-                if (!newEntities.some(e => e.id === row.id)) {
-                    newEntities.push(row);
+                if (!appendEntities.some(e => e.id === row.id)) {
+                    appendEntities.push(row);
                 }
             });
 
-            setEntities(newEntities);
+            setSelectedEntities(appendEntities.filter(e => !isIdAborted(e.id)));
         },
     };
 
@@ -138,11 +131,21 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
         setCurrentPage(1); // 重置到第一页
     };
 
+    const handleCancelModal = () => {
+        // console.log("handleCancelModal", abortedItems, defaultSelection)
+        setSelectedEntities([...defaultSelection]);
+        setNewEntity('');
+        setSearchResults([]);
+        setCurrentPage(1);
+        setTotalEntities(0);
+        setReqLimit(10);
+        setSearchKeyword('');
+        form.resetFields();
+        onCancel && onCancel();
+    };
+
     return (
-        <Modal title={title || "Append Entities"} open={visible} onCancel={() => {
-            resetStatus()
-            onCancel && onCancel()
-        }} footer={footer} width={960} >
+        <Modal title={title || "Append Entities"} open={visible} onCancel={handleCancelModal} footer={footer} width={960} >
             <Form form={form} onFinish={handleFinish}>
                 <Form.Item>
                     <Input
@@ -151,19 +154,19 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                         placeholder="Enter entity ID"
                         onPressEnter={handleAddEntity}
                         disabled={
-                            !!(maxCount && entities.length >= maxCount)
+                            !!(maxCount && selectedEntities.length >= maxCount)
                         } // 禁用输入框
                     />
 
-                    <Button type="dashed" onClick={handleAddEntity} style={{ marginTop: 8 }} disabled={
-                        !!(maxCount && entities.length >= maxCount)
-                    }>
+                    <Button type="dashed" onClick={handleAddEntity} style={{ marginTop: 8 }} disabled={!!(maxCount && selectedEntities.length >= maxCount)}>
                         Add Entity
                     </Button>
                 </Form.Item>
                 <List
                     grid={{ gutter: 2, column: 4 }}
-                    dataSource={entities}
+                    dataSource={
+                        selectedEntities.filter(e => !isIdAborted(e.id))
+                    }
                     renderItem={entity => (
                         (() => {
                             const content = entity.content || searchResults.find(x => x.id === entity.id)?.content || "";
@@ -175,7 +178,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                                 <Card
                                     title={entity.id}
                                     size="small"
-                                    extra={[<Button type="link" danger onClick={() => handleRemoveEntity(entity.id)}>Remove</Button>]}>
+                                    extra={[<Button type="link" danger onClick={() => handleRemoveEntity(entity.id)}>Rem</Button>]}>
                                     <FirstLine content={content} showName={title} />
                                 </Card>
                             </List.Item>

@@ -239,7 +239,7 @@ const CampaignDetail: React.FC = () => {
                     onCancel={() => setAddEntitiesModalVisible(false)}
                     onSubmit={handleAddEntitiesSubmit}
                     fetchEntities={fetchEntities}
-                    defaultSelected={
+                    abortedItems={
                         items.map(monster => ({ id: monster.item_id, content: monster.description}))
                     }
                     enableSearch={false}
