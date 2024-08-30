@@ -9,9 +9,10 @@ import { Book } from "../Basic/dto";
 interface ItemUploadProps {
     onUploadSuccess: () => void;
     className?: string;
+    style?: React.CSSProperties;
 }
 
-const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className }) => {
+const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className, style }) => {
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
@@ -77,9 +78,15 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className }) =
     };
 
     return (
-        <>
-            <Button type="primary" icon={<UploadOutlined />} loading={loading} className={className} onClick={handleButtonClick}>
-                Upload Items
+        <div className={className} style={style}>
+            <Button
+                type="primary"
+                icon={<UploadOutlined />}
+                loading={loading}
+                onClick={handleButtonClick}
+                style={{ width: '100%', height: '100%' }}
+            >
+                上传条目
             </Button>
             <input
                 type="file"
@@ -94,7 +101,7 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className }) =
                 fetchEntities={fetchBooks}
                 maxCount={1} // 限制最多选择1本书
             />
-        </>
+        </div>
     );
 };
 

@@ -8,6 +8,8 @@ import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import {Book, Item} from "../Basic/dto";
+import BookCard from './BookCard';
+import { useIsMobile } from '../../hooks/useWindowSize';
 import '../Common/CommonStyles.css';
 
 const BookList: React.FC = () => {
@@ -137,13 +139,11 @@ const BookList: React.FC = () => {
         </Card>
     );
 
-    return (
-        <PageLayout title="Books" icon="/book_icon.png">
-            <Link to={`/books/new`} state={{page: currentPage, limit}}>
-                <Button type="primary" className="create-new-one-button">Create New Book</Button>
-            </Link>
+    const isMobile = useIsMobile();
 
-            <div className="table-container">
+    const renderBookList = () => {
+        if (!isMobile) {
+            return (
                 <Table
                     columns={columns}
                     dataSource={books}
@@ -156,6 +156,32 @@ const BookList: React.FC = () => {
                     pagination={false}
                     loading={loading}
                 />
+            );
+        } else {
+            return (
+                <div>
+                    {books.map(book => (
+                        <BookCard
+                            key={book.id}
+                            book={book}
+                            onDelete={() => showDeleteModal(book)}
+                            currentPage={currentPage}
+                            limit={limit}
+                        />
+                    ))}
+                </div>
+            );
+        }
+    };
+
+    return (
+        <PageLayout title="Books" icon="/book_icon.png">
+            <Link to={`/books/new`} state={{page: currentPage, limit}}>
+                <Button type="primary" className="create-new-one-button">Create New Book</Button>
+            </Link>
+
+            <div className="table-container">
+                {renderBookList()}
             </div>
             <PaginationComponent
                 currentPage={currentPage}

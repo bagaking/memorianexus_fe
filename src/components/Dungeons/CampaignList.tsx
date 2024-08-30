@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card } from 'antd';
+import { message, Button, Card, Space, Row, Col, Typography, Table } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getDungeons, deleteDungeon } from '../../api/dungeons';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';
+import { useIsMobile } from '../../hooks/useWindowSize';
+
+const { Title, Paragraph } = Typography;
 
 interface Dungeon {
     id: string;
@@ -26,6 +29,7 @@ const CampaignList: React.FC = () => {
     const queryParams = new URLSearchParams(location.search);
     const [currentPage, setCurrentPage] = useState(Number(queryParams.get('page')) || 1);
     const [limit, setLimit] = useState(Number(queryParams.get('limit')) || 10);
+    const isMobile = useIsMobile();
 
     const fetchDungeons = async (page: number, limit: number) => {
         setLoading(true);
@@ -94,91 +98,100 @@ const CampaignList: React.FC = () => {
         navigate(`/campaigns?page=1&limit=${newLimit}`);
     };
 
+
     const columns = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: 200,
-        },
-        {
-            title: 'Title',
+            title: '标题',
             dataIndex: 'title',
             key: 'title',
         },
         {
-            title: 'Description',
+            title: '描述',
             dataIndex: 'description',
             key: 'description',
+            ellipsis: true,
         },
         {
-            title: 'Challenge',
-            key: 'action',
+            title: '操作',
+            key: 'actions',
             render: (_: any, record: Dungeon) => (
-                <Button type="primary">
-                    <Link to={`/campaigns/${record.id}/challenge`}>Challenge</Link>
-                </Button>
-            ),
-        },
-        {
-            title: 'Edit',
-            key: 'edit',
-            render: (_: any, record: Dungeon) => (
-                <>
-                    <Button type="link" size="small" color="danger" style={{ marginLeft: '8px' }}>
-                        <Link to={`/campaigns/${record.id}`}>Info</Link>
-                    </Button>
-                    <Button type="link" size="small" style={{ marginLeft: '8px' }}>
-                        <Link to={`/campaigns/${record.id}/monsters`}>Monsters</Link>
-                    </Button>
-                    <Button type="primary" danger size="small" onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
-                        Remove
-                    </Button>
-                </>
+                <Space>
+                    <Link to={`/campaigns/${record.id}/challenge`}>挑战</Link>
+                    <Link to={`/campaigns/${record.id}`}>信息</Link>
+                    <Link to={`/campaigns/${record.id}/monsters`}>怪物</Link>
+                    <Button type="link" danger onClick={() => showDeleteModal(record)}>删除</Button>
+                </Space>
             ),
         },
     ];
 
-    const expandedRowRender = (record: Dungeon) => (
-        <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
-            <small>&{record.title}</small>
-            <br/>
-            {record.description}
+    const DungeonCard: React.FC<{ dungeon: Dungeon }> = ({ dungeon }) => (
+        <Card
+            title={dungeon.title}
+            extra={<Link to={`/campaigns/${dungeon.id}/challenge`}>挑战</Link>}
+            actions={[
+                <Link to={`/campaigns/${dungeon.id}`}>信息</Link>,
+                <Link to={`/campaigns/${dungeon.id}/monsters`}>怪物</Link>,
+                <Button type="text" danger onClick={() => showDeleteModal(dungeon)}>删除</Button>
+            ]}
+        >
+            <Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '更多' }}>
+                {dungeon.description}
+            </Paragraph>
         </Card>
     );
 
+    const DungeonList: React.FC = () => (
+        <Table
+            columns={columns}
+            dataSource={dungeons}
+            rowKey="id"
+            pagination={false}
+            loading={loading}
+        />
+    );
+
+    const DungeonCardList: React.FC = () => (
+        <Row gutter={[16, 16]}>
+            {dungeons.map(dungeon => (
+                <Col xs={24} sm={12} key={dungeon.id}>
+                    <DungeonCard dungeon={dungeon} />
+                </Col>
+            ))}
+        </Row>
+    );
+
     return (
-        <PageLayout title="Campaigns" icon="/campaign_dungeon_icon.png">
-            <Link to="/campaigns/new">
-                <Button type="primary" style={{marginBottom: '16px', width: "100%"}} className="create-new-one-button">Create
-                    New Campaign Dungeon</Button>
-            </Link>
-            <div className="table-container">
-                <Table
-                    columns={columns}
-                    dataSource={dungeons}
-                    rowKey="id"
-                    expandedRowKeys={expandedRowKeys}
-                    onRow={(record) => ({
-                        onClick: () => handleExpand(record),
-                    })}
-                    expandable={{expandedRowRender}}
-                    pagination={false}
-                    loading={loading}
-                />
-            </div>
-                <PaginationComponent
-                    currentPage={currentPage}
-                    totalItems={totalDungeons}
-                    limit={limit}
-                    pageDataLength={dungeons.length}
-                    onPageChange={handlePageChange}
-                    onLimitChange={handleLimitChange}
-                />
-                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete}
-                             onCancel={() => setDeleteModalVisible(false)}/>
+        <PageLayout title="战役" icon="/campaign_dungeon_icon.png">
+            <Row gutter={[16, 16]}>
+                <Col xs={24}>
+                    <Link to="/campaigns/new">
+                        <Button type="primary" style={{width: "100%"}} className="create-new-one-button">
+                            创建新战役
+                        </Button>
+                    </Link>
+                </Col>
+                <Col xs={24}>
+                    {isMobile ? <DungeonCardList /> : <DungeonList />}
+                </Col>
+                <Col xs={24}>
+                    <PaginationComponent
+                        currentPage={currentPage}
+                        totalItems={totalDungeons}
+                        limit={limit}
+                        pageDataLength={dungeons.length}
+                        onPageChange={handlePageChange}
+                        onLimitChange={handleLimitChange}
+                    />
+                </Col>
+            </Row>
+            <DeleteModal 
+                visible={deleteModalVisible} 
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteModalVisible(false)}
+            />
         </PageLayout>
-);
+    );
 };
 
 export default CampaignList;

@@ -7,16 +7,17 @@ import '../Common/CommonStyles.css';
 
 interface PageLayoutProps {
     title: string;
-    backUrl?: string;
-    icon?: string;
-    bannerUrl?: string; // 新增 bannerUrl 属性
+    icon: string;
+    style?: React.CSSProperties;
+    bannerUrl?: string;
+    backUrl?: string; // 添加 backUrl 属性
     children: React.ReactNode;
 }
 
 const { Header, Content } = Layout;
-export const PageLayout: React.FC<PageLayoutProps> = ({ title, backUrl, children, icon, bannerUrl }) => {
+export const PageLayout: React.FC<PageLayoutProps> = ({ children, title, icon, style, bannerUrl, backUrl }) => {
     return (
-        <Layout className="page-layout-container" >
+        <Layout className="page-layout-container" style={style}>
             <Header className="page-layout-header" style={{ backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined }}>
                 {backUrl && (
                     <Link to={backUrl}>
@@ -30,7 +31,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ title, backUrl, children
                     {title}
                 </h1>
             </Header>
-            <Content className="page-layout-content"> {/* 添加顶部内边距 */}
+            <Content className="page-layout-content">
                 {children}
             </Content>
         </Layout>

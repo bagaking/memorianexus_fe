@@ -88,3 +88,56 @@
     }
 }
 
+.item-list-card {
+    margin-bottom: 24px;
+}
+
+.action-buttons {
+    margin-bottom: 16px;
+}
+
+.create-button, .upload-button {
+    height: 40px;
+    font-size: 14px;
+}
+
+.ant-table-row {
+    cursor: pointer;
+}
+
+.item-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px; /* 减小卡片间距 */
+}
+
+.item-card {
+    width: 100%;
+}
+
+.item-card .ant-card-actions {
+    background: none;
+}
+
+.item-card .ant-card-actions li {
+    margin: 0;
+}
+
+.item-card .ant-btn {
+    padding: 4px 8px;
+    height: auto;
+    font-size: 12px;
+}
+
+.item-card .ant-btn-text {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.item-card .ant-btn-text:hover {
+    color: #1890ff;
+}
+
+.item-card .ant-btn-text.ant-btn-dangerous:hover {
+    color: #ff4d4f;
+}
+

@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card } from 'antd';
+import { Table, message, Button, Card, Row, Col, Typography, Tag, Divider } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { Components } from 'react-markdown';
 import { getItems, deleteItem } from '../../api/items';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import ItemUpload from './ItemUpload'; // 引入 ItemUpload 组件
+import { useIsMobile } from '../../hooks/useWindowSize';
 import '../Common/CommonStyles.css';
 import './ItemList.css'; // 引入新的样式文件
+import { PlusOutlined } from '@ant-design/icons';
+import ItemCard from './ItemCard';
+
+const { Text } = Typography;
 
 interface Item {
     id: string;
@@ -17,6 +23,7 @@ interface Item {
 }
 
 const ItemList: React.FC = () => {
+    const isMobile = useIsMobile();
     const [items, setItems] = useState<Item[]>([]);
     const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -95,9 +102,45 @@ const ItemList: React.FC = () => {
 
     const handleLimitChange = (newLimit: number) => {
         setLimit(newLimit);
-        setCurrentPage(1); // 重置到第一页
+        setCurrentPage(1); // 重到第一页
         navigate(`/items?page=1&limit=${newLimit}`);
     };
+
+
+    const customRenderers: Components = {
+        h1: createHeadingRenderer('h1'),
+        h2: createHeadingRenderer('h2'),
+        h3: createHeadingRenderer('h3'),
+        h4: createHeadingRenderer('h4'),
+        h5: createHeadingRenderer('h5'),
+        h6: createHeadingRenderer('h6'),
+    };
+
+    function createHeadingRenderer(level: string) {
+        return ({ children }: React.PropsWithChildren<{}>) => (
+            <Text>
+                <Tag color="default" style={{ borderRadius: '2px', padding: '0 2px', marginRight: '2px', fontSize: '10px' }}>
+                    <Text type="secondary">{level}</Text>
+                </Tag>
+                <Text strong> {children}</Text>
+            </Text>
+        );
+    }
+
+    const ItemCardList: React.FC = () => (
+        <Row gutter={[8, 8]}>
+            {items.map(item => (
+                <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.id}>
+                    <ItemCard 
+                        item={item}
+                        customRenderers={customRenderers}
+                        showDeleteModal={showDeleteModal}
+                        getFirstNonEmptyLine={getFirstNonEmptyLine}
+                    />
+                </Col>
+            ))}
+        </Row>
+    );
 
     const columns: any[] = [
         {
@@ -112,7 +155,7 @@ const ItemList: React.FC = () => {
             dataIndex: 'content',
             key: 'content',
             responsive: ['sm'], // 在小屏及以上屏幕显示
-            render: (text: string) => <ReactMarkdown className="markdown-content">{getFirstNonEmptyLine(text).replace("#", "")}</ReactMarkdown>,
+            render: (text: string) => <ReactMarkdown components={customRenderers}>{getFirstNonEmptyLine(text)}</ReactMarkdown>,
         },
         {
             title: 'Type',
@@ -141,47 +184,70 @@ const ItemList: React.FC = () => {
         <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
             <small>&{record.type}</small>
             <br/>
-            <ReactMarkdown className="markdown-content">{record.content}</ReactMarkdown>
+            <ReactMarkdown components={customRenderers}>{record.content}</ReactMarkdown>
         </Card>
+    );
+
+    const ActionButtons: React.FC = () => (
+        <Row gutter={[16, 16]} className="action-buttons">
+            <Col xs={12} sm={12}>
+                <Link to="/items/new" style={{ display: 'block', height: '100%' }}>
+                    <Button type="primary" icon={<PlusOutlined />} block className="create-button" style={{ height: '100%' }}>
+                        创建新项目
+                    </Button>
+                </Link>
+            </Col>
+            <Col xs={12} sm={12}>
+                <ItemUpload
+                    className="upload-button"
+                    onUploadSuccess={() => fetchItems(currentPage, limit)}
+                    style={{ height: '100%' }}
+                />
+            </Col>
+        </Row>
     );
 
     return (
         <PageLayout title="Items" icon="/item_icon.png">
-            <div className="action-cards-container">
-                <Link to="/items/new" className="action-card create-card">
-                    <Button type="primary" size="large" className="action-card-button">Create New Item</Button>
-                </Link>
-                <div className="action-card upload-card">
-                    <ItemUpload className="action-card-button" onUploadSuccess={() => fetchItems(currentPage, limit)}/>
-                </div>
+            <div style={{ padding: isMobile ? '8px' : '24px' }}>
+                <Card className="item-list-card">
+                    <ActionButtons />
+                    <Divider />
+                    {isMobile ? (
+                        <ItemCardList />
+                    ) : (
+                        <Table
+                            columns={columns}
+                            dataSource={items}
+                            rowKey="id"
+                            expandedRowKeys={expandedRowKeys}
+                            onRow={(record) => ({
+                                onClick: () => handleExpand(record),
+                            })}
+                            expandable={{ expandedRowRender }}
+                            pagination={false}
+                            loading={loading}
+                            scroll={{ x: '100%' }} // 允许水平滚动
+                        />
+                    )}
+                    <Divider />
+                    <PaginationComponent
+                        currentPage={currentPage}
+                        totalItems={totalItems}
+                        limit={limit}
+                        pageDataLength={items.length}
+                        onPageChange={handlePageChange}
+                        onLimitChange={handleLimitChange}
+                    />
+                </Card>
             </div>
-            <div className="table-container">
-                <Table
-                    columns={columns}
-                    dataSource={items}
-                    rowKey="id"
-                    expandedRowKeys={expandedRowKeys}
-                    onRow={(record) => ({
-                        onClick: () => handleExpand(record),
-                    })}
-                    expandable={{ expandedRowRender }}
-                    pagination={false}
-                    loading={loading}
-                    scroll={{ x: '100%' }} // 允许水平滚动
-                />
-            </div>
-            <PaginationComponent
-                currentPage={currentPage}
-                totalItems={totalItems}
-                limit={limit}
-                pageDataLength={items.length}
-                onPageChange={handlePageChange}
-                onLimitChange={handleLimitChange}
+            <DeleteModal 
+                visible={deleteModalVisible} 
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteModalVisible(false)}
             />
-            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete}
-                             onCancel={() => setDeleteModalVisible(false)}/>
         </PageLayout>
-);
+    );
 };
 
 export default ItemList;
