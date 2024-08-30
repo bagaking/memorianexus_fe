@@ -58,3 +58,29 @@
     height: 24px;
     margin-right: 8px;
 }
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .fixed-sider {
+        position: relative;
+        top: 0;
+        height: auto;
+        width: 100%;
+    }
+
+    .site-layout {
+        margin-left: 0;
+    }
+
+    .site-layout-content {
+        padding: 16px;
+    }
+
+    .ant-anchor-wrapper {
+        padding: 8px;
+    }
+
+    .ant-anchor-link-title {
+        font-size: 14px;
+    }
+}

@@ -52,7 +52,7 @@ const Navbar: React.FC = () => {
         <Header className="navbar-header">
             <div className="navbar-left">
                 <img src="/favicon.ico" alt="Logo" className="navbar-logo"/>
-                <Link to="/" className="navbar-title">MemoriaNexus</Link>
+                <Link to="/" className="navbar-title">MemNexus</Link>
             </div>
             <Button className="menu-button" type="primary" icon={<MenuOutlined/>} onClick={showDrawer}/>
             <Menu theme="dark" mode="horizontal" className="navbar-menu">
@@ -96,13 +96,14 @@ const Navbar: React.FC = () => {
                 )}
             </Menu>
             <Drawer
-                title="Menu"
+                title= {userProfile ? <PointsBar showName={false} style={{width: "100px", height: "48px", color: "#fff"}}></PointsBar> : "- MENU -"}
                 placement="right"
                 onClose={onClose}
                 visible={visible}
                 className="navbar-drawer"
             >
                 <Menu mode="vertical" className="navbar-drawer-menu" onClick={handleMenuClick}>
+
                     <Menu.Item key="home" icon={<HomeOutlined/>}>
                         <Link to="/">Home</Link>
                     </Menu.Item>
@@ -118,7 +119,7 @@ const Navbar: React.FC = () => {
                                 <Link to="/campaigns">Campaigns</Link>
                             </Menu.Item>
                             <Menu.Item key="profile" icon={<UserOutlined/>}>
-                                <Link to="/profile">Profile</Link>
+                                <Link to="/profile"><span>{userProfile?.nickname || "Profile" }</span></Link>
                             </Menu.Item>
                         </>
                     ) : (

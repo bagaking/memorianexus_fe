@@ -1,8 +1,9 @@
 import axios from 'axios';
 import Cookies from "js-cookie";
+import {HandleNetworkError, HostApp} from "./_host";
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080/api/v1',
+    baseURL: `${HostApp()}/api/v1`,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -15,5 +16,7 @@ instance.interceptors.request.use((config) => {
     }
     return config;
 });
+
+instance.interceptors.response.use(response => response, HandleNetworkError)
 
 export default instance;

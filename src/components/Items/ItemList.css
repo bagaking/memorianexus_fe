@@ -51,6 +51,32 @@
 }
 
 @media (max-width: 768px) {
+    .card-list {
+        display: block;
+    }
+
+    .card-item {
+        margin-bottom: 16px;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 16px;
+        background: #fff;
+    }
+
+    .card-item .card-title {
+        font-weight: bold;
+    }
+
+    .card-item .card-content {
+        margin-top: 8px;
+    }
+
+    .card-item .card-actions {
+        margin-top: 8px;
+        text-align: right;
+    }
+
+
     .action-card {
         height: 48px;
         border-radius: 4px;
@@ -61,3 +87,4 @@
         font-size: 16px;
     }
 }
+

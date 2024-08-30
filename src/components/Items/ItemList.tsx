@@ -99,27 +99,31 @@ const ItemList: React.FC = () => {
         navigate(`/items?page=1&limit=${newLimit}`);
     };
 
-    const columns = [
+    const columns: any[] = [
         {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
             width: 200,
+            responsive: ['md'], // 在中等及以上屏幕显示
         },
         {
             title: 'Content',
             dataIndex: 'content',
             key: 'content',
+            responsive: ['sm'], // 在小屏及以上屏幕显示
             render: (text: string) => <ReactMarkdown className="markdown-content">{getFirstNonEmptyLine(text).replace("#", "")}</ReactMarkdown>,
         },
         {
             title: 'Type',
             dataIndex: 'type',
             key: 'type',
+            responsive: ['md'], // 在中等及以上屏幕显示
         },
         {
             title: 'Action',
             key: 'action',
+            responsive: ['sm'], // 在小屏及以上屏幕显示
             render: (_: any, record: Item) => (
                 <>
                     <Button type="link" size="small">
@@ -148,21 +152,24 @@ const ItemList: React.FC = () => {
                     <Button type="primary" size="large" className="action-card-button">Create New Item</Button>
                 </Link>
                 <div className="action-card upload-card">
-                    <ItemUpload className="action-card-button" onUploadSuccess={() => fetchItems(currentPage, limit)} />
+                    <ItemUpload className="action-card-button" onUploadSuccess={() => fetchItems(currentPage, limit)}/>
                 </div>
             </div>
-            <Table
-                columns={columns}
-                dataSource={items}
-                rowKey="id"
-                expandedRowKeys={expandedRowKeys}
-                onRow={(record) => ({
-                    onClick: () => handleExpand(record),
-                })}
-                expandable={{ expandedRowRender }}
-                pagination={false}
-                loading={loading}
-            />
+            <div className="table-container">
+                <Table
+                    columns={columns}
+                    dataSource={items}
+                    rowKey="id"
+                    expandedRowKeys={expandedRowKeys}
+                    onRow={(record) => ({
+                        onClick: () => handleExpand(record),
+                    })}
+                    expandable={{ expandedRowRender }}
+                    pagination={false}
+                    loading={loading}
+                    scroll={{ x: '100%' }} // 允许水平滚动
+                />
+            </div>
             <PaginationComponent
                 currentPage={currentPage}
                 totalItems={totalItems}
@@ -171,9 +178,10 @@ const ItemList: React.FC = () => {
                 onPageChange={handlePageChange}
                 onLimitChange={handleLimitChange}
             />
-            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete}
+                             onCancel={() => setDeleteModalVisible(false)}/>
         </PageLayout>
-    );
+);
 };
 
 export default ItemList;

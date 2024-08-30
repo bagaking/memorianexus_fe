@@ -24,12 +24,13 @@ const Profile: React.FC = () => {
 
     useEffect(() => {
         const fetchProfileData = async () => {
-            const profile = await getProfile();
-            if (!profile) {
-                throw new Error('fetch profile failed');
+
+            const prof = await getProfile();
+            if (!prof) {
+                throw new Error('fetch prof failed');
             }
-            setProfile(profile);
-            form.setFieldsValue(profile);
+            setProfile(prof);
+            form.setFieldsValue(prof);
             return profile
         };
 

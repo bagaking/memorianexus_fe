@@ -150,31 +150,35 @@ const CampaignList: React.FC = () => {
     return (
         <PageLayout title="Campaigns" icon="/campaign_dungeon_icon.png">
             <Link to="/campaigns/new">
-                <Button type="primary" style={{ marginBottom: '16px', width: "100%" }} className="create-new-one-button">Create New Campaign Dungeon</Button>
+                <Button type="primary" style={{marginBottom: '16px', width: "100%"}} className="create-new-one-button">Create
+                    New Campaign Dungeon</Button>
             </Link>
-            <Table
-                columns={columns}
-                dataSource={dungeons}
-                rowKey="id"
-                expandedRowKeys={expandedRowKeys}
-                onRow={(record) => ({
-                    onClick: () => handleExpand(record),
-                })}
-                expandable={{ expandedRowRender }}
-                pagination={false}
-                loading={loading}
-            />
-            <PaginationComponent
-                currentPage={currentPage}
-                totalItems={totalDungeons}
-                limit={limit}
-                pageDataLength={dungeons.length}
-                onPageChange={handlePageChange}
-                onLimitChange={handleLimitChange}
-            />
-            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
+            <div className="table-container">
+                <Table
+                    columns={columns}
+                    dataSource={dungeons}
+                    rowKey="id"
+                    expandedRowKeys={expandedRowKeys}
+                    onRow={(record) => ({
+                        onClick: () => handleExpand(record),
+                    })}
+                    expandable={{expandedRowRender}}
+                    pagination={false}
+                    loading={loading}
+                />
+            </div>
+                <PaginationComponent
+                    currentPage={currentPage}
+                    totalItems={totalDungeons}
+                    limit={limit}
+                    pageDataLength={dungeons.length}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                />
+                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete}
+                             onCancel={() => setDeleteModalVisible(false)}/>
         </PageLayout>
-    );
+);
 };
 
 export default CampaignList;

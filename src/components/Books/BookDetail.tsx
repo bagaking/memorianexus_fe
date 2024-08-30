@@ -1,18 +1,18 @@
+// src/components/Books/BookDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Form, message, Button } from 'antd';
+import { Form, message } from 'antd';
 import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
 import { PageLayout } from '../Layout/PageLayout';
 import { TitleField, MarkdownField } from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
-import {Book} from "../Basic/dto";
+import { Book } from "../Basic/dto";
 import BookItemList from "./BookItemList";
 
 import '../Common/CommonStyles.css';
 import './BookDetail.css';
-
 
 const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -96,18 +96,24 @@ const BookDetail: React.FC = () => {
 
     return (
         <PageLayout title={(id && id !== 'new') ? `Edit Book (id: ${id})` : 'Create Book'} backUrl={`/books?page=${currentPage}&limit=${limit}`} icon="/book_icon.png">
-            <Form form={form} onFinish={handleSubmit}>
-                <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
-                <TitleField />
-                <MarkdownField name="description" placeholder="my description" rules={[{ required: true, message: 'Please enter the description!' }]} />
-                <EditableTagField name="tags" />
-            </Form>
-
+            <div className="book-detail-container">
+                <Form form={form} onFinish={handleSubmit} className="book-detail-content">
+                    <ActionButtons
+                        isEditMode={!!id && id !== 'new'}
+                        onDelete={showDeleteModal}
+                        // additionalButtons={[
+                        //     { label: 'Custom Button 1', onClick: () => console.log('Custom Button 1 clicked'), type: 'primary' },
+                        //     { label: 'Custom Button 2', onClick: () => console.log('Custom Button 2 clicked'), type: 'default' }
+                        // ]}
+                        layout="horizontal"
+                    />
+                    <TitleField />
+                    <MarkdownField name="description" placeholder="my description" rules={[{ required: true, message: 'Please enter the description!' }]} />
+                    <EditableTagField name="tags" />
+                </Form>
                 <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
-                {(id && id !== "new") &&
-                    <BookItemList bookId={id} />
-                }
-
+                {(id && id !== "new") && <BookItemList bookId={id} />}
+            </div>
         </PageLayout>
     );
 };

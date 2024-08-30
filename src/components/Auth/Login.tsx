@@ -16,7 +16,22 @@ const Login: React.FC = () => {
             message.success('Welcome back ' + localStorage.getItem('ACCESS_TOKEN')+ ' ' + authContext.isAuthenticated);
             navigate('/'); // 登录成功后跳转到首页或其他页面
         } catch (error) {
-            message.error('Failed to login, ' + error);
+
+            let ee = (error as any)
+            let eeMessage = ee.message || `${error}`;
+            if (ee.response) {
+                // 服务器有响应但状态码非 2xx 范围
+                eeMessage = `Error: ${ee.response.status}. Message: ${ee.response.data}`;
+            } else if (ee.request) {
+                // 请求已发送但没有收到响应
+                eeMessage = `Network Error: ${ee.message}. Request details: ${ee.request}`;
+            } else {
+                // 在设置请求时出现了错误
+                eeMessage = `Request Setup Error: ${ee.message}`;
+            }
+
+            console.error(error);
+            message.error(`Login failed, err= ${eeMessage}`);
         }
     };
 

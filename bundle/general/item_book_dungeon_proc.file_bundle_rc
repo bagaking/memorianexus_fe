@@ -1,0 +1,15 @@
+entry = [
+    "./src/api/book*",
+    "./src/api/item*",
+    "./src/api/campaigns*",
+    "./src/api/dungeons*",
+    "./src/components/Items/**/*",
+    "./src/components/Books/**/*",
+    "./src/components/Dungeon/**/*",
+]
+
+exclude = [
+    ".bundle.txt",
+    "./script",
+    "node_modules/**"
+]

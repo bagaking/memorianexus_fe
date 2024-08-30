@@ -7,9 +7,8 @@ import { getBooks, deleteBook } from '../../api/books';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
-import '../Common/CommonStyles.css';
 import {Book, Item} from "../Basic/dto";
-import FirstLine from "../Common/Firstline";
+import '../Common/CommonStyles.css';
 
 const BookList: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
@@ -131,8 +130,6 @@ const BookList: React.FC = () => {
         },
     ];
 
-
-
     const expandedRowRender = (record: Book) => (
         <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
             <h2>{record.title}</h2>
@@ -146,18 +143,20 @@ const BookList: React.FC = () => {
                 <Button type="primary" className="create-new-one-button">Create New Book</Button>
             </Link>
 
-            <Table
-                columns={columns}
-                dataSource={books}
-                rowKey="id"
-                expandedRowKeys={expandedRowKeys}
-                onRow={(record) => ({
-                    onClick: () => handleExpand(record),
-                })}
-                expandable={{expandedRowRender}}
-                pagination={false}
-                loading={loading}
-            />
+            <div className="table-container">
+                <Table
+                    columns={columns}
+                    dataSource={books}
+                    rowKey="id"
+                    expandedRowKeys={expandedRowKeys}
+                    onRow={(record) => ({
+                        onClick: () => handleExpand(record),
+                    })}
+                    expandable={{expandedRowRender}}
+                    pagination={false}
+                    loading={loading}
+                />
+            </div>
             <PaginationComponent
                 currentPage={currentPage}
                 totalItems={totalBooks}

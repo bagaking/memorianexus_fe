@@ -1,5 +1,6 @@
 entry = [
     "./src/api/**/*",
+    "package.json",
 ]
 
 exclude = [
