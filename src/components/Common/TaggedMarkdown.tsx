@@ -9,7 +9,7 @@ interface TaggedMarkdownProps {
   tagStyles?: {
     [key: string]: React.CSSProperties;
   };
-  indentHeadings?: boolean;
+  mode?: 'tag' | 'heading' | 'both';
   customRenderers?: Partial<Components>;
 }
 
@@ -22,23 +22,35 @@ const defaultTagStyles: { [key: string]: React.CSSProperties } = {
   h6: { color: '#eb2f96' },
 };
 
-export const createTaggedRenderer = (tagStyles: { [key: string]: React.CSSProperties }, indentHeadings: boolean) => {
+const tagStyle: React.CSSProperties = {
+  borderRadius: '4px', 
+  padding: '0 4px', 
+  marginRight: '4px', 
+  fontSize: '8px',
+  lineHeight: '16px',
+  verticalAlign: 'middle',
+};
+
+export const createTaggedRenderer = (tagStyles: { [key: string]: React.CSSProperties }, mode: 'tag' | 'heading' | 'both' = 'tag') => {
   return (nodeType: string) => {
     return ({ children }: React.PropsWithChildren<{}>) => (
-      <Text>
-        {indentHeadings && (
+      <span style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+        {(mode === 'tag' || mode === 'both') && (
           <Tag color={tagStyles[nodeType]?.color || 'default'} style={{ 
-            borderRadius: '2px', 
-            padding: '0 2px', 
-            marginRight: '2px', 
-            fontSize: '10px',
+            ...tagStyle,
             ...tagStyles[nodeType]
           }}>
             <Text type="secondary">{nodeType}</Text>
           </Tag>
         )}
-        <Text strong>{children}</Text>
-      </Text>
+        {mode === 'heading' ? (
+          React.createElement(nodeType, { style: { margin: 0 } }, children)
+        ) : mode === 'both' ? (
+          React.createElement(nodeType, { style: { margin: 0 } }, children)
+        ) : (
+          <Text strong>{children}</Text>
+        )}
+      </span>
     );
   };
 };
@@ -46,17 +58,17 @@ export const createTaggedRenderer = (tagStyles: { [key: string]: React.CSSProper
 export const TaggedMarkdown: React.FC<TaggedMarkdownProps> = ({ 
   children, 
   tagStyles = {}, 
-  indentHeadings = true,
+  mode = 'both',
   customRenderers = {}
 }) => {
   const mergedTagStyles = { ...defaultTagStyles, ...tagStyles };
   const defaultRenderers: Components = {
-    h1: createTaggedRenderer(mergedTagStyles, indentHeadings)('h1'),
-    h2: createTaggedRenderer(mergedTagStyles, indentHeadings)('h2'),
-    h3: createTaggedRenderer(mergedTagStyles, indentHeadings)('h3'),
-    h4: createTaggedRenderer(mergedTagStyles, indentHeadings)('h4'),
-    h5: createTaggedRenderer(mergedTagStyles, indentHeadings)('h5'),
-    h6: createTaggedRenderer(mergedTagStyles, indentHeadings)('h6'),
+    h1: createTaggedRenderer(mergedTagStyles, mode)('h1'),
+    h2: createTaggedRenderer(mergedTagStyles, mode)('h2'),
+    h3: createTaggedRenderer(mergedTagStyles, mode)('h3'),
+    h4: createTaggedRenderer(mergedTagStyles, mode)('h4'),
+    h5: createTaggedRenderer(mergedTagStyles, mode)('h5'),
+    h6: createTaggedRenderer(mergedTagStyles, mode)('h6'),
   };
 
   const mergedRenderers = { ...defaultRenderers, ...customRenderers };

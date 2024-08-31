@@ -129,7 +129,7 @@ const ItemList: React.FC = () => {
             dataIndex: 'content',
             key: 'content',
             responsive: ['sm'],
-            render: (text: string) => <TaggedMarkdown indentHeadings={true}>{getFirstNonEmptyLine(text)}</TaggedMarkdown>,
+            render: (text: string) => <TaggedMarkdown mode="tag">{getFirstNonEmptyLine(text)}</TaggedMarkdown>,
         },
         {
             title: 'Type',

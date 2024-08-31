@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { message } from 'antd';
-import { getPracticeMonsters, submitPracticeResult, getItemById } from '../../api';
+import { Divider, message } from 'antd';
+import { getPracticeMonsters, submitPracticeResult, getItemById, getDungeonDetail } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
 import { DungeonMonster, Item, ParsePercentage } from '../Basic/dto';
 import { showReward } from '../Common/RewardNotification';
@@ -11,6 +11,7 @@ import SkillCard from './SkillCard';
 import MonsterPortrait from './MonsterPortrait';
 import MonsterHealthBar from './MonsterHealthBar';
 import { useUserPoints } from "../../context/UserPointsContext";
+import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 import './CampaignChallenge.less';
 
 const CampaignChallenge: React.FC = () => {
@@ -21,6 +22,21 @@ const CampaignChallenge: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const { refreshPoints } = useUserPoints();
     const [showFullContent, setShowFullContent] = useState(false);
+    const [campaignName, setCampaignName] = useState('');
+    const { contentRef, AnimatedTitle } = useScrollAnimation(loading, {
+        animationDuration: 3000,
+        flashCount: 3,
+        flashDuration: 500
+    });
+
+    const fetchCampaignName = async () => {
+        try {
+            const response = await getDungeonDetail(id!);
+            setCampaignName(response.data.data.title);
+        } catch (error) {
+            console.error('Failed to fetch campaign name:', error);
+        }
+    };
 
     const fetchMonstersAndDetails = async () => {
         try {
@@ -45,6 +61,7 @@ const CampaignChallenge: React.FC = () => {
     };
 
     useEffect(() => {
+        fetchCampaignName();
         fetchMonstersAndDetails();
     }, [id]);
 
@@ -91,9 +108,13 @@ const CampaignChallenge: React.FC = () => {
     const currentItemDetail = itemDetails.find(detail => detail.id === currentMonster.item_id);
 
     return (
-        <PageLayout title="Campaign Challenge" backUrl={`/campaigns`} icon="/campaign_dungeon_icon.png">
+        <PageLayout 
+            title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
+            backUrl={`/campaigns`} 
+            icon="/campaign_dungeon_icon.png"
+        >
             <div className="campaign-challenge-container">
-                <div className="campaign-challenge-content">
+                <div className="campaign-challenge-content" ref={contentRef}>
                     <div className={`monster-card ${showFullContent ? 'show-full-content' : ''}`} onClick={toggleMonsterContent}>
                         <div className="monster-image-container">
                             <MonsterPortrait 
@@ -108,7 +129,7 @@ const CampaignChallenge: React.FC = () => {
                             </h2>
                         </div>
                         <div className="monster-content">
-                            <TaggedMarkdown>{currentItemDetail?.content || ''}</TaggedMarkdown>
+                            <TaggedMarkdown mode='both'>{currentItemDetail?.content || ''}</TaggedMarkdown>
                         </div>
                     </div>
                     <div className="skills-container">

@@ -6,7 +6,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import './PageLayout.less';
 
 interface PageLayoutProps {
-    title: string;
+    title: string | React.ReactNode;
     icon: string;
     style?: React.CSSProperties;
     bannerUrl?: string;
