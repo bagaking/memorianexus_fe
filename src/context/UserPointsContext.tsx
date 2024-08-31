@@ -1,13 +1,14 @@
 // src/context/UserPointsContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { getPoints } from '../api/profile';
 import {ParseUint64, Points} from "../components/Basic/dto";
 
 interface UserPointsContextProps {
     points: Points | null;
     loading: boolean;
-    error: string | null;
-    refreshPoints: (updater: Points | null) => void;
+    error: Error | null;
+    refreshPoints: (newPoints?: Partial<Points>) => Promise<void>;
+    initialized: boolean;  // 新增
 }
 
 const UserPointsContext = createContext<UserPointsContextProps | undefined>(undefined);
@@ -24,43 +25,31 @@ interface UserPointsProviderProps {
     children: ReactNode;
 }
 
-export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children }) => {
+export const UserPointsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [points, setPoints] = useState<Points | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+    const [initialized, setInitialized] = useState(false);  // 新增
 
-    const fetchPoints = async () => {
-        try {
-            const pointsData = await getPoints();
-            setPoints(pointsData);
-            setLoading(false);
-        } catch (err) {
-            setError('Failed to fetch user points');
-            setLoading(false);
+    const refreshPoints = useCallback(async (newPoints?: Partial<Points>) => {
+        if (newPoints) {
+            setPoints({ 
+                ...points,
+                ... (newPoints as Points),
+            });
+        } else {
+            // 从 API 获取最新数据的逻辑
+            const updatedPoints = await getPoints();
+            setPoints(updatedPoints);
         }
-    };
-
-    useEffect(() => {
-        fetchPoints();
     }, []);
 
-    const refreshPoints = (updater: Points | null) => {
-        setLoading(true);
-        if(!! updater) {
-            let p: Points = {
-                cash: ParseUint64(points?.cash) + ParseUint64(updater?.cash),
-                gem: ParseUint64(points?.gem) + ParseUint64(updater?.gem),
-                vip_score: ParseUint64(points?.vip_score) + ParseUint64(updater?.vip_score),
-            }
-            console.log("refreshPoints", p, updater)
-            setPoints(p);
-            return
-        }
-        fetchPoints();
-    };
+    useEffect(() => {
+        refreshPoints();
+    }, [refreshPoints]);
 
     return (
-        <UserPointsContext.Provider value={{ points, loading, error, refreshPoints }}>
+        <UserPointsContext.Provider value={{ points, loading, error, refreshPoints, initialized }}>
             {children}
         </UserPointsContext.Provider>
     );

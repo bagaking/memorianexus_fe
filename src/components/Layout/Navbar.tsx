@@ -4,21 +4,16 @@ import { Link } from 'react-router-dom';
 import { Menu, Layout, Drawer, Button,  } from 'antd';
 import { MenuOutlined, HomeOutlined, BookOutlined, FileOutlined, UserOutlined, AppstoreOutlined, UserAddOutlined, LoginOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
-import { getProfile } from "../../api";
+import { getProfile, IProfile } from "../../api";
 import PointsBar from "../Common/PointsBar";
 import './Navbar.less';
 
 const { Header } = Layout;
 
-interface UserProfile {
-    avatar_url: string;
-    nickname: string;
-}
-
 const Navbar: React.FC = () => {
     const [visible, setVisible] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [userProfile, setUserProfile] = useState<IProfile | null>(null);
     const auth = useAuth();
 
     useEffect(() => {
@@ -59,7 +54,7 @@ const Navbar: React.FC = () => {
                         <Link to="/items">项目</Link>
                     </Menu.Item>
                     <Menu.Item key="campaigns" icon={<AppstoreOutlined/>}>
-                        <Link to="/campaigns">活动</Link>
+                        <Link to="/campaigns">副本</Link>
                     </Menu.Item>
                     {userProfile && (
                         <Menu.Item key="profile" className="navbar-profile-menu-item">

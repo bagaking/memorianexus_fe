@@ -2,10 +2,10 @@ import axios from './axios';
 import {Points} from "../components/Basic/dto";
 
 export interface IProfile {
-    id: number;
+    id: string;
     nickname: string;
     email: string;
-    avatar_url: string;
+    avatar_url: string | null | undefined;
     bio: string;
     created_at: string;
 }

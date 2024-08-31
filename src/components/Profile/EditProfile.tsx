@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, message, Row, Col, Card, Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import { getProfile, updateProfile } from '../../api/profile';
+import { getProfile, IProfile, updateProfile } from '../../api/profile';
 import { useIsMobile } from '../../hooks/useWindowSize';
 
 interface UserProfile {
     email: string;
     nickname: string;
-    avatar_url: string;
+    avatar_url: string | null | undefined;
     bio: string;
 }
 
 const EditProfile: React.FC = () => {
     const [form] = Form.useForm();
-    const [profile, setProfile] = useState<UserProfile>({
+    const [profile, setProfile] = useState<IProfile>({
+        id: '',
         email: '',
         nickname: '',
         avatar_url: '',
-        bio: ''
+        bio: '',
+        created_at: '',
     });
     const isMobile = useIsMobile();
 

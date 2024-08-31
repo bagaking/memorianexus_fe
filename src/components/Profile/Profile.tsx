@@ -1,6 +1,6 @@
 // src/components/Profile/Profile.tsx
 import React, { useEffect, useState, useRef } from 'react';
-import { Form, Input, Button, message, Switch, Select, Layout, Modal, Divider, Card, Avatar, Row, Col, Affix, Spin } from 'antd';
+import { Form, Input, Button, message, Switch, Select, Layout, Modal, Divider, Card, Avatar, Row, Col, Affix, Spin, Alert } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { IProfile, ISettingsMemorization, ISettingsAdvance, getProfile, updateProfile, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api/profile';
 import { useAuth } from '../../context/AuthContext';
@@ -25,7 +25,7 @@ const { Content } = Layout;
 const Profile: React.FC = () => {
     const [form] = Form.useForm();
     const [profile, setProfile] = useState<IProfile | null>(null);
-    const { points, loading: pointsLoading, error: pointsError } = useUserPoints();
+    const { points, loading: pointsLoading, error: pointsError, initialized: pointsInitialized } = useUserPoints();
     const [memorizationSettings, setMemorizationSettings] = useState<ISettingsMemorization | null>(null);
     const [advanceSettings, setAdvanceSettings] = useState<ISettingsAdvance | null>(null);
     const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
                 return await fetchFunc();
             } catch (err) {
                 if (i === retries - 1) throw err;
-                await new Promise(resolve => setTimeout(resolve, 1000)); // 等��1秒后重试
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 等1秒后重试
             }
         }
     };
@@ -83,13 +83,26 @@ const Profile: React.FC = () => {
 
     const handleProfileUpdate = async (values: Partial<IProfile>) => {
         try {
-            await updateProfile(values);
+            // 确保 avatar_url 不为空字符串
+            const updatedValues = {
+                ...values,
+                avatar_url: values.avatar_url || null
+            };
+            
+            await updateProfile(updatedValues);
             message.success('个人资料更新成功');
+            
+            // 重新获取最新的个人资料
             const profileData = await getProfile();
             setProfile(profileData);
+            
             // 更新表单字段，确保头像 URL 被正确设置
             form.setFieldsValue(profileData);
+            
+            // 如果需要，可以在这里添加额外的日志
+            console.log('Updated profile:', profileData);
         } catch (error) {
+            console.error('更新个人资料失败:', error);
             message.error('更新个人资料失败');
         }
     };
@@ -125,7 +138,7 @@ const Profile: React.FC = () => {
         setLogoutModalVisible(false);
     };
 
-    if (isLoading || pointsLoading) {
+    if (isLoading || (pointsLoading && !pointsInitialized)) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <Spin size="large" />
@@ -133,8 +146,8 @@ const Profile: React.FC = () => {
         );
     }
 
-    if (!profile || !memorizationSettings || !advanceSettings || pointsError) {
-        return <div>数据加载失败，请刷新页面重试。</div>;
+    if (!profile || !memorizationSettings || !advanceSettings) {
+        return <div>个人资料数据加载失败，请刷新页面重试。</div>;
     }
 
     const ProfileSection = () => (
@@ -147,7 +160,7 @@ const Profile: React.FC = () => {
                     <Input />
                 </Form.Item>
                 <Form.Item name="avatar_url" label="头像" rules={[{ required: false, message: '请输入您的头像 URL！' }]}>
-                    <Input />
+                    <Input placeholder="请输入头像 URL" />
                 </Form.Item>
                 <MarkdownField name="bio" label="个人简介" placeholder="输入您的个人简介" rules={[{ required: false, message: '请输入您的个人简介！' }]}/>
                 <Form.Item wrapperCol={{ offset: isMobile ? 0 : 8, span: 16 }}>
@@ -213,7 +226,7 @@ const Profile: React.FC = () => {
     );
 
     return (
-        <PageLayout title="个人资料" icon={profile.avatar_url}>
+        <PageLayout title="个人资料" icon={profile.avatar_url ?? ''}>
             <Layout>
                 <Content>
                     <Row gutter={24}>
@@ -239,7 +252,16 @@ const Profile: React.FC = () => {
                                         </Row>
                                     </Col>
                                     <Col xs={24} sm={24} md={16}>
-                                        <CoolPointsDisplay />
+                                        {pointsError ? (
+                                            <Alert
+                                                message="积分加载失败"
+                                                description="无法加载您的积分信息，但您仍可以查看和编辑其他个人资料。"
+                                                type="error"
+                                                showIcon
+                                            />
+                                        ) : (
+                                            <CoolPointsDisplay />
+                                        )}
                                     </Col>
                                 </Row>
                             </Card>
