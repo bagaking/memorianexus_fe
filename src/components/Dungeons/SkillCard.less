@@ -46,14 +46,6 @@
         transition: opacity @transition-duration;
     }
 
-    &:hover {
-        transform: scale(1.02);
-
-        &::before {
-            opacity: 0.3;
-        }
-    }
-
     &-content {
         .flex-center();
         flex-direction: row;
@@ -86,6 +78,19 @@
     .generate-skill-card(complete, #40a9ff);
 }
 
+/* 桌面设备的悬停效果 */
+@media (hover: hover) and (pointer: fine) {
+    .skill-card {
+        &:hover {
+            transform: scale(1.02);
+
+            &::before {
+                opacity: 0.3;
+            }
+        }
+    }
+}
+
 /* 媒体查询：在手机上调整布局 */
 @media (max-width: 768px) {
     @card-width: calc(100vw / 5 - 10px);
@@ -103,5 +108,21 @@
             font-size: calc(32px * @card-scale-rate);
             margin-right: 0;
         }
+
+        /* 移动设备上的点击效果 */
+        &:active::before {
+            opacity: 0.3;
+            animation: fadeOutGlow 1s forwards;
+        }
+    }
+}
+
+/* 定义渐隐动画 */
+@keyframes fadeOutGlow {
+    0% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
     }
 }

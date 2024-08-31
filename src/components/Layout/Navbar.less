@@ -1,10 +1,4 @@
-// 变量
-@primary-color: #4a00e0;
-@secondary-color: #8e2de2;
-@text-color: white;
-@highlight-color: #ffd700;
-@selected-bg-color: rgba(255, 255, 255, 0.2);
-@transition-duration: 0.3s;
+@import '../Common/variables.less';
 
 // 混合
 .flex-center() {
@@ -16,13 +10,13 @@
 .navbar {
   &-header {
     padding: 0;
-    background: linear-gradient(45deg, @primary-color, @secondary-color);
+    background: linear-gradient(45deg, @navbar-header-primary-color, @navbar-header-secondary-color);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    height: 64px;
+    height: @navbar-height;
   }
 
   &-content {
@@ -40,7 +34,7 @@
   &-logo {
     height: 32px;
     margin-right: 16px;
-    transition: transform @transition-duration ease;
+    transition: transform @default-transition-duration ease;
 
     &:hover {
       transform: scale(1.1);
@@ -48,7 +42,7 @@
   }
 
   &-title {
-    color: @text-color;
+    color: @navbar-header-text-color;
     font-size: 20px;
     font-weight: bold;
     white-space: nowrap;
@@ -62,9 +56,9 @@
     justify-content: flex-end;
 
     .ant-menu-item {
-      color: @text-color;
+      color: @navbar-header-text-color;
       font-weight: 500;
-      transition: all @transition-duration ease;
+      transition: all @default-transition-duration ease;
       margin: 0 4px;
       padding: 0 10px;
       position: relative;
@@ -77,12 +71,12 @@
         left: 50%;
         width: 0;
         height: 2px;
-        background: @highlight-color;
-        transition: all @transition-duration ease;
+        background: @navbar-header-highlight-color;
+        transition: all @default-transition-duration ease;
       }
 
       &:hover {
-        color: @highlight-color;
+        color: @navbar-header-highlight-color;
         background-color: rgba(255, 255, 255, 0.1);
 
         &::after {
@@ -92,7 +86,7 @@
       }
 
       &-active {
-        color: @highlight-color;
+        color: @navbar-header-highlight-color;
         background-color: rgba(255, 255, 255, 0.2);
 
         &::after {
@@ -103,7 +97,7 @@
 
       .anticon {
         margin-right: 5px;
-        transition: transform @transition-duration ease;
+        transition: transform @default-transition-duration ease;
       }
 
       &:hover .anticon {
@@ -135,7 +129,7 @@
 
     &-name {
       margin-right: 8px;
-      color: @text-color;
+      color: @navbar-header-text-color;
     }
   }
 }
@@ -144,14 +138,14 @@
   display: none;
   background: transparent;
   border: none;
-  color: @text-color;
+  color: @navbar-header-text-color;
   font-size: 20px;
   cursor: pointer;
-  transition: all @transition-duration ease;
+  transition: all @default-transition-duration ease;
   padding: 0 10px;
 
   &:hover {
-    color: lighten(@secondary-color, 30%);
+    color: lighten(@navbar-header-secondary-color, 30%);
   }
 }
 
@@ -196,13 +190,13 @@
   }
 
   &-menu {
-    background: linear-gradient(to bottom, @primary-color, @secondary-color);
+    background: linear-gradient(to bottom, @navbar-header-primary-color, @navbar-header-secondary-color);
     height: 100%;
 
     .ant-menu-item {
-      color: @text-color;
+      color: @navbar-header-text-color;
       font-weight: 500;
-      transition: all @transition-duration ease;
+      transition: all @default-transition-duration ease;
       margin: 0;
       padding: 0 24px;
       height: 50px;
@@ -217,13 +211,13 @@
         left: 0;
         width: 0;
         height: 2px;
-        background: @highlight-color;
-        transition: all @transition-duration ease;
+        background: @navbar-header-highlight-color;
+        transition: all @default-transition-duration ease;
       }
 
       &:hover {
-        color: @highlight-color;
-        background-color: @selected-bg-color;
+        color: @navbar-header-highlight-color;
+        background-color: rgba(255, 255, 255, 0.2);
 
         &::after {
           width: 100%;
@@ -231,8 +225,8 @@
       }
 
       &-selected {
-        color: @highlight-color;
-        background-color: @selected-bg-color;
+        color: @navbar-header-highlight-color;
+        background-color: rgba(255, 255, 255, 0.2);
 
         &::after {
           width: 100%;
@@ -241,7 +235,7 @@
 
       .anticon {
         margin-right: 10px;
-        transition: transform @transition-duration ease;
+        transition: transform @default-transition-duration ease;
       }
 
       &:hover .anticon {
@@ -274,10 +268,10 @@
   border-radius: 20px;
   padding: 2px 10px;
   font-size: 14px;
-  color: @text-color;
+  color: @navbar-header-text-color;
   margin-right: 10px;
   white-space: nowrap;
-  transition: all @transition-duration ease;
+  transition: all @default-transition-duration ease;
 
   &:hover {
     transform: scale(1.05);
