@@ -3,7 +3,7 @@ import React from 'react';
 import { Layout, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import '../Common/CommonStyles.css';
+import './PageLayout.less';
 
 interface PageLayoutProps {
     title: string;
@@ -22,7 +22,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ children, title, icon, s
                 {backUrl && (
                     <Link to={backUrl}>
                         <Button type="text" className="back-button">
-                            <ArrowLeftOutlined style={{ fontSize: '16px', color: '#fff' }} />
+                            <ArrowLeftOutlined />
                         </Button>
                     </Link>
                 )}

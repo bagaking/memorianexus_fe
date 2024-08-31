@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message, Row, Col, Card, Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import { getProfile, updateProfile } from '../../api/profile';
+import { useIsMobile } from '../../hooks/useWindowSize';
 
 interface UserProfile {
     email: string;
@@ -17,6 +19,7 @@ const EditProfile: React.FC = () => {
         avatar_url: '',
         bio: ''
     });
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -26,7 +29,7 @@ const EditProfile: React.FC = () => {
                 form.setFieldsValue(profile);
             } catch (error) {
                 console.error(error);
-                message.error('Failed to edit profile');
+                message.error('Failed to fetch profile');
             }
         };
 
@@ -44,23 +47,55 @@ const EditProfile: React.FC = () => {
     };
 
     return (
-        <div>
-            <h2>Edit Profile</h2>
-            <Form form={form} onFinish={handleSubmit}>
-                <Form.Item name="nickname" rules={[{ required: true, message: 'Please input your nickname!' }]}>
-                    <Input placeholder="Nickname" />
-                </Form.Item>
-                <Form.Item name="avatar_url" rules={[{ required: true, message: 'Please input your avatar URL!' }]}>
-                    <Input placeholder="Avatar URL" />
-                </Form.Item>
-                <Form.Item name="bio" rules={[{ required: true, message: 'Please input your bio!' }]}>
-                    <Input placeholder="Bio" />
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">Save</Button>
-                </Form.Item>
-            </Form>
-        </div>
+        <Row justify="center" align="middle" style={{ minHeight: '100vh' }}>
+            <Col xs={24} sm={20} md={16} lg={12} xl={8}>
+                <Card 
+                    title={<h2 style={{ textAlign: 'center' }}>Edit Profile</h2>}
+                    extra={
+                        <Avatar 
+                            size={64} 
+                            src={profile.avatar_url} 
+                            icon={<UserOutlined />}
+                        />
+                    }
+                >
+                    <Form 
+                        form={form} 
+                        onFinish={handleSubmit}
+                        layout={isMobile ? 'vertical' : 'horizontal'}
+                        labelCol={{ span: isMobile ? 24 : 8 }}
+                        wrapperCol={{ span: isMobile ? 24 : 16 }}
+                    >
+                        <Form.Item 
+                            name="nickname" 
+                            label="Nickname"
+                            rules={[{ required: true, message: 'Please input your nickname!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item 
+                            name="avatar_url" 
+                            label="Avatar URL"
+                            rules={[{ required: true, message: 'Please input your avatar URL!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item 
+                            name="bio" 
+                            label="Bio"
+                            rules={[{ required: true, message: 'Please input your bio!' }]}
+                        >
+                            <Input.TextArea rows={4} />
+                        </Form.Item>
+                        <Form.Item wrapperCol={{ offset: isMobile ? 0 : 8, span: 16 }}>
+                            <Button type="primary" htmlType="submit" block={isMobile}>
+                                Save
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Card>
+            </Col>
+        </Row>
     );
 };
 

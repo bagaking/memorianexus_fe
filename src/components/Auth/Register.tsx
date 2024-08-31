@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {Form, Input, Button, message, Card, Typography} from 'antd';
 import { register } from '../../api/auth';
-import './Login.css';
+import './Login.less';
 
 const { Title } = Typography;
 

@@ -12,7 +12,7 @@ import { Book } from "../Basic/dto";
 import BookItemList from "./BookItemList";
 
 import '../Common/CommonStyles.css';
-import './BookDetail.css';
+import './BookDetail.less';
 
 const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();

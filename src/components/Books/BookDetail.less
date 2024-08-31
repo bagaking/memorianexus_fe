@@ -1,0 +1,119 @@
+@padding: 20px;
+@bg-color: #f0f2f5;
+@font-color: #001529;
+@box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+@modal-bg-color: #ff4d4f;
+@modal-hover-bg-color: #ff7875;
+@container-bg-color: #fafafa;
+@container-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+@transition: all 0.3s ease;
+
+.book-detail-container {
+    padding: @padding;
+    background-color: @bg-color;
+    min-height: 100vh;
+
+    h2 {
+        font-size: 32px;
+        color: @font-color;
+        margin-bottom: 20px;
+    }
+}
+
+.book-detail-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: @box-shadow;
+    animation: fadeIn 0.5s ease-in-out;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    .ant-form-item {
+        margin-bottom: 16px;
+    }
+}
+
+.delete-modal .ant-modal-content {
+    border-radius: 8px;
+}
+
+.delete-modal .ant-modal-header {
+    background-color: @modal-bg-color;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+}
+
+.delete-modal .ant-modal-footer {
+    border-radius: 0 0 8px 8px;
+}
+
+.delete-modal .ant-btn-primary {
+    background-color: @modal-bg-color;
+    border-color: @modal-bg-color;
+    color: #fff;
+
+    &:hover {
+        background-color: @modal-hover-bg-color;
+        border-color: @modal-hover-bg-color;
+    }
+}
+
+/* 子模块样式 */
+.book-items-container {
+    margin-top: 40px;
+    padding: @padding;
+    background: @container-bg-color;
+    border-radius: 8px;
+    box-shadow: @container-box-shadow;
+
+    h2 {
+        font-size: 28px;
+        color: @font-color;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .book-detail-container {
+        h2 {
+            font-size: 24px;
+        }
+    }
+
+    .book-detail-content {
+        padding: 16px;
+
+        .ant-form-item {
+            margin-bottom: 12px;
+        }
+
+        .ant-btn-primary,
+        .ant-btn-danger {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+    }
+
+    .book-items-container {
+        padding: 16px;
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

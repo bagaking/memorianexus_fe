@@ -1,0 +1,40 @@
+/* 定义变量 */
+@card-height: 200px;
+@preview-height: 168px;
+@hover-min-height: 180px;
+@hover-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+@selected-bg-color: #88ea8d;
+@selected-border-color: #95fbef;
+@transition: all 0.3s ease;
+
+.item-card {
+    height: @card-height;
+    overflow: hidden;
+    position: relative;
+    transition: @transition;
+    cursor: pointer;
+
+    &:hover {
+        width: auto;
+        min-height: @hover-min-height;
+        min-width: 100%;
+        z-index: 1;
+        box-shadow: @hover-box-shadow;
+    }
+
+    &.selected {
+        background-color: @selected-bg-color;
+        border-color: @selected-border-color;
+    }
+}
+
+.item-preview-container {
+    height: @preview-height;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.item-card-content {
+    max-height: 90%;
+    overflow: hidden;
+}

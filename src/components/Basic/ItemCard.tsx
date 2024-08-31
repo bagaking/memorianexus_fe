@@ -1,33 +1,61 @@
-// ItemCard.tsx
 import React from 'react';
-import {Card, Tooltip} from 'antd';
-import Markdown from "react-markdown";
-import "./ItemCard.css";
-import Meta from "antd/es/card/Meta";
-import {Link} from "react-router-dom";
-import {Item} from "./dto";
+import { Card, Button, Typography, Tooltip } from 'antd';
+import { Link } from 'react-router-dom';
+import TaggedMarkdown from '../Common/TaggedMarkdown';
+import { Item } from "../Basic/dto";
+
+const { Text } = Typography;
 
 interface ItemCardProps {
-    item: Item;
-    onClick?: () => void;
-    selected?: boolean;
+	item: Item;
+	showDeleteModal?: (item: Item) => void;
+	getFirstNonEmptyLine?: (content: string) => string;
+	onClick?: () => void;
+	selected?: boolean;
+	showPreview?: boolean;
+	showActions?: boolean;
+	indentHeadings?: boolean;
 }
 
-const ItemCard: React.FC<ItemCardProps> = ({ item, onClick, selected }) => {
-    return (
-        <Tooltip title={()=><Markdown>{item.content}</Markdown>}>
-            <Card className={`item-card ${selected ? 'selected' : ''}`} onClick={onClick} >
-                <Meta
-                    // avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
-                    description={<Link to={`/items/${item.id}`} target="_blank">{item.id}</Link>}
-                />
-                <div className="item-preview-container">
-                    <Markdown className="item-card-content" >{item.content}</Markdown>
-                </div>
+const ItemCard: React.FC<ItemCardProps> = ({
+	item,
+	showDeleteModal,
+	getFirstNonEmptyLine = (content: string) => content.split('\n')[0],
+	onClick,
+	selected,
+	showPreview = true,
+	showActions = true,
+	indentHeadings = true
+}) => {
+	const cardContent = (
+		<Card
+			size="small"
+			title={<TaggedMarkdown indentHeadings={indentHeadings}>{getFirstNonEmptyLine(item.content)}</TaggedMarkdown>}
+			extra={<small>{item.type}</small>}
+			actions={showActions ? [
+				<Link to={`/items/${item.id}`}>详情</Link>,
+				showDeleteModal && <Button type="link" danger onClick={() => showDeleteModal(item)}>删除</Button>
+			].filter(Boolean) : undefined}
+			style={{ marginBottom: '8px' }}
+			className={`item-card ${selected ? 'selected' : ''}`}
+			onClick={onClick}
+		>
+			{showPreview && (
+				<div className="item-preview-container">
+					<TaggedMarkdown indentHeadings={indentHeadings}>
+						{item.content.split('\n').slice(1,3).join('\n')}
+					</TaggedMarkdown>
+					{item.content.split('\n').length > 4 && <Text type="secondary">...</Text>}
+				</div>
+			)}
+		</Card>
+	);
 
-            </Card>
-        </Tooltip>
-    );
+	return showPreview ? (
+		<Tooltip title={<TaggedMarkdown indentHeadings={indentHeadings}>{item.content}</TaggedMarkdown>}>
+			{cardContent}
+		</Tooltip>
+	) : cardContent;
 };
 
 export default ItemCard;

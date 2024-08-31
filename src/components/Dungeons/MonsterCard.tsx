@@ -1,11 +1,8 @@
-// ItemCard.tsx
 import React from 'react';
-import {Avatar, Card} from 'antd';
-import Meta from "antd/es/card/Meta";
-import {Link} from "react-router-dom";
-
-import {DungeonMonster} from "../Basic/dto";
-import "./MonsterCard.css"
+import { Card } from 'antd';
+import { Link } from "react-router-dom";
+import { DungeonMonster } from "../Basic/dto";
+import "./MonsterCard.less"
 
 interface MonsterCardProps {
     monster: DungeonMonster;
@@ -14,32 +11,26 @@ interface MonsterCardProps {
 }
 
 const MonsterCard: React.FC<MonsterCardProps> = ({ monster, onClick, selected }) => {
-
-
     return (
-        // <Tooltip title={()=><Markdown>{monster.avatar}</Markdown>}>
-            <Card size="small"
-                cover={
-                    <img
-                        alt={monster.item_id}
-                        src={monster.avatar || "/portraits/skeleton_warrior_01.png"}
-                    />
-                }
-                className={`monster-card ${selected ? 'selected' : ''}`} onClick={onClick} >
-                <Meta
-                    // avatar={<Avatar src="monster.avatar" />}
-                    description={<Link to={`/Items/${monster.item_id}`} target="_blank">{monster.item_id}</Link>}
+        <Card
+            className={`monster-card ${selected ? 'selected' : ''}`}
+            onClick={onClick}
+            cover={
+                <img
+                    alt={monster.item_id}
+                    src={monster.avatar || "/portraits/skeleton_warrior_01.png"}
                 />
-                <div className="monster-preview-container">
-                    <li>{`Difficulty: ${monster.difficulty}`}</li>
-                    <li>{`Importance: ${monster.importance}`}</li>
-                    <li>{`Familiarity: ${monster.familiarity}`}</li>
-                    {/*<Markdown className="monster-card-content" ></Markdown>*/}
-                    {/*<Markdown className="monster-card-content" >{`Difficulty: ${monster.difficulty}`}</Markdown>*/}
+            }
+        >
+            <div className="monster-info">
+                <Link to={`/Items/${monster.item_id}`} target="_blank" className="monster-id">{monster.item_id}</Link>
+                <div className="monster-stats">
+                    <span>D:{monster.difficulty}</span>
+                    <span>I:{monster.importance}</span>
+                    <span>F:{monster.familiarity}</span>
                 </div>
-
-            </Card>
-        // </Tooltip>
+            </div>
+        </Card>
     );
 };
 

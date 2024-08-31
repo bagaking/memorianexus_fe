@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card, Row, Col, Typography, Tag, Divider } from 'antd';
+import { Table, message, Button, Card, Row, Col, Typography, Divider } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import { Components } from 'react-markdown';
 import { getItems, deleteItem } from '../../api/items';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
-import ItemUpload from './ItemUpload'; // 引入 ItemUpload 组件
+import ItemUpload from './ItemUpload';
 import { useIsMobile } from '../../hooks/useWindowSize';
-import '../Common/CommonStyles.css';
-import './ItemList.css'; // 引入新的样式文件
 import { PlusOutlined } from '@ant-design/icons';
-import ItemCard from './ItemCard';
+import ItemCard from "../Basic/ItemCard";
+import TaggedMarkdown from '../Common/TaggedMarkdown';
+import { Item } from "../Basic/dto";
+import { ColumnsType } from 'antd/es/table';
 
-const { Text } = Typography;
+import '../Common/CommonStyles.css';
+import './ItemList.less';
 
-interface Item {
-    id: string;
-    content: string;
-    type: string;
-}
 
 const ItemList: React.FC = () => {
     const isMobile = useIsMobile();
@@ -102,30 +97,9 @@ const ItemList: React.FC = () => {
 
     const handleLimitChange = (newLimit: number) => {
         setLimit(newLimit);
-        setCurrentPage(1); // 重到第一页
+        setCurrentPage(1);
         navigate(`/items?page=1&limit=${newLimit}`);
     };
-
-
-    const customRenderers: Components = {
-        h1: createHeadingRenderer('h1'),
-        h2: createHeadingRenderer('h2'),
-        h3: createHeadingRenderer('h3'),
-        h4: createHeadingRenderer('h4'),
-        h5: createHeadingRenderer('h5'),
-        h6: createHeadingRenderer('h6'),
-    };
-
-    function createHeadingRenderer(level: string) {
-        return ({ children }: React.PropsWithChildren<{}>) => (
-            <Text>
-                <Tag color="default" style={{ borderRadius: '2px', padding: '0 2px', marginRight: '2px', fontSize: '10px' }}>
-                    <Text type="secondary">{level}</Text>
-                </Tag>
-                <Text strong> {children}</Text>
-            </Text>
-        );
-    }
 
     const ItemCardList: React.FC = () => (
         <Row gutter={[8, 8]}>
@@ -133,40 +107,40 @@ const ItemList: React.FC = () => {
                 <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.id}>
                     <ItemCard 
                         item={item}
-                        customRenderers={customRenderers}
                         showDeleteModal={showDeleteModal}
-                        getFirstNonEmptyLine={getFirstNonEmptyLine}
+                        showPreview={true}
+                        showActions={true}
                     />
                 </Col>
             ))}
         </Row>
     );
 
-    const columns: any[] = [
+    const columns: ColumnsType<Item> = [
         {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
             width: 200,
-            responsive: ['md'], // 在中等及以上屏幕显示
+            responsive: ['md'],
         },
         {
             title: 'Content',
             dataIndex: 'content',
             key: 'content',
-            responsive: ['sm'], // 在小屏及以上屏幕显示
-            render: (text: string) => <ReactMarkdown components={customRenderers}>{getFirstNonEmptyLine(text)}</ReactMarkdown>,
+            responsive: ['sm'],
+            render: (text: string) => <TaggedMarkdown indentHeadings={true}>{getFirstNonEmptyLine(text)}</TaggedMarkdown>,
         },
         {
             title: 'Type',
             dataIndex: 'type',
             key: 'type',
-            responsive: ['md'], // 在中等及以上屏幕显示
+            responsive: ['md'],
         },
         {
             title: 'Action',
             key: 'action',
-            responsive: ['sm'], // 在小屏及以上屏幕显示
+            responsive: ['sm'],
             render: (_: any, record: Item) => (
                 <>
                     <Button type="link" size="small">
@@ -184,7 +158,7 @@ const ItemList: React.FC = () => {
         <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
             <small>&{record.type}</small>
             <br/>
-            <ReactMarkdown components={customRenderers}>{record.content}</ReactMarkdown>
+            <TaggedMarkdown>{record.content}</TaggedMarkdown>
         </Card>
     );
 
@@ -227,7 +201,7 @@ const ItemList: React.FC = () => {
                             expandable={{ expandedRowRender }}
                             pagination={false}
                             loading={loading}
-                            scroll={{ x: '100%' }} // 允许水平滚动
+                            scroll={{ x: '100%' }}
                         />
                     )}
                     <Divider />

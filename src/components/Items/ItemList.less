@@ -1,0 +1,149 @@
+/* 定义变量 */
+@card-height: 120px;
+@card-radius: 12px;
+@box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+@transition: transform 0.2s;
+@gradient-create: linear-gradient(135deg, #f5222daa, #40a9ff);
+@gradient-upload: linear-gradient(135deg, #f5222daa, #52c41a);
+@font-size: 24px;
+@font-weight: bold;
+
+.action-cards-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.action-card {
+    flex: 1;
+    margin: 0 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: @card-radius;
+    box-shadow: @box-shadow;
+    transition: @transition;
+    height: @card-height;
+
+    &.create-card {
+        background: @gradient-create;
+
+        &:hover {
+            background: @gradient-create;
+        }
+    }
+
+    &.upload-card {
+        background: @gradient-upload;
+
+        &:hover {
+            background: @gradient-upload;
+        }
+    }
+
+    .action-card-button {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        background: transparent;
+        color: white;
+        font-size: @font-size;
+        font-weight: @font-weight;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s, color 0.3s;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-list {
+        display: block;
+    }
+
+    .card-item {
+        margin-bottom: 16px;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 16px;
+        background: #fff;
+
+        .card-title {
+            font-weight: bold;
+        }
+
+        .card-content {
+            margin-top: 8px;
+        }
+
+        .card-actions {
+            margin-top: 8px;
+            text-align: right;
+        }
+    }
+
+    .action-card {
+        height: 48px;
+        border-radius: 4px;
+        margin: 0 2px;
+    }
+
+    .action-card-button {
+        font-size: 16px;
+    }
+}
+
+.item-list-card {
+    margin-bottom: 24px;
+}
+
+.action-buttons {
+    margin-bottom: 16px;
+}
+
+.create-button, .upload-button {
+    height: 40px;
+    font-size: 14px;
+}
+
+.ant-table-row {
+    cursor: pointer;
+}
+
+.item-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.item-card {
+    width: 100%;
+
+    .ant-card-actions {
+        background: none;
+
+        li {
+            margin: 0;
+        }
+    }
+
+    .ant-btn {
+        padding: 4px 8px;
+        height: auto;
+        font-size: 12px;
+
+        &.ant-btn-text {
+            color: rgba(0, 0, 0, 0.45);
+
+            &:hover {
+                color: #1890ff;
+            }
+
+            &.ant-btn-dangerous:hover {
+                color: #ff4d4f;
+            }
+        }
+    }
+}

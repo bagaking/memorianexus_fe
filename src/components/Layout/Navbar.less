@@ -1,0 +1,286 @@
+// 变量
+@primary-color: #4a00e0;
+@secondary-color: #8e2de2;
+@text-color: white;
+@highlight-color: #ffd700;
+@selected-bg-color: rgba(255, 255, 255, 0.2);
+@transition-duration: 0.3s;
+
+// 混合
+.flex-center() {
+  display: flex;
+  align-items: center;
+}
+
+// 主样式
+.navbar {
+  &-header {
+    padding: 0;
+    background: linear-gradient(45deg, @primary-color, @secondary-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 64px;
+  }
+
+  &-content {
+    .flex-center();
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 0 20px;
+  }
+
+  &-left {
+    .flex-center();
+  }
+
+  &-logo {
+    height: 32px;
+    margin-right: 16px;
+    transition: transform @transition-duration ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &-title {
+    color: @text-color;
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  &-menu {
+    .flex-center();
+    background: transparent;
+    border-bottom: none;
+    flex: 1;
+    justify-content: flex-end;
+
+    .ant-menu-item {
+      color: @text-color;
+      font-weight: 500;
+      transition: all @transition-duration ease;
+      margin: 0 4px;
+      padding: 0 10px;
+      position: relative;
+      overflow: hidden;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: @highlight-color;
+        transition: all @transition-duration ease;
+      }
+
+      &:hover {
+        color: @highlight-color;
+        background-color: rgba(255, 255, 255, 0.1);
+
+        &::after {
+          width: 100%;
+          left: 0;
+        }
+      }
+
+      &-active {
+        color: @highlight-color;
+        background-color: rgba(255, 255, 255, 0.2);
+
+        &::after {
+          width: 100%;
+          left: 0;
+        }
+      }
+
+      .anticon {
+        margin-right: 5px;
+        transition: transform @transition-duration ease;
+      }
+
+      &:hover .anticon {
+        transform: scale(1.2);
+      }
+    }
+  }
+
+  &-mobile-right {
+    .flex-center();
+  }
+
+  &-profile {
+    &-menu-item {
+      margin-left: auto;
+    }
+
+    &-link {
+      .flex-center();
+      height: 100%;
+    }
+
+    &-avatar {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
+
+    &-name {
+      margin-right: 8px;
+      color: @text-color;
+    }
+  }
+}
+
+.menu-button {
+  display: none;
+  background: transparent;
+  border: none;
+  color: @text-color;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all @transition-duration ease;
+  padding: 0 10px;
+
+  &:hover {
+    color: lighten(@secondary-color, 30%);
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .navbar {
+    &-content {
+      padding: 0 10px;
+    }
+
+    &-logo {
+      height: 24px;
+    }
+
+    &-title {
+      font-size: 16px;
+    }
+
+    &-menu {
+      display: none;
+    }
+
+    &-mobile-right {
+      .flex-center();
+    }
+  }
+
+  .menu-button {
+    display: flex;
+    align-items: center;
+  }
+}
+
+// 抽屉菜单样式
+.navbar-drawer {
+  .ant-drawer-content-wrapper {
+    width: 250px !important;
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+  }
+
+  &-menu {
+    background: linear-gradient(to bottom, @primary-color, @secondary-color);
+    height: 100%;
+
+    .ant-menu-item {
+      color: @text-color;
+      font-weight: 500;
+      transition: all @transition-duration ease;
+      margin: 0;
+      padding: 0 24px;
+      height: 50px;
+      line-height: 50px;
+      position: relative;
+      overflow: hidden;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: @highlight-color;
+        transition: all @transition-duration ease;
+      }
+
+      &:hover {
+        color: @highlight-color;
+        background-color: @selected-bg-color;
+
+        &::after {
+          width: 100%;
+        }
+      }
+
+      &-selected {
+        color: @highlight-color;
+        background-color: @selected-bg-color;
+
+        &::after {
+          width: 100%;
+        }
+      }
+
+      .anticon {
+        margin-right: 10px;
+        transition: transform @transition-duration ease;
+      }
+
+      &:hover .anticon {
+        transform: translateX(5px);
+      }
+    }
+  }
+}
+
+// 添加菜单项的进入动画
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar-menu .ant-menu-item,
+.navbar-drawer-menu .ant-menu-item {
+  animation: fadeInDown 0.3s ease-out;
+}
+
+// 积分条样式
+.points-bar {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 14px;
+  color: @text-color;
+  margin-right: 10px;
+  white-space: nowrap;
+  transition: all @transition-duration ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+}

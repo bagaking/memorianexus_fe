@@ -4,12 +4,17 @@ import {getBookItems, addBookItems, removeBookItems, getItems} from '../../api';
 import {Item} from "../Basic/dto";
 import FirstLine from "../Common/Firstline";
 import ItemCard from "../Basic/ItemCard";
+import { useIsMobile } from '../../hooks/useWindowSize';
+import Masonry from 'react-masonry-css';
+
+import "./BookItemList.less";
 
 interface ItemListProps {
     bookId: string;
 }
 
 const BookItemList: React.FC<ItemListProps> = ({bookId}) => {
+    const isMobile = useIsMobile();
 
     const fetchItems = async (page: number, limit: number = 10) => {
         const response = await getBookItems({bookId, page, limit});
@@ -39,7 +44,6 @@ const BookItemList: React.FC<ItemListProps> = ({bookId}) => {
     const deleteItems = async (itemIds: string[]) => {
         await removeBookItems({bookId, itemIds});
     };
-
 
     const itemsColumns = [
         {
@@ -75,6 +79,12 @@ const BookItemList: React.FC<ItemListProps> = ({bookId}) => {
         },
     ];
 
+    const breakpointColumnsObj = {
+        default: 3,
+        1100: 2,
+        700: 1
+    };
+
     return (
         <EmbedItemPack<Item>
             fetchItems={fetchItems}
@@ -82,12 +92,27 @@ const BookItemList: React.FC<ItemListProps> = ({bookId}) => {
             enableSearchWhenAdd={true}
             addItems={addItems}
             deleteItems={deleteItems}
-            itemsColumns={itemsColumns}
-            renderItem={(item, selected, onSelect) => <ItemCard
-                item={item}
-                onClick={onSelect}
-                selected={selected}
-            />}
+            itemsColumns={isMobile ? undefined : itemsColumns}
+            renderItem={(item, selected, onSelect) => (
+                isMobile ? (
+                    <div className="my-masonry-grid_column">
+                        <ItemCard
+                            item={item}
+                            onClick={onSelect}
+                            selected={selected}
+                            showPreview={true}
+                            showActions={false}
+                        />
+                    </div>
+                ) : (
+                    <ItemCard
+                        item={item}
+                        onClick={onSelect}
+                        selected={selected}
+                        showPreview={false}
+                    />
+                )
+            )}
             rowKey="id"
         />
     );

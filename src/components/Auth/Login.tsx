@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Button, message, Card, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './Login.css';
+import './Login.less';
 
 const { Title } = Typography;
 

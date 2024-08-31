@@ -28,7 +28,7 @@ const hostConf: HostConf = {
 };
 
 
-const DefaultEnv:"development" | "staging" | "product" | "test" = "test"
+const DefaultEnv:"development" | "staging" | "product" | "test" = "staging"
 
 export const HostIAM = (env: "development" | "staging" | "product" | "test" = DefaultEnv): string => {
     return hostConf[env].iam
