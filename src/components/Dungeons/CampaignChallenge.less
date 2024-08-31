@@ -195,11 +195,31 @@
 // 技能卡片
 .skills-container {
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    height: 200px;
-    perspective: 1000px;
-    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 20px;
+
+    &.mobile {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 10px;
+
+        .skill-card {
+            flex: 0 0 auto;
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+
+            .ant-card-body {
+                padding: 0;
+            }
+
+            .anticon {
+                font-size: 24px;
+            }
+        }
+    }
 }
 
 .skill-card {

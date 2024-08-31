@@ -12,10 +12,13 @@ import ItemCard from "../Basic/ItemCard";
 import TaggedMarkdown from '../Common/TaggedMarkdown';
 import { Item } from "../Basic/dto";
 import { ColumnsType } from 'antd/es/table';
+import { Tag as AntdTag } from 'antd';
+import { TagOutlined } from '@ant-design/icons';
 
 import '../Common/CommonStyles.css';
 import './ItemList.less';
 
+const { Text } = Typography;
 
 const ItemList: React.FC = () => {
     const isMobile = useIsMobile();
@@ -155,10 +158,34 @@ const ItemList: React.FC = () => {
     ];
 
     const expandedRowRender = (record: Item) => (
-        <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
-            <small>&{record.type}</small>
-            <br/>
-            <TaggedMarkdown>{record.content}</TaggedMarkdown>
+        <Card 
+            key={record.id} 
+            style={{ 
+                margin: '-17px', 
+                borderRadius: '0px 0px 8px 8px',
+                boxShadow: 'none',
+                border: 'none',
+                padding: '2px 8px' // 减小内边距使内容更紧凑
+            }}
+        >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}> {/* 减小间距 */}
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '4px' // 添加一点底部边距
+                }}>
+                    <Text type="secondary" style={{ fontSize: '12px', fontStyle: 'italic' }}>
+                        - Content Preview -
+                    </Text>
+                    <AntdTag icon={<TagOutlined />} color="cyan" style={{ marginLeft: '8px' }}>
+                        {record.type}
+                    </AntdTag>
+                </div>
+                <TaggedMarkdown mode="both">
+                    {record.content}
+                </TaggedMarkdown>
+            </div>
         </Card>
     );
 

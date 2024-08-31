@@ -1,0 +1,107 @@
+// 变量
+@card-padding: 10px;
+@card-width: calc(100vw / 9);
+@card-scale-rate: 1;
+@card-height: calc(@card-width / 0.7);
+@card-radius: calc(24px * @card-scale-rate);
+@transition-duration: 0.3s;
+
+// 混合
+.flex-center() {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 技能卡片样式 */
+.skill-card {
+    width: @card-width;
+    height: @card-height;
+    margin: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all @transition-duration;
+    background-size: cover, cover;
+    background-position: center, center;
+    .flex-center();
+    flex-direction: column;
+    border-radius: @card-radius;
+    padding: @card-padding;
+    max-height: 100%;
+    background-repeat: no-repeat, no-repeat;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #ff00003b, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+        z-index: -1;
+        filter: blur(5px);
+        opacity: 0;
+        transition: opacity @transition-duration;
+    }
+
+    &:hover {
+        transform: scale(1.02);
+
+        &::before {
+            opacity: 0.3;
+        }
+    }
+
+    &-content {
+        .flex-center();
+        flex-direction: row;
+        padding: 8px;
+        color: white;
+    }
+
+    &-icon {
+        font-size: calc(24px * @card-scale-rate);
+        margin-right: calc(8px * @card-scale-rate);
+    }
+
+    &-title {
+        font-size: calc(24px * @card-scale-rate);
+        text-shadow: #0e2439 2px 4px 6px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .generate-skill-card(@name, @color) {
+        &.@{name} {
+            background-image: linear-gradient(to top, fade(@color, 70%), transparent), url('/assets/skills/attack_result_@{name}.png');
+        }
+    }
+
+    .generate-skill-card(defeat, #ff4d4f);
+    .generate-skill-card(miss, #faad14);
+    .generate-skill-card(hit, #52c41a);
+    .generate-skill-card(kill, #f5222d);
+    .generate-skill-card(complete, #40a9ff);
+}
+
+/* 媒体查询：在手机上调整布局 */
+@media (max-width: 768px) {
+    @card-width: calc(100vw / 5 - 10px);
+    @card-scale-rate: 0.8;
+
+    .skill-card {
+        width: @card-width;
+        margin: 5px;
+
+        &-title {
+            display: none;
+        }
+
+        &-icon {
+            font-size: calc(32px * @card-scale-rate);
+            margin-right: 0;
+        }
+    }
+}

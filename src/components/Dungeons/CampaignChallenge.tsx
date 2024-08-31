@@ -12,6 +12,7 @@ import MonsterPortrait from './MonsterPortrait';
 import MonsterHealthBar from './MonsterHealthBar';
 import { useUserPoints } from "../../context/UserPointsContext";
 import { useScrollAnimation } from '../../hooks/useScrollAnimation';
+import { useIsMobile } from '../../hooks/useWindowSize';
 import './CampaignChallenge.less';
 
 const CampaignChallenge: React.FC = () => {
@@ -24,10 +25,11 @@ const CampaignChallenge: React.FC = () => {
     const [showFullContent, setShowFullContent] = useState(false);
     const [campaignName, setCampaignName] = useState('');
     const { contentRef, AnimatedTitle } = useScrollAnimation(loading, {
-        animationDuration: 3000,
-        flashCount: 3,
-        flashDuration: 500
+        animationDuration: 2000,
+        flashCount: 4,
+        flashDuration: 300
     });
+    const isMobile = useIsMobile();
 
     const fetchCampaignName = async () => {
         try {
@@ -107,6 +109,14 @@ const CampaignChallenge: React.FC = () => {
     const currentMonster = monsters[currentMonsterIndex];
     const currentItemDetail = itemDetails.find(detail => detail.id === currentMonster.item_id);
 
+    const skillCards = [
+        { icon: <CloseCircleOutlined/>, resultType: "defeat", title: "Defeat", backgroundImage: "/skill-backgrounds/defeat.jpg" },
+        { icon: <StopOutlined/>, resultType: "miss", title: "Miss", backgroundImage: "/skill-backgrounds/miss.jpg" },
+        { icon: <CheckCircleOutlined/>, resultType: "hit", title: "Hit", backgroundImage: "/skill-backgrounds/hit.jpg" },
+        { icon: <FireOutlined/>, resultType: "kill", title: "Kill", backgroundImage: "/skill-backgrounds/kill.jpg" },
+        { icon: <TrophyOutlined/>, resultType: "complete", title: "Complete", backgroundImage: "/skill-backgrounds/complete.jpg" },
+    ];
+
     return (
         <PageLayout 
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
@@ -132,42 +142,17 @@ const CampaignChallenge: React.FC = () => {
                             <TaggedMarkdown mode='both'>{currentItemDetail?.content || ''}</TaggedMarkdown>
                         </div>
                     </div>
-                    <div className="skills-container">
-                        <SkillCard
-                            icon={<CloseCircleOutlined/>}
-                            onClick={() => handleAttackResult("defeat")}
-                            resultType="defeat"
-                            title="Defeat"
-                            backgroundImage="/skill-backgrounds/defeat.jpg"
-                        />
-                        <SkillCard
-                            icon={<StopOutlined/>}
-                            onClick={() => handleAttackResult("miss")}
-                            resultType="miss"
-                            title="Miss"
-                            backgroundImage="/skill-backgrounds/miss.jpg"
-                        />
-                        <SkillCard
-                            icon={<CheckCircleOutlined/>}
-                            onClick={() => handleAttackResult("hit")}
-                            resultType="hit"
-                            title="Hit"
-                            backgroundImage="/skill-backgrounds/hit.jpg"
-                        />
-                        <SkillCard
-                            icon={<FireOutlined/>}
-                            onClick={() => handleAttackResult("kill")}
-                            resultType="kill"
-                            title="Kill"
-                            backgroundImage="/skill-backgrounds/kill.jpg"
-                        />
-                        <SkillCard
-                            icon={<TrophyOutlined/>}
-                            onClick={() => handleAttackResult("complete")}
-                            resultType="complete"
-                            title="Complete"
-                            backgroundImage="/skill-backgrounds/complete.jpg"
-                        />
+                    <div className={`skills-container ${isMobile ? 'mobile' : ''}`}>
+                        {skillCards.map((card, index) => (
+                            <SkillCard
+                                key={index}
+                                icon={card.icon}
+                                onClick={() => handleAttackResult(card.resultType as any)}
+                                resultType={card.resultType}
+                                title={isMobile ? '' : card.title}
+                                backgroundImage={card.backgroundImage}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>

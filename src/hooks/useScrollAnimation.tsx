@@ -26,24 +26,25 @@ export const useScrollAnimation = (
     options: ScrollAnimationOptions = {}
 ) => {
     const contentRef = useRef<HTMLDivElement>(null);
-    const titleRef = useRef<HTMLHeadingElement>(null);
     const [isFlashing, setIsFlashing] = useState(false);
-    const [animationExecuted, setAnimationExecuted] = useState(false);
+    const animationExecutedRef = useRef(false);
 
     const flashTitle = useCallback((count: number, flashDuration: number) => {
         return new Promise<void>((resolve) => {
-            const flash = (remainingCount: number) => {
-                if (remainingCount > 0) {
+            let flashCount = 0;
+            const flash = () => {
+                if (flashCount < count) {
                     setIsFlashing(true);
                     setTimeout(() => {
                         setIsFlashing(false);
-                        setTimeout(() => flash(remainingCount - 1), flashDuration / 2);
+                        flashCount++;
+                        setTimeout(flash, flashDuration / 2);
                     }, flashDuration / 2);
                 } else {
                     resolve();
                 }
             };
-            flash(count);
+            flash();
         });
     }, []);
 
@@ -71,7 +72,7 @@ export const useScrollAnimation = (
     }, []);
 
     useEffect(() => {
-        if (loading || animationExecuted || !contentRef.current || !titleRef.current) {
+        if (loading || animationExecutedRef.current || !contentRef.current) {
             return;
         }
 
@@ -82,16 +83,16 @@ export const useScrollAnimation = (
         } = options;
 
         const runAnimation = async () => {
+            animationExecutedRef.current = true;
             await flashTitle(flashCount, flashDuration);
             scrollToBottom(animationDuration - flashCount * flashDuration);
-            setAnimationExecuted(true);
         };
 
         runAnimation();
     }, [loading, options, flashTitle, scrollToBottom]);
 
-    const AnimatedTitle: React.FC<React.PropsWithChildren<{}>> = useCallback(({ children }) => (
-        <AnimatedTitleBase ref={titleRef} isFlashing={isFlashing}>{children}</AnimatedTitleBase>
+    const AnimatedTitle = useCallback<React.FC<React.PropsWithChildren<{}>>>(({ children }) => (
+        <AnimatedTitleBase isFlashing={isFlashing}>{children}</AnimatedTitleBase>
     ), [isFlashing]);
 
     return { 
