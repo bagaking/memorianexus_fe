@@ -13,25 +13,25 @@ const Login: React.FC = () => {
     const handleSubmit = async (values: { username: string; password: string }) => {
         try {
             await authContext.login(values.username, values.password);
-            message.success('Welcome back ' + localStorage.getItem('ACCESS_TOKEN')+ ' ' + authContext.isAuthenticated);
+            message.success('登录成功，欢迎回来！');
             navigate('/'); // 登录成功后跳转到首页或其他页面
         } catch (error) {
+            const err = error as any;
+            let errorMessage = '登录失败';
 
-            let ee = (error as any)
-            let eeMessage = ee.message || `${error}`;
-            if (ee.response) {
+            if (err.response) {
                 // 服务器有响应但状态码非 2xx 范围
-                eeMessage = `Error: ${ee.response.status}. Message: ${ee.response.data}`;
-            } else if (ee.request) {
+                errorMessage = `错误: ${err.response.status}. 信息: ${err.response.data}`;
+            } else if (err.request) {
                 // 请求已发送但没有收到响应
-                eeMessage = `Network Error: ${ee.message}. Request details: ${ee.request}`;
+                errorMessage = `网络错误: ${err.message}`;
             } else {
                 // 在设置请求时出现了错误
-                eeMessage = `Request Setup Error: ${ee.message}`;
+                errorMessage = `请求设置错误: ${err.message}`;
             }
 
-            console.error(error);
-            message.error(`Login failed, err= ${eeMessage}`);
+            console.error('登录错误:', errorMessage);
+            message.error(errorMessage);
         }
     };
 
