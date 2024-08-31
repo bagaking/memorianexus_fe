@@ -8,9 +8,8 @@ interface MonsterHealthBarProps {
 const MonsterHealthBar: React.FC<MonsterHealthBarProps> = ({ health }) => {
     return (
         <div className="monster-health-bar">
-            <div className="health-bar-fill" style={{ width: `${health}%` }}>
-                <div className="health-bar-text">{`${Math.round(health)}%`}</div>
-            </div>
+            <div className="health-bar-fill" style={{ width: `${health}%` }}></div>
+            <div className="health-bar-text">{`${Math.round(health)}%`}</div>
         </div>
     );
 };

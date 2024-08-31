@@ -7,24 +7,26 @@
     background-color: rgba(44, 44, 44, 0.6);
     border-radius: 2px;
     overflow: hidden;
-    z-index: 2;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .health-bar-fill {
     height: 100%;
-    background: linear-gradient(to right, #721f1f, #cd1f1f);
+    background: linear-gradient(to right, #721f1f, #cd1f1f, #ff4d4d, #ffa64d,  #52c41a);
     transition: width 0.5s ease-out;
     position: relative;
 }
-
+ 
 .health-bar-text {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-    font-size: 11px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    pointer-events: none; // 确保文本不会干扰鼠标事件
 }

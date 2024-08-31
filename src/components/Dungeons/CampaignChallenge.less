@@ -3,6 +3,7 @@
 @heading-color: rgba(0, 0, 0, 0.85);
 @primary-color: #1890ff;
 @transition-duration: 0.3s;
+@glow-color: rgba(255, 215, 0, 0.5); // 金光颜色
 
 // 混合
 .flex-center {
@@ -44,10 +45,9 @@
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    display: flex;
+    // display: flex; // 不要 flex
     flex-direction: column;
     overflow: hidden;
-    // margin-bottom: 20px;
     position: relative;
     cursor: pointer;
     .smooth-transition;
@@ -65,6 +65,7 @@
     }
 
     &:hover {
+        width: 100%; // 不设置的话可能被上层覆盖，这里锁定下
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
 
         &::before {
@@ -77,21 +78,103 @@
     }
 
     .monster-image-container {
+        position: relative;
         height: 100%;
+        overflow: hidden;
+        .smooth-transition;
+    }
+
+    .monster-image-wrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .monster-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
         .smooth-transition;
     }
 
     .monster-title {
-        opacity: 1;
-        background-color: rgba(233, 233, 233, 0.8);
-        padding: 4px;
-        border-radius: 4px;
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        color: #fff;
+        font-size: 28px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.5),
+            2px 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        margin: 0;
+        padding: 10px 15px;
+        background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+        border-left: 4px solid #ff4d4d;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transform: skew(-5deg);
         .smooth-transition;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            filter: blur(0.1px);
+            opacity: 0.8;
+            z-index: -1;
+            background: white;
+            .smooth-transition;
+        }
+
+        &:hover {
+            background: linear-gradient(45deg, #ff4d4d, #ff9900, #ffff00, #33cc33, #3399ff, #9933ff);
+            transform: skew(-5deg);
+            &::before {
+                filter: blur(2px);
+                opacity: 0.7;
+            }
+        }
+    }
+
+    .monster-content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        font-size: 16px;
+        line-height: 1.6;
+        color: @text-color;
+        .smooth-transition;
+        transform: translateY(100%);
+        opacity: 0;
+        width: 100%;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px @glow-color;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
     }
 
     &.show-full-content {
         .monster-image-container {
-            height: 30%;
+            height: 16%;
         }
 
         .monster-title {
@@ -101,75 +184,11 @@
         .monster-content {
             transform: translateY(0);
             opacity: 1;
+
+            &::before {
+                opacity: 1;
+            }
         }
-    }
-}
-
-.monster-image-container {
-    position: relative;
-    height: 60%;
-    overflow: hidden;
-    .smooth-transition;
-}
-
-.monster-image-wrapper {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.monster-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-    .smooth-transition;
-}
-
-.monster-title {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    z-index: 2;
-    margin: 0;
-    .smooth-transition;
-}
-
-.monster-content {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    font-size: 16px;
-    line-height: 1.6;
-    color: @text-color;
-    .smooth-transition;
-    transform: translateY(100%);
-    opacity: 0;
-    width: 100%; // 添加宽度100%
-}
-
-.monster-card.show-full-content {
-    .monster-image-container {
-        height: 30%;
-    }
-
-    .monster-content {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.monster-card {
-    width: 100%; // 确保卡片宽度为100%
-    .smooth-transition;
-
-    &:hover {
-        width: 100%; // hover时保持宽度100%
     }
 }
 
@@ -242,6 +261,14 @@
 
     .monster-card {
         height: 50vh;
+
+        &:hover {
+            box-shadow: none;
+
+            &::before {
+                opacity: 0;
+            }
+        }
     }
 
     .skills-container {
@@ -254,7 +281,7 @@
         transform: none !important;
 
         &:hover {
-            transform: scale(1.1) !important;
+            transform: none !important;
         }
     }
 }
