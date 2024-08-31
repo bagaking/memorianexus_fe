@@ -1,0 +1,260 @@
+// 变量
+@text-color: rgba(0, 0, 0, 0.85);
+@heading-color: rgba(0, 0, 0, 0.85);
+@primary-color: #1890ff;
+@transition-duration: 0.3s;
+
+// 混合
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.smooth-transition {
+    transition: all @transition-duration ease;
+}
+
+// 主容器
+.campaign-challenge-container {
+    background: url('/assets/battlefield/battlefield_01.png') center/cover no-repeat;
+    height: calc(100vh - 64px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.campaign-challenge-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+}
+
+// 怪物卡片
+.monster-card {
+    width: 100%;
+    max-width: 600px;
+    height: 60vh;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    // margin-bottom: 20px;
+    position: relative;
+    cursor: pointer;
+    .smooth-transition;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, transparent 0%, rgba(255, 255, 255, 0.2) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+
+        &::before {
+            opacity: 1;
+        }
+    }
+
+    .ant-progress {
+        margin-bottom: 0;
+    }
+
+    .monster-image-container {
+        height: 100%;
+        .smooth-transition;
+    }
+
+    .monster-title {
+        opacity: 1;
+        background-color: rgba(233, 233, 233, 0.8);
+        padding: 4px;
+        border-radius: 4px;
+        .smooth-transition;
+    }
+
+    &.show-full-content {
+        .monster-image-container {
+            height: 30%;
+        }
+
+        .monster-title {
+            opacity: 0;
+        }
+
+        .monster-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+}
+
+.monster-image-container {
+    position: relative;
+    height: 60%;
+    overflow: hidden;
+    .smooth-transition;
+}
+
+.monster-image-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.monster-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    .smooth-transition;
+}
+
+.monster-title {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    margin: 0;
+    .smooth-transition;
+}
+
+.monster-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    font-size: 16px;
+    line-height: 1.6;
+    color: @text-color;
+    .smooth-transition;
+    transform: translateY(100%);
+    opacity: 0;
+    width: 100%; // 添加宽度100%
+}
+
+.monster-card.show-full-content {
+    .monster-image-container {
+        height: 30%;
+    }
+
+    .monster-content {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.monster-card {
+    width: 100%; // 确保卡片宽度为100%
+    .smooth-transition;
+
+    &:hover {
+        width: 100%; // hover时保持宽度100%
+    }
+}
+
+// 技能卡片
+.skills-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 200px;
+    perspective: 1000px;
+    width: 100%;
+}
+
+.skill-card {
+    width: 100px;
+    height: 150px;
+    margin: 0 -10px;
+    transform-origin: bottom center;
+    position: relative;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    overflow: hidden;
+    .smooth-transition;
+
+    &:hover {
+        transform: translateY(-30px) scale(1.1) !important;
+        z-index: 10;
+    }
+
+    @rotations: -20deg, -10deg, 0deg, 10deg, 20deg;
+    .generate-rotations(@i: 1) when (@i <= length(@rotations)) {
+        &:nth-child(@{i}) {
+            transform: rotate(extract(@rotations, @i)) translateY(0);
+        }
+        .generate-rotations(@i + 1);
+    }
+    .generate-rotations();
+
+    .skill-card-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        text-align: center;
+        padding: 10px;
+
+        .anticon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .skill-card-title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+    }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+    .campaign-challenge-container {
+        padding: 10px;
+    }
+
+    .monster-card {
+        height: 50vh;
+    }
+
+    .skills-container {
+        height: auto;
+        flex-wrap: wrap;
+    }
+
+    .skill-card {
+        margin: 5px;
+        transform: none !important;
+
+        &:hover {
+            transform: scale(1.1) !important;
+        }
+    }
+}

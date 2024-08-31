@@ -1,14 +1,14 @@
 // src/context/UserPointsContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { getPoints } from '../api/profile';
-import {ParseUint64, Points} from "../components/Basic/dto";
+import { ParseUint64, Points } from "../components/Basic/dto";
 
 interface UserPointsContextProps {
     points: Points | null;
     loading: boolean;
     error: Error | null;
     refreshPoints: (newPoints?: Partial<Points>) => Promise<void>;
-    initialized: boolean;  // 新增
+    initialized: boolean;
 }
 
 const UserPointsContext = createContext<UserPointsContextProps | undefined>(undefined);
@@ -25,28 +25,62 @@ interface UserPointsProviderProps {
     children: ReactNode;
 }
 
-export const UserPointsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+const RETRY_INTERVAL = 60000; // 60 seconds
+const MAX_RETRIES = 3;
+
+export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children }) => {
     const [points, setPoints] = useState<Points | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-    const [initialized, setInitialized] = useState(false);  // 新增
+    const [initialized, setInitialized] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
+
+    const fetchPoints = useCallback(async () => {
+        try {
+            const updatedPoints = await getPoints();
+            setPoints(updatedPoints);
+            setLoading(false);
+            setError(null);
+            setInitialized(true);
+            setRetryCount(0);
+        } catch (err) {
+            console.error('Error fetching points:', err);
+            setError(err as Error);
+            if (retryCount < MAX_RETRIES) {
+                setTimeout(() => {
+                    setRetryCount(prevCount => prevCount + 1);
+                    fetchPoints();
+                }, RETRY_INTERVAL);
+            } else {
+                setLoading(false);
+            }
+        }
+    }, [retryCount]);
 
     const refreshPoints = useCallback(async (newPoints?: Partial<Points>) => {
         if (newPoints) {
-            setPoints({ 
-                ...points,
-                ... (newPoints as Points),
-            });
+            setPoints(prevPoints => ({ 
+                ...prevPoints,
+                ...newPoints,
+            } as Points));
         } else {
-            // 从 API 获取最新数据的逻辑
-            const updatedPoints = await getPoints();
-            setPoints(updatedPoints);
+            setLoading(true);
+            setRetryCount(0);
+            await fetchPoints();
         }
-    }, []);
+    }, [fetchPoints]);
 
     useEffect(() => {
-        refreshPoints();
-    }, [refreshPoints]);
+        fetchPoints();
+
+        const intervalId = setInterval(() => {
+            if (!loading && initialized) {
+                fetchPoints();
+            }
+        }, 60000); // 每分钟更新一次
+
+        return () => clearInterval(intervalId);
+    }, [fetchPoints, loading, initialized]);
 
     return (
         <UserPointsContext.Provider value={{ points, loading, error, refreshPoints, initialized }}>

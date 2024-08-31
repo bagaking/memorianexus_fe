@@ -105,10 +105,7 @@ const Navbar: React.FC = () => {
                 {isMobile ? (
                     <div className="navbar-mobile-right">
                         {auth?.isAuthenticated && (
-                            <PointsBar 
-                                showName={false} 
-                                style={{marginRight: "16px", color: "#fff"}}
-                            />
+                            <PointsBar showName={false}  style={{marginRight: "16px", color: "#fff"}} />
                         )}
                         <Button className="menu-button" type="primary" icon={<MenuOutlined/>} onClick={showDrawer}/>
                     </div>

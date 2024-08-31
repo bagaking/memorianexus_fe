@@ -15,9 +15,11 @@ const Login: React.FC = () => {
     const handleSubmit = async (values: { username: string; password: string }) => {
         try {
             await authContext.login(values.username, values.password);
-            await refreshPoints(); // 登录成功后立即刷新点数信息
+
+            refreshPoints(); // 登录成功后并行刷新点数信息
             message.success('登录成功，欢迎回来！');
             navigate('/'); // 登录成功后跳转到首页或其他页面
+
         } catch (error) {
             const err = error as any;
             let errorMessage = '登录失败';

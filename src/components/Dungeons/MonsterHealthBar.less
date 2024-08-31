@@ -1,0 +1,30 @@
+.monster-health-bar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    height: 14px;
+    background-color: rgba(44, 44, 44, 0.6);
+    border-radius: 2px;
+    overflow: hidden;
+    z-index: 2;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.health-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #721f1f, #cd1f1f);
+    transition: width 0.5s ease-out;
+    position: relative;
+}
+
+.health-bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    font-size: 11px;
+}

@@ -1,6 +1,6 @@
 // src/components/Profile/Profile.tsx
 import React, { useEffect, useState, useRef } from 'react';
-import { Form, Input, Button, message, Switch, Select, Layout, Modal, Divider, Card, Avatar, Row, Col, Affix, Spin, Alert } from 'antd';
+import { Form, Input, Button, message, Switch, Select, Layout, Modal, Divider, Card, Avatar, Row, Col, Affix, Spin } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { IProfile, ISettingsMemorization, ISettingsAdvance, getProfile, updateProfile, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api/profile';
 import { useAuth } from '../../context/AuthContext';
@@ -25,7 +25,6 @@ const { Content } = Layout;
 const Profile: React.FC = () => {
     const [form] = Form.useForm();
     const [profile, setProfile] = useState<IProfile | null>(null);
-    const { points, loading: pointsLoading, error: pointsError, initialized: pointsInitialized } = useUserPoints();
     const [memorizationSettings, setMemorizationSettings] = useState<ISettingsMemorization | null>(null);
     const [advanceSettings, setAdvanceSettings] = useState<ISettingsAdvance | null>(null);
     const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -138,7 +137,7 @@ const Profile: React.FC = () => {
         setLogoutModalVisible(false);
     };
 
-    if (isLoading || (pointsLoading && !pointsInitialized)) {
+    if (isLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <Spin size="large" />
@@ -252,16 +251,7 @@ const Profile: React.FC = () => {
                                         </Row>
                                     </Col>
                                     <Col xs={24} sm={24} md={16}>
-                                        {pointsError ? (
-                                            <Alert
-                                                message="积分加载失败"
-                                                description="无法加载您的积分信息，但您仍可以查看和编辑其他个人资料。"
-                                                type="error"
-                                                showIcon
-                                            />
-                                        ) : (
-                                            <CoolPointsDisplay />
-                                        )}
+                                        <CoolPointsDisplay />
                                     </Col>
                                 </Row>
                             </Card>
