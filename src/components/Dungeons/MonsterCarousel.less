@@ -205,6 +205,8 @@
         left: 0;
         right: 0;
         z-index: 4;
+
+        transition: transform @transition-duration @transition-timing-function;
     }
 
     .monster-content {
@@ -228,6 +230,7 @@
     &.show-full-content {
         .monster-image-container {
             height: @show-full-content-height;
+            transition: transform @transition-duration @transition-timing-function height @transition-duration @transition-timing-function;
         }
 
         .monster-title {
