@@ -2,7 +2,6 @@ import React from 'react';
 import { Card } from 'antd';
 import { Link } from "react-router-dom";
 import { DungeonMonster } from "../Basic/dto";
-import "./MonsterCard.less"
 
 interface MonsterCardProps {
     monster: DungeonMonster;
