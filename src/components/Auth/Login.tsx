@@ -9,14 +9,14 @@ const { Title, Text } = Typography;
 
 const Login: React.FC = () => {
     const authContext = useAuth();
-    const { refreshPoints } = useUserPoints();
+    const { updatePoints } = useUserPoints();
     const navigate = useNavigate();
 
     const handleSubmit = async (values: { username: string; password: string }) => {
         try {
             await authContext.login(values.username, values.password);
 
-            refreshPoints(); // 登录成功后并行刷新点数信息
+            updatePoints(); // 登录成功后并行刷新点数信息
             message.success('登录成功，欢迎回来！');
             navigate('/'); // 登录成功后跳转到首页或其他页面
 

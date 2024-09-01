@@ -7,7 +7,7 @@ interface UserPointsContextProps {
     points: Points | null;
     loading: boolean;
     error: Error | null;
-    refreshPoints: (newPoints?: Partial<Points>) => Promise<void>;
+    updatePoints: (pointsUpdate?: Partial<Points>, isIncrement?: boolean) => Promise<void>;
     initialized: boolean;
 }
 
@@ -57,17 +57,28 @@ export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children
         }
     }, [retryCount]);
 
-    const refreshPoints = useCallback(async (newPoints?: Partial<Points>) => {
-        if (newPoints) {
-            setPoints(prevPoints => ({ 
-                ...prevPoints,
-                ...newPoints,
-            } as Points));
-        } else {
-            setLoading(true);
-            setRetryCount(0);
+    const updatePoints = useCallback(async (pointsUpdate?: Partial<Points>, isIncrement: boolean = true) => {
+        if (!pointsUpdate) {
+            // 如果没有传入 pointsUpdate，则触发 fetchPoints
             await fetchPoints();
+            return;
         }
+
+        setPoints(prevPoints => {
+            if (!prevPoints) return prevPoints;
+            const newPoints: Points = { ...prevPoints };
+            Object.keys(pointsUpdate).forEach(key => {
+                const typedKey = key as keyof Points;
+                if (newPoints[typedKey] !== undefined && pointsUpdate[typedKey] !== undefined) {
+                    if (isIncrement) {
+                        newPoints[typedKey] = ParseUint64(newPoints[typedKey]) + ParseUint64(pointsUpdate[typedKey]!);
+                    } else {
+                        newPoints[typedKey] = ParseUint64(pointsUpdate[typedKey]!);
+                    }
+                }
+            });
+            return newPoints;
+        });
     }, [fetchPoints]);
 
     useEffect(() => {
@@ -83,7 +94,7 @@ export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children
     }, [fetchPoints, loading, initialized]);
 
     return (
-        <UserPointsContext.Provider value={{ points, loading, error, refreshPoints, initialized }}>
+        <UserPointsContext.Provider value={{ points, loading, error, updatePoints, initialized }}>
             {children}
         </UserPointsContext.Provider>
     );

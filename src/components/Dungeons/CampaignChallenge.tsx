@@ -21,7 +21,7 @@ const CampaignChallenge: React.FC = () => {
     const [currentMonsterIndex, setCurrentMonsterIndex] = useState(0);
     const [itemDetails, setItemDetails] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
-    const { refreshPoints } = useUserPoints();
+    const { updatePoints } = useUserPoints();
     const [showFullContent, setShowFullContent] = useState(false);
     const [campaignName, setCampaignName] = useState('');
     const { contentRef, AnimatedTitle } = useScrollAnimation(loading, {
@@ -80,9 +80,9 @@ const CampaignChallenge: React.FC = () => {
 
             const resp = submitResult.data.data
 
-            if(!!resp && !!resp.points_update && resp.points_update.cash) {
+            if(!!resp && !!resp.points_update) {
                 showReward(resp.points_update.cash);
-                refreshPoints(resp.points_update)
+                updatePoints(resp.points_update)
             }
 
             if (currentMonsterIndex < monsters.length - 1) {

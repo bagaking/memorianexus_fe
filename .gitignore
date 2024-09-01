@@ -24,3 +24,5 @@ yarn-error.log*
 
 .idea
 bundle/**/*.bundle.txt
+deploy_staging.sh
+set_env.sh

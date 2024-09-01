@@ -7,7 +7,8 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "bundle": "make -C bundle -f Makefile clean && make -f bundle/Makefile"
+    "bundle": "make -C bundle -f Makefile clean && make -f bundle/Makefile",
+    "deploy_staging": "./deploy_staging.sh"
   },
   "eslintConfig": {
     "extends": [
