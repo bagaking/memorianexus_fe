@@ -18,6 +18,61 @@ interface MonsterCarouselProps {
 export interface MonsterCarouselRef {
     moveToNextCard: () => void;
 }
+const hashCode = function(str: string) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};
+
+const getMonsterPortrait = (id: string): string => {
+    const hash = hashCode(id); // 假设 id 是字符串，使用 hashCode 方法
+    const portraits = [
+        "skeleton_warrior_01.png",
+        "skeleton_warrior_02.png",
+        "skeleton_warrior_03.png",
+        "skeleton_warrior_04.png",
+        "skeleton_warrior_05.png",
+        "skeleton_warrior_06.png",
+        "skeleton_warrior_07.png",
+        "evil_warrior_01.png",
+        "evil_warrior_02.png",
+        "evil_warrior_03.png",
+        "evil_warrior_04.png",
+        "evil_warrior_05.png",
+        "evil_warrior_06.png",
+        "human_warrior_01.png",
+        "human_warrior_02.png",
+        "human_warrior_03.png",
+        "human_warrior_04.png",
+        "human_warrior_05.png",
+        "human_warrior_06.png",
+        "goblin_warrior_01.png",
+        "goblin_warrior_02.png",
+        "goblin_warrior_03.png",
+        "goblin_warrior_04.png",
+        "sea_warrior_01.png",
+        "sea_warrior_02.png",
+        "sea_warrior_03.png",
+        "sea_warrior_04.png",
+        "sea_warrior_05.png",
+        "sea_warrior_06.png",
+        "sea_warrior_07.png",
+        "engineer_warrior_01.png",
+        "engineer_warrior_02.png",
+        "engineer_warrior_03.png",
+        "engineer_warrior_04.png",
+        "engineer_warrior_05.png",
+        "engineer_warrior_06.png",
+    ];
+
+    // 使用 hash 值来选择头像，确保在 portraits 数组范围内
+    const index = Math.abs(hash) % portraits.length;
+    return `/portraits/${portraits[index]}`;
+};
+
 
 const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
     monsters,
@@ -159,7 +214,7 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
             >
                 <div className="monster-image-container">
                     <MonsterPortrait 
-                        src="/portraits/skeleton_warrior_01.png" 
+                        src={getMonsterPortrait(monster.item_id)} // 使用头像映射函数
                         alt="Monster Avatar" 
                     />
                     <MonsterHealthBar 
@@ -172,7 +227,7 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
                     </div>
                 </div>
                 
-                <div className={`monster-content ${disableTransition ? 'no-transition' : ''}`}>
+                <div className={`monster-content ${disableTransition ? 'no-transition' : ''} `}>
                     {monster.submitResult && (
                         <div className="monster-result-info">
                             <p>熟练度: {monster.submitResult.familiarity}%</p>
