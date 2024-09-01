@@ -1,15 +1,28 @@
 import React from 'react';
+import styled from 'styled-components';
 
 interface MonsterPortraitProps {
     src: string;
     alt: string;
 }
 
+const ImageWrapper = styled.div`
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+`;
+
+const PortraitImage = styled.img`
+    width: 100%;
+    object-fit: cover;
+    object-position: center top;
+`;
+
 const MonsterPortrait: React.FC<MonsterPortraitProps> = ({ src, alt }) => {
     return (
-        <div className="monster-image-wrapper">
-            <img src={src} alt={alt} className="monster-image" />
-        </div>
+        <ImageWrapper>
+            <PortraitImage src={src} alt={alt} />
+        </ImageWrapper>
     );
 };
 

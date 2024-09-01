@@ -13,6 +13,7 @@ import MonsterHealthBar from './MonsterHealthBar';
 import { useUserPoints } from "../../context/UserPointsContext";
 import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 import { useIsMobile } from '../../hooks/useWindowSize';
+import MonsterCarousel from './MonsterCarousel';
 import './CampaignChallenge.less';
 
 const CampaignChallenge: React.FC = () => {
@@ -54,6 +55,7 @@ const CampaignChallenge: React.FC = () => {
 
             setMonsters(monstersData);
             setItemDetails(details);
+            setCurrentMonsterIndex(0); // 重置当前怪物索引
             setLoading(false);
         } catch (error) {
             console.error(error);
@@ -66,10 +68,6 @@ const CampaignChallenge: React.FC = () => {
         fetchCampaignName();
         fetchMonstersAndDetails();
     }, [id]);
-
-    function getFirstNonEmptyLine(content: string = "") {
-        return content.split('\n').filter(line => line.trim() !== '')[0] || ''
-    }
 
     const handleAttackResult = async (result: "defeat" | "miss" | "hit" | "kill" | "complete") => {
         try {
@@ -106,9 +104,6 @@ const CampaignChallenge: React.FC = () => {
         return <div>Loading...</div>;
     }
 
-    const currentMonster = monsters[currentMonsterIndex];
-    const currentItemDetail = itemDetails.find(detail => detail.id === currentMonster.item_id);
-
     const skillCards = [
         { icon: <CloseCircleOutlined/>, resultType: "defeat", title: "Defeat", backgroundImage: "/skill-backgrounds/defeat.jpg" },
         { icon: <StopOutlined/>, resultType: "miss", title: "Miss", backgroundImage: "/skill-backgrounds/miss.jpg" },
@@ -125,23 +120,14 @@ const CampaignChallenge: React.FC = () => {
         >
             <div className="campaign-challenge-container">
                 <div className="campaign-challenge-content" ref={contentRef}>
-                    <div className={`monster-card ${showFullContent ? 'show-full-content' : ''}`} onClick={toggleMonsterContent}>
-                        <div className="monster-image-container">
-                            <MonsterPortrait 
-                                src="/portraits/skeleton_warrior_01.png" 
-                                alt="Monster Avatar" 
-                            />
-                            <MonsterHealthBar 
-                                health={100 - ParsePercentage(currentMonster.familiarity)}
-                            />
-                            <h2 className="monster-title">
-                                <TaggedMarkdown>{getFirstNonEmptyLine(currentItemDetail?.content)}</TaggedMarkdown>
-                            </h2>
-                        </div>
-                        <div className="monster-content">
-                            <TaggedMarkdown mode='both'>{currentItemDetail?.content || ''}</TaggedMarkdown>
-                        </div>
-                    </div>
+                    <MonsterCarousel
+                        monsters={monsters}
+                        itemDetails={itemDetails}
+                        currentMonsterIndex={currentMonsterIndex}
+                        showFullContent={showFullContent}
+                        toggleMonsterContent={toggleMonsterContent}
+                        setCurrentMonsterIndex={setCurrentMonsterIndex}
+                    />
                     <div className={`skills-container ${isMobile ? 'mobile' : ''}`}>
                         {skillCards.map((card, index) => (
                             <SkillCard

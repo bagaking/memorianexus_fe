@@ -1,15 +1,8 @@
 @import '../Common/variables.less';
 
 // 变量
-@container-padding: 10px;
-@skills-container-height: 148px; // 设置技能容器高度
-
+@glow-color: rgba(255, 215, 0, 0.5);
 @text-color: rgba(0, 0, 0, 0.85);
-@heading-color: rgba(0, 0, 0, 0.85);
-@primary-color: #1890ff;
-@transition-duration: 0.3s;
-@glow-color: rgba(255, 215, 0, 0.5); // 金光颜色
-
 
 // 混合
 .flex-center {
@@ -19,228 +12,37 @@
 }
 
 .smooth-transition {
-    transition: all @transition-duration ease;
+    transition: all @default-transition-duration ease;
 }
 
 // 主容器
 .campaign-challenge-container {
     background: url('/assets/battlefield/battlefield_01.png') center/cover no-repeat;
     height: calc(100vh - @navbar-height);
-    padding: @container-padding;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
+    .flex-center();
     overflow: hidden;
 }
 
 .campaign-challenge-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    .flex-center();
     width: 100%;
-    max-width: 800px;
+    max-width: 90vw; // 使用视口宽度的90%
     height: 100%;
 }
 
-// 怪物卡片
-.monster-card {
-    width: 100%;
-    max-width: 600px;
-    height: 60vh;
-    max-height: calc(100vh - @navbar-height);
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    // display: flex; // 不要 flex
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    .smooth-transition;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: radial-gradient(circle at center, transparent 0%, rgba(255, 255, 255, 0.2) 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    &:hover {
-        width: 100%; // 不设置的话可能被上层覆盖，这里锁定下
-        box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-
-        &::before {
-            opacity: 1;
-        }
-    }
-
-    .ant-progress {
-        margin-bottom: 0;
-    }
-
-    .monster-image-container {
-        position: relative;
-        height: 100%;
-        overflow: hidden;
-        .smooth-transition;
-    }
-
-    .monster-image-wrapper {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
-
-    .monster-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top;
-        .smooth-transition;
-    }
-
-    .monster-title {
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
-        right: 20px;
-        color: #fff;
-        font-size: 28px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow: 
-            0 0 10px rgba(255, 255, 255, 0.5),
-            2px 2px 4px rgba(0, 0, 0, 0.5);
-        z-index: 2;
-        margin: 0;
-        padding: 10px 15px;
-        background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
-        border-left: 4px solid #ff4d4d;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transform: skew(-5deg);
-        .smooth-transition;
-
-        &::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            filter: blur(0.1px);
-            opacity: 0.8;
-            z-index: -1;
-            background: white;
-            .smooth-transition;
-        }
-
-        &:hover {
-            background: linear-gradient(45deg, #ff4d4d, #ff9900, #ffff00, #33cc33, #3399ff, #9933ff);
-            transform: skew(-5deg);
-            &::before {
-                filter: blur(2px);
-                opacity: 0.7;
-            }
-        }
-    }
-
-    .monster-content {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        font-size: 16px;
-        line-height: 1.6;
-        color: @text-color;
-        .smooth-transition;
-        transform: translateY(100%);
-        opacity: 0;
-        width: 100%;
-        position: relative;
-
-        &::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px @glow-color;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: -1;
-        }
-    }
-
-    &.show-full-content {
-        .monster-image-container {
-            height: 16%;
-        }
-
-        .monster-title {
-            opacity: 0;
-        }
-
-        .monster-content {
-            height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-
-            &::-webkit-scrollbar {
-                display: none;
-            }
-
-            transform: translateY(0);
-            opacity: 1;
-
-            &::before {
-                opacity: 1;
-            }
-        }
-    }
-}
-
-// 技能卡片
+// 技能卡片容器
 .skills-container {
-    height: @skills-container-height;
+    height: @campaign-skills-container-height;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     margin-top: 20px;
-
-    &.mobile {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding-bottom: 10px;
-
-        .skill-card {
-            flex: 0 0 auto;
-            width: 60px;
-            height: 60px;
-            margin-right: 10px;
-
-            .ant-card-body {
-                padding: 0;
-            }
-
-            .anticon {
-                font-size: 24px;
-            }
-        }
-    }
 }
 
+// 技能卡片
 .skill-card {
     width: 100px;
     height: 150px;
@@ -252,7 +54,7 @@
     background-position: center;
     border-radius: 10px;
     overflow: hidden;
-    .smooth-transition;
+    .smooth-transition();
 
     &:hover {
         transform: translateY(-30px) scale(1.1) !important;
@@ -295,36 +97,12 @@
 // 响应式设计
 @media (max-width: 768px) {
     .campaign-challenge-container {
-        padding: @container-padding;
+        padding: @campaign-container-padding;
         height: calc(100vh - @layout-header-mobile-height - 4px);
     }
 
-    .monster-card {
-        max-height: calc(100vh - @navbar-height - @container-padding * 2 - @skills-container-height);
-        max-width: none;
-
-        &.show-full-content {
-            .monster-image-container {
-                height: 12%;
-                overflow: hidden;
-            }
-
-            .monster-content {
-                height: 100%;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch; // 为 iOS 设备提供平滑滚动
-                scrollbar-width: none; // 隐藏 Firefox 滚动条
-                -ms-overflow-style: none; // 隐藏 IE 和 Edge 滚动条
-
-                &::-webkit-scrollbar {
-                    display: none; // 隐藏 WebKit 滚动条 (Chrome, Safari, newer versions of Opera)
-                }
-            }
-        }
-    }
-
     .skills-container {
-        height: @skills-container-height;
+        height: @campaign-skills-container-height;
         flex-wrap: nowrap;
         overflow-x: auto;
         justify-content: flex-start;
@@ -334,45 +112,70 @@
         -ms-overflow-style: none;
 
         &::-webkit-scrollbar {
-            display: none; // 隐藏 WebKit 滚动条
+            display: none;
+        }
+
+        &.mobile {
+            .skill-card {
+                flex: 0 0 auto;
+                width: 60px;
+                height: 60px;
+                margin-right: 10px;
+                transform: none !important;
+
+                &:hover {
+                    transform: none !important;
+                }
+
+                .ant-card-body {
+                    padding: 0;
+                }
+
+                .anticon {
+                    font-size: 24px;
+                }
+            }
         }
     }
 
     .skill-card {
         flex: 0 0 auto;
         margin: 5px;
-        transform: none !important;
-
-        &:hover {
-            transform: none !important;
-        }
-
-        // 调整卡片大小以适应容器高度
-        width: calc(@skills-container-height - 10px);
-        height: calc(@skills-container-height - 10px);
+        width: calc(@campaign-skills-container-height - 10px);
+        height: calc(@campaign-skills-container-height - 10px);
 
         &-icon {
-            font-size: calc(@skills-container-height / 3);
+            font-size: calc(@campaign-skills-container-height / 3);
         }
     }
 }
 
 // 针对特别小的屏幕（如 iPhone SE）的额外调整
 @media (max-width: 320px) and (max-height: 568px) {
-    .monster-card {
-        max-height: calc(100vh - @navbar-height - @container-padding * 2 - @skills-container-height + 10px);
-    }
-
     .skills-container {
-        height: calc(@skills-container-height - 10px);
+        height: calc(@campaign-skills-container-height - 10px);
     }
 
     .skill-card {
-        width: calc(@skills-container-height - 20px);
-        height: calc(@skills-container-height - 20px);
+        width: calc(@campaign-skills-container-height - 20px);
+        height: calc(@campaign-skills-container-height - 20px);
 
         &-icon {
-            font-size: calc(@skills-container-height / 4);
+            font-size: calc(@campaign-skills-container-height / 4);
         }
+    }
+}
+
+// 为大屏幕设置一个更宽的最大宽度
+@media (min-width: 1600px) {
+    .campaign-challenge-content {
+        max-width: 1280px; // 增加了最大宽度以使内容更宽
+    }
+}
+
+// 为小屏幕调整
+@media (max-width: 768px) {
+    .campaign-challenge-content {
+        max-width: 95vw; // 在小屏幕上使用更大的比例
     }
 }
