@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { FaMicrophone, FaStop } from 'react-icons/fa'; // 导入图标
+import { FaMicrophone, FaStop } from 'react-icons/fa';
+
+interface Window {
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
+}
 
 const rotate = keyframes`
     0% { transform: rotate(0deg); }
@@ -8,58 +13,59 @@ const rotate = keyframes`
 `;
 
 const Button = styled.button<{ isRecording: boolean }>`
-    background: linear-gradient(135deg, #007aff, #0051a8); /* 渐变背景 */
+    background: linear-gradient(135deg, #007aff, #0051a8);
     color: white;
     border: none;
-    border-radius: 50%; /* 圆形按钮 */
-    width: 50px; /* 调整宽度 */
-    height: 50px; /* 调整高度 */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* 背景色和缩放过渡效果 */
-    animation: ${props => props.isRecording ? css`${rotate} 1s linear infinite` : 'none'}; /* 录音时旋转动画 */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    animation: ${props => props.isRecording ? css`${rotate} 1s linear infinite` : 'none'};
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 
     &:hover {
-        background: linear-gradient(135deg, #0051a8, #003d7a); /* 悬停时的渐变颜色 */
-        transform: scale(1.05); /* 悬停时放大 */
+        background: linear-gradient(135deg, #0051a8, #003d7a);
+        transform: scale(1.05);
     }
 
     &:active {
-        transform: scale(0.95); /* 点击时缩小 */
+        transform: scale(0.95);
     }
 
     &:disabled {
-        background-color: #b0b0b0; /* 禁用状态的颜色 */
-        cursor: not-allowed; /* 禁用状态的光标 */
+        background-color: #b0b0b0;
+        cursor: not-allowed;
     }
 `;
 
 const Container = styled.div<{ position: 'left' | 'right' }>`
     position: fixed;
-    bottom: 20px; /* 默认位置在底部 */
-    ${props => props.position}: 20px; /* 根据配置放置在左边或右边 */
-    z-index: 1000; /* 确保在其他元素之上 */
-    cursor: move; /* 拖拽时显示手型 */
+    bottom: 20px;
+    ${props => props.position}: 20px;
+    z-index: 1000;
+    cursor: move;
 `;
 
 interface RecordButtonProps {
     onRecord: (isRecording: boolean) => void;
-    onAudioStop: (audioBlob: Blob) => void; // 新增回调处理音频
-    onError?: (error: string) => void; // 新增错误处理回调
-    position: 'left' | 'right'; // 配置位置
-    dragBounds?: { top: number, right: number, bottom: number, left: number }; // 可拖动范围
+    onAudioStop: (audioBlob: Blob) => void;
+    onTranscript?: (transcript: string) => void;
+    onError?: (error: string) => void;
+    position: 'left' | 'right';
+    dragBounds?: { top: number, right: number, bottom: number, left: number };
 }
 
-const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, position, onError, dragBounds }) => {
+const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, onTranscript, position, onError, dragBounds }) => {
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-    const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
+    const [recognition, setRecognition] = useState<any>(null);
 
     const handleRecordingError = (error: string) => {
         onError && onError(error);
@@ -81,6 +87,33 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, posi
         });
     };
 
+    const initializeTranscription = () => { // 用浏览器默认的识别，不太行，还是考虑用第三方服务的 ASR
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.error('浏览器不支持语音识别');
+            return null;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = (event: any) => {
+            const transcript = Array.from(event.results)
+                .map((result: any) => result[0].transcript)
+                .join('');
+            
+            if (onTranscript) {
+                onTranscript(transcript);
+            }
+            
+            console.log('transcript', transcript, event.results);
+        };
+
+        recognition.start();
+        return recognition;
+    };
+
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -97,6 +130,9 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, posi
             setIsRecording(true);
             onRecord(true);
 
+            const newRecognition = initializeTranscription();
+            setRecognition(newRecognition);
+
             recorder.onstop = async () => {
                 console.log('recorder.onstop');
                 console.log('chunks:', chunks);
@@ -107,12 +143,15 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, posi
                 }
 
                 const audioBlob = new Blob(chunks, { type: 'audio/webm' });
-                setAudioChunks(chunks);
                 setIsRecording(false);
                 onRecord(false);
 
                 onAudioStop(audioBlob);
                 playAudio(audioBlob);
+
+                if (newRecognition) {
+                    newRecognition.stop();
+                }
             };
 
         } catch (error) {
@@ -123,6 +162,9 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, posi
     const stopRecording = () => {
         if (mediaRecorder && mediaRecorder.state !== 'inactive') {
             mediaRecorder.stop();
+        }
+        if (recognition) {
+            recognition.stop();
         }
     };
 
@@ -168,8 +210,8 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, posi
             position={position}
             onMouseDown={handleMouseDown}
         >
-            <Button isRecording={isRecording} onClick={isRecording ? async () => await stopRecording() : startRecording}>
-                {isRecording ? <FaStop size={24} /> : <FaMicrophone size={24} />} {/* 使用图标 */}
+            <Button isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording}>
+                {isRecording ? <FaStop size={24} /> : <FaMicrophone size={24} />}
             </Button>
         </Container>
     );
