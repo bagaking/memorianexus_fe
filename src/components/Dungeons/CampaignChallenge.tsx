@@ -1,25 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Divider, message } from 'antd';
-import { getPracticeMonsters, submitPracticeResult, getItemById, getDungeonDetail } from '../../api';
+import { message } from 'antd';
+import { getPracticeMonsters, submitPracticeResult, getItemById, getDungeonDetail, PracticeResultResponse } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
-import { DungeonMonster, Item, ParsePercentage } from '../Basic/dto';
+import { DungeonMonster, Item, DungeonMonsterWithResult, ParseUint64 } from '../Basic/dto';
 import { showReward } from '../Common/RewardNotification';
-import { TaggedMarkdown } from '../Common/TaggedMarkdown';
 import { CloseCircleOutlined, StopOutlined, CheckCircleOutlined, FireOutlined, TrophyOutlined } from '@ant-design/icons';
 import SkillCard from './SkillCard';
-import MonsterPortrait from './MonsterPortrait';
-import MonsterHealthBar from './MonsterHealthBar';
 import { useUserPoints } from "../../context/UserPointsContext";
 import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 import { useIsMobile } from '../../hooks/useWindowSize';
-import MonsterCarousel from './MonsterCarousel';
+import MonsterCarousel, { MonsterCarouselRef } from './MonsterCarousel';
 import './CampaignChallenge.less';
 
 const CampaignChallenge: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [monsters, setMonsters] = useState<DungeonMonster[]>([]);
+    const [monsters, setMonsters] = useState<DungeonMonsterWithResult[]>([]);
     const [currentMonsterIndex, setCurrentMonsterIndex] = useState(0);
+    const carouselRef = useRef<MonsterCarouselRef>(null);
     const [itemDetails, setItemDetails] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
     const { updatePoints } = useUserPoints();
@@ -31,6 +29,17 @@ const CampaignChallenge: React.FC = () => {
         flashDuration: 300
     });
     const isMobile = useIsMobile();
+
+    const handleCardChange = (newIndex: number) => {
+        console.log(`Card changed to index ${newIndex}`);
+    };
+
+    const handleUserAnswer = () => {
+        console.log(`handleUserAnswer called, currentMonsterIndex: ${currentMonsterIndex}`);
+        if (carouselRef.current) {
+            carouselRef.current.moveToNextCard();
+        }
+    };
 
     const fetchCampaignName = async () => {
         try {
@@ -76,19 +85,37 @@ const CampaignChallenge: React.FC = () => {
                 result: result,
             });
 
-            const resp = submitResult.data.data
+            const respData = submitResult.data;
 
-            if(!!resp && !!resp.points_update) {
-                showReward(resp.points_update.cash);
-                updatePoints(resp.points_update)
-            }
+            console.log("respData", respData);
+            if (respData && respData.points_update) {
+                updatePoints(respData.points_update);
+                await showReward(ParseUint64(respData.points_update.cash));
+                
+                // 更新当前怪物的提交结果
+                const updatedMonsters = [...monsters];
+                updatedMonsters[currentMonsterIndex] = {
+                    ...updatedMonsters[currentMonsterIndex],
+                    submitResult: {
+                        familiarity: respData.updates.familiarity,
+                        next_practice_at: respData.updates.next_practice_at,
+                        practice_at: respData.updates.practice_at,
+                        practice_count: respData.from.practice_count + 1,
+                    }
+                };
+                setMonsters(updatedMonsters);
 
-            if (currentMonsterIndex < monsters.length - 1) {
-                setCurrentMonsterIndex(currentMonsterIndex + 1);
+                // 移动到下一张卡片
+                const nextIndex = (currentMonsterIndex + 1) % monsters.length;
+                setCurrentMonsterIndex(nextIndex);
                 setShowFullContent(false); // 重置卡片状态
-            } else {
-                await fetchMonstersAndDetails();
-                setShowFullContent(false); // 重置卡片状态
+
+                // 如果到达最后一张卡片，重新获取怪物
+                if (nextIndex === 0) {
+                    await fetchMonstersAndDetails();
+                }
+
+                handleUserAnswer(); // 直接调用
             }
         } catch (error) {
             console.error(error);
@@ -123,10 +150,14 @@ const CampaignChallenge: React.FC = () => {
                     <MonsterCarousel
                         monsters={monsters}
                         itemDetails={itemDetails}
-                        currentMonsterIndex={currentMonsterIndex}
                         showFullContent={showFullContent}
                         toggleMonsterContent={toggleMonsterContent}
+
+                        currentMonsterIndex={currentMonsterIndex}
                         setCurrentMonsterIndex={setCurrentMonsterIndex}
+
+                        onCardChange={handleCardChange}
+                        ref={carouselRef}
                     />
                     <div className={`skills-container ${isMobile ? 'mobile' : ''}`}>
                         {skillCards.map((card, index) => (

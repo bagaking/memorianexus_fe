@@ -12,12 +12,6 @@ export interface Dungeon {
     updated_at?: string;
 }
 
-export interface PracticeResult {
-    monster_id: string;
-    result: "defeat" | "miss" | "hit" | "kill" | "complete"
-}
-
-
 // 创建复习计划
 export const createCampaign = async (data: Partial<Dungeon>) => {
     (data as any).type = "campaign"
@@ -101,9 +95,92 @@ export const getPracticeMonsters = async (dungeonId: string, count: number) => {
 };
 
 // 上报复习计划的 Monster 结果
-export const submitPracticeResult = async (dungeonId: string, result: PracticeResult) => {
-    return axios.post(`/dungeon/campaigns/${dungeonId}/submit`, result);
+/* example
+{
+    "message": "user-monster practice result updated",
+    "data": {
+        "from": {
+            "dungeon_id": "7394140847492562945",
+            "item_id": "7394140727355228161",
+            "practice_at": "2024-09-01T16:06:15.34422696+08:00",
+            "next_practice_at": "2024-09-01T16:35:09.355465134+08:00",
+            "practice_count": 1,
+            "familiarity": "16%",
+            "difficulty": 1,
+            "importance": 1,
+            "description": "## 营养计划需要因人而异的原因，具体有哪些分类？\n\n营养计划需要个性化的原因主要分为以下几类：\n\n- **生���特征**：包括遗传、性别、年龄、体型、身体成分。\n- **健康状况**：包括病史和运动损伤。\n- **营养和生活习惯**：包括运动员的饮食习惯、生活习惯、食物和口味偏好。\n- **环境和资源**：包括训练环境、食材获取难易程度、烹饪能力、经济条件。\n- **训练要求**：包括当前的训练计划和设定的营养目标。\n- **补剂使用情况**：考虑运动员已经使用或计划使用的营养补剂。\n",
+            "source_type": 1,
+            "source_id": "7394140727355228161",
+            "created_at": "2024-07-22T01:23:30+08:00"
+        },
+        "updates": {
+            "familiarity": 16,
+            "next_practice_at": "2024-09-01T16:35:09.355465134+08:00",
+            "practice_at": "2024-09-01T16:06:15.34422696+08:00",
+            "practice_count": {
+                "SQL": "practice_count + ?",
+                "Vars": [
+                    1
+                ],
+                "WithoutParentheses": false
+            },
+            "visibility": 0
+        },
+        "points_update": {
+            "cash": "44",
+            "gem": "0",
+            "vip_score": "0"
+        }
+    }
+}
+*/
+export const submitPracticeResult = async (dungeonId: string, result: PracticeResult): Promise<PracticeResultResponse> => {
+    const resp = await axios.post(`/dungeon/campaigns/${dungeonId}/submit`, result);
+    return resp.data
 };
+
+export type PracticeResultEnum = "defeat" | "miss" | "hit" | "kill" | "complete"
+
+export interface PracticeResult {
+    monster_id: string;
+    result: PracticeResultEnum;
+}
+
+export interface PracticeResultResponse {
+    message: string;
+    data: {
+        from: {
+            dungeon_id: string;
+            item_id: string;
+            practice_at: string;
+            next_practice_at: string;
+            practice_count: number;
+            familiarity: string;
+            difficulty: number;
+            importance: number;
+            description: string;
+            source_type: number;
+            source_id: string;
+            created_at: string;
+        };
+        updates: {
+            familiarity: number;
+            next_practice_at: string;
+            practice_at: string;
+            practice_count: {
+                SQL: string;
+                Vars: number[];
+                WithoutParentheses: boolean;
+            };
+            visibility: number;
+        };
+        points_update: {
+            cash: string;
+            gem: string;
+            vip_score: string;
+        };
+    };
+}
 
 // 获取复习计划的结果
 export const getPracticeResults = async (dungeonId: string) => {

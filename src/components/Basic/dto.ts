@@ -16,11 +16,22 @@ export interface DungeonMonster {
     created_at?: string;
 }
 
+export interface SubmitResultResponse {
+    familiarity: number;
+    next_practice_at: string;
+    practice_at: string;
+    practice_count: number;
+}
+
+export interface DungeonMonsterWithResult extends DungeonMonster {
+    submitResult?: SubmitResultResponse;
+}
+
 
 export interface Points {
-    cash: number ; // uint64 str
-    gem: number ; // uint64 str
-    vip_score: number ; // uint64 str
+    cash: string ; // uint64 str
+    gem: string ; // uint64 str
+    vip_score: string ; // uint64 str
 }
 
 

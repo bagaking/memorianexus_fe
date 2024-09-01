@@ -71,9 +71,9 @@ export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children
                 const typedKey = key as keyof Points;
                 if (newPoints[typedKey] !== undefined && pointsUpdate[typedKey] !== undefined) {
                     if (isIncrement) {
-                        newPoints[typedKey] = ParseUint64(newPoints[typedKey]) + ParseUint64(pointsUpdate[typedKey]!);
+                        newPoints[typedKey] = `${ParseUint64(newPoints[typedKey]) + ParseUint64(pointsUpdate[typedKey]!)}`;
                     } else {
-                        newPoints[typedKey] = ParseUint64(pointsUpdate[typedKey]!);
+                        newPoints[typedKey] = `${ParseUint64(pointsUpdate[typedKey]!)}`;
                     }
                 }
             });

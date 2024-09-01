@@ -1,67 +1,129 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { DungeonMonster, Item, ParsePercentage } from '../Basic/dto';
+import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { DungeonMonsterWithResult, Item, ParsePercentage } from '../Basic/dto';
 import MonsterPortrait from './MonsterPortrait';
 import MonsterHealthBar from './MonsterHealthBar';
 import { TaggedMarkdown } from '../Common/TaggedMarkdown';
 import './MonsterCarousel.less';
 
 interface MonsterCarouselProps {
-    monsters: DungeonMonster[];
+    monsters: DungeonMonsterWithResult[];
     itemDetails: Item[];
     currentMonsterIndex: number;
     showFullContent: boolean;
     toggleMonsterContent: () => void;
     setCurrentMonsterIndex: (index: number) => void;
+    onCardChange: (index: number) => void;
 }
 
-const MonsterCarousel: React.FC<MonsterCarouselProps> = ({
+export interface MonsterCarouselRef {
+    moveToNextCard: () => void;
+}
+
+const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
     monsters,
     itemDetails,
     currentMonsterIndex,
     showFullContent,
     toggleMonsterContent,
-    setCurrentMonsterIndex
-}) => {
+    setCurrentMonsterIndex,
+    onCardChange
+}, ref) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [disableTransition, setDisableTransition] = useState(false);
     const [displayedIndex, setDisplayedIndex] = useState(currentMonsterIndex);
+    const [localShowFullContent, setLocalShowFullContent] = useState(showFullContent);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    const TRANSITION_DURATION = 500; // 与 CSS 中的过渡时间保持一致
+
+    const resetCarousel = useCallback(() => {
+        setDisableTransition(true);
+        setSlideDirection(null);
+        setDisplayedIndex(currentMonsterIndex);
+        
+        // 如果 monster-content 是显示状态，则关闭它
+        if (showFullContent) {
+            toggleMonsterContent();
+        }
+        
+        requestAnimationFrame(() => {
+            setDisableTransition(false);
+        });
+    }, [currentMonsterIndex, showFullContent, toggleMonsterContent]);
+
+    const changeCard = useCallback((newIndex: number, animate: boolean = true) => {
+        if (newIndex < 0 || newIndex >= monsters.length) return;
+
+        if (showFullContent) {
+            toggleMonsterContent();
+        }
+
+        if (animate) {
+            setSlideDirection(newIndex > displayedIndex ? 'left' : 'right');
+            setIsTransitioning(true);
+            setCurrentMonsterIndex(newIndex);
+        } else {
+            setDisableTransition(true);
+            setCurrentMonsterIndex(newIndex);
+            setDisplayedIndex(newIndex);
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    setDisableTransition(false);
+                }, 100);
+            });
+        }
+
+        onCardChange(newIndex);
+    }, [displayedIndex, monsters.length, showFullContent, toggleMonsterContent, setCurrentMonsterIndex, onCardChange]);
+
+    const moveToNextCard = useCallback(() => {
+        const nextIndex = (currentMonsterIndex + 1) % monsters.length;
+        changeCard(nextIndex, true);
+    }, [currentMonsterIndex, monsters.length, changeCard]);
+
+    useImperativeHandle(ref, () => ({
+        moveToNextCard
+    }));
+
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoaded(true), 100);
-        return () => clearTimeout(timer);
+        setIsLoaded(true);
     }, []);
 
     useEffect(() => {
-        if (slideDirection) {
-            setIsTransitioning(true);
+        if (isTransitioning) {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => {
+                resetCarousel();
                 setIsTransitioning(false);
-                setSlideDirection(null);
-                setDisableTransition(true);
-                setDisplayedIndex(currentMonsterIndex);
-                requestAnimationFrame(() => {
-                    // 稍微延迟一下再禁用过渡效果
-                    setTimeout(() => {
-                        setDisableTransition(false);
-                    }, 50);
-                });
-            }, 300);
+            }, TRANSITION_DURATION);
         }
-        return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        };
-    }, [slideDirection, currentMonsterIndex]);
+    }, [isTransitioning, resetCarousel]);
 
-    const handleCardClick = (index: number, isActive: boolean) => {
-        if (isActive && !isTransitioning) {
-            toggleMonsterContent();
-        } else if (!isTransitioning && !slideDirection) {
-            setSlideDirection(index > displayedIndex ? 'left' : 'right');
-            setCurrentMonsterIndex(index);
+    useEffect(() => {
+        if (!isTransitioning) {
+            setDisplayedIndex(currentMonsterIndex);
+        }
+    }, [currentMonsterIndex, isTransitioning]);
+
+    useEffect(() => {
+        setLocalShowFullContent(showFullContent);
+    }, [showFullContent]);
+
+    const handleCardClick = (index: number) => {
+        // 只允许当前显示的卡片被点击
+        if (index !== displayedIndex) return;
+
+        if (!isTransitioning) {
+            // 如果当前卡片有 submitResult，保持全内容状态
+            const monster = monsters[index];
+            if (monster.submitResult) {
+                setLocalShowFullContent(true);
+            } else {
+                setLocalShowFullContent(!localShowFullContent);
+                toggleMonsterContent();
+            }
         }
     };
 
@@ -73,12 +135,27 @@ const MonsterCarousel: React.FC<MonsterCarouselProps> = ({
         if (index < 0 || index >= monsters.length) return null;
         const monster = monsters[index];
         const itemDetail = itemDetails.find(detail => detail.id === monster.item_id);
-        const isActive = index === currentMonsterIndex;
+        const isActive = index === displayedIndex;
+        const isPrev = index === displayedIndex - 1;
+
+        const getPracticeCount = (practiceCount: number | { SQL: string; Vars: number[]; WithoutParentheses: boolean }) => {
+            if (typeof practiceCount === 'number') {
+                return practiceCount;
+            }
+            return '更新中';
+        };
+
+        console.log("Monster:", monster);
 
         return (
             <div 
-                className={`monster-card ${isActive ? 'active' : ''} ${showFullContent && isActive ? 'show-full-content' : ''} ${disableTransition ? 'no-transition' : ''}`} 
-                onClick={() => handleCardClick(index, isActive)}
+                onClick={() => handleCardClick(index)}
+                className={`monster-card 
+                    ${isActive ? 'active' : ''} 
+                    ${isPrev ? 'prev' : ''} 
+                    ${(localShowFullContent && isActive || monster.submitResult) ? 'show-full-content' : ''} 
+                    ${disableTransition ? 'no-transition' : ''}`
+                } 
             >
                 <div className="monster-image-container">
                     <MonsterPortrait 
@@ -86,13 +163,24 @@ const MonsterCarousel: React.FC<MonsterCarouselProps> = ({
                         alt="Monster Avatar" 
                     />
                     <MonsterHealthBar 
-                        health={100 - ParsePercentage(monster.familiarity)}
+                        health={100 - ParsePercentage(monster.familiarity)} fillClassName={`${disableTransition ? 'no-transition' : ''}`}
                     />
-                    <h2 className="monster-title">
-                        <TaggedMarkdown>{getFirstNonEmptyLine(itemDetail?.content)}</TaggedMarkdown>
-                    </h2>
+                    <div className="monster-title-container">
+                        <div className="monster-title">
+                            <TaggedMarkdown mode='tag'>{getFirstNonEmptyLine(itemDetail?.content)}</TaggedMarkdown>
+                        </div>
+                    </div>
                 </div>
+                
                 <div className={`monster-content ${disableTransition ? 'no-transition' : ''}`}>
+                    {monster.submitResult && (
+                        <div className="monster-result-info">
+                            <p>熟练度: {monster.submitResult.familiarity}%</p>
+                            <p>下次复习: {new Date(monster.submitResult.next_practice_at).toLocaleString()}</p>
+                            <p>上次练习: {new Date(monster.submitResult.practice_at).toLocaleString()}</p>
+                            <p>练习次数: {getPracticeCount(monster.submitResult.practice_count || 0)}</p>
+                        </div>
+                    )}
                     <TaggedMarkdown mode='both'>{itemDetail?.content || ''}</TaggedMarkdown>
                 </div>
             </div>
@@ -108,19 +196,19 @@ const MonsterCarousel: React.FC<MonsterCarouselProps> = ({
         return (
             <div className={`monster-cards-container ${isLoaded ? 'loaded' : ''} ${slideDirection ? `slide-${slideDirection}` : ''} ${disableTransition ? 'no-transition' : ''}`}>
                 <div className={`monster-card-wrapper far-prev ${disableTransition ? 'no-transition' : ''}`}>
-                    {farPrevIndex >= 0 && renderMonsterCard(farPrevIndex)}
+                    {renderMonsterCard(farPrevIndex)}
                 </div>
                 <div className={`monster-card-wrapper prev ${disableTransition ? 'no-transition' : ''}`}>
-                    {prevIndex >= 0 && renderMonsterCard(prevIndex)}
+                    {renderMonsterCard(prevIndex)}
                 </div>
                 <div className={`monster-card-wrapper current ${disableTransition ? 'no-transition' : ''}`}>
                     {renderMonsterCard(displayedIndex)}
                 </div>
                 <div className={`monster-card-wrapper next ${disableTransition ? 'no-transition' : ''}`}>
-                    {nextIndex < monsters.length && renderMonsterCard(nextIndex)}
+                    {renderMonsterCard(nextIndex)}
                 </div>
                 <div className={`monster-card-wrapper far-next ${disableTransition ? 'no-transition' : ''}`}>
-                    {farNextIndex < monsters.length && renderMonsterCard(farNextIndex)}
+                    {renderMonsterCard(farNextIndex)}
                 </div>
             </div>
         );
@@ -131,6 +219,6 @@ const MonsterCarousel: React.FC<MonsterCarouselProps> = ({
             {renderMonsterCards()}
         </div>
     );
-};
+});
 
 export default MonsterCarousel;
