@@ -12,6 +12,7 @@ import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 import { useIsMobile } from '../../hooks/useWindowSize';
 import MonsterCarousel, { MonsterCarouselRef } from './MonsterCarousel';
 import './CampaignChallenge.less';
+import RecordButton from '../Common/RecordButton'; // 导入录音按钮组件
 
 const CampaignChallenge: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -127,6 +128,12 @@ const CampaignChallenge: React.FC = () => {
         setShowFullContent(!showFullContent);
     };
 
+    const handleAudioStop = (audioBlob: Blob) => {
+        // 处理录音结束后的音频数据
+        console.log('录音结束，音频数据:', audioBlob);
+        // 这里可以将音频数据上传到服务器或进行其他处理
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -152,10 +159,8 @@ const CampaignChallenge: React.FC = () => {
                         itemDetails={itemDetails}
                         showFullContent={showFullContent}
                         toggleMonsterContent={toggleMonsterContent}
-
                         currentMonsterIndex={currentMonsterIndex}
                         setCurrentMonsterIndex={setCurrentMonsterIndex}
-
                         onCardChange={handleCardChange}
                         ref={carouselRef}
                     />
@@ -170,6 +175,11 @@ const CampaignChallenge: React.FC = () => {
                                 backgroundImage={card.backgroundImage}
                             />
                         ))}
+                        <RecordButton 
+                            onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
+                            onAudioStop={handleAudioStop} 
+                            position="right" 
+                        /> {/* 添加录音按钮 */}
                     </div>
                 </div>
             </div>
