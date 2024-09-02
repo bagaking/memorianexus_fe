@@ -1,0 +1,86 @@
+@import '../Common/variables.less';
+
+// 变量定义
+@card-btn-height: 68px;
+@card-btn-width: @card-btn-height * 1.618;
+@custom-btn-color: #d9d9d9;
+@border-radius: 16px;
+@transition-duration: 0.3s;
+
+// Mixins
+.flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-styles() {
+  margin: 8px;
+  height: @card-btn-height;
+  width: @card-btn-width;
+  border-radius: @border-radius;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  font-size: 18px;
+  .flex-center();
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: transform @transition-duration, box-shadow @transition-duration;
+  flex: 0 1 auto;
+}
+
+// 主样式
+.button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+
+  &.flex-start { justify-content: flex-start; }
+  &.flex-end { justify-content: flex-end; }
+  &.space-around { justify-content: space-around; }
+  &.space-between { justify-content: space-between; }
+
+  .ant-btn-primary, .ant-btn-danger, .custom-btn {
+    .button-styles();
+  }
+
+  .ant-btn-primary {
+    background-color: @btn-primary-color;
+    &:hover {
+      background-color: lighten(@btn-primary-color, 10%);
+      border-color: lighten(@btn-primary-color, 10%);
+    }
+  }
+
+  .ant-btn-danger {
+    background-color: @btn-danger-color;
+    &:hover {
+      background-color: lighten(@btn-danger-color, 10%);
+      border-color: lighten(@btn-danger-color, 10%);
+    }
+  }
+
+  .custom-btn {
+    background-color: @custom-btn-color;
+    &:hover {
+      background-color: darken(@custom-btn-color, 60%);
+      border-color: darken(@custom-btn-color, 60%);
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .button-container {
+    flex-direction: column;
+
+    .ant-btn-primary,
+    .ant-btn-danger,
+    .custom-btn {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  }
+}

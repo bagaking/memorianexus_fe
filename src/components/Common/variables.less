@@ -1,5 +1,44 @@
+// 层级
+// 现有的变量保持不变
+
+// Z-index 系统
+@z-index-negative: -1;
+@z-index-zero: 0;
+@z-index-1: 100;
+@z-index-2: 200;
+@z-index-3: 300;
+@z-index-4: 400;
+@z-index-5: 500;
+@z-index-6: 600;
+@z-index-7: 700;
+@z-index-8: 800;
+@z-index-9: 900;
+@z-index-10: 1000;
+
+// 语义化 z-index 变量
+@z-index-background: @z-index-zero;
+@z-index-default: @z-index-1;
+@z-index-hover: @z-index-2;
+@z-index-sticky: @z-index-3;
+@z-index-dropdown: @z-index-4;
+@z-index-fixed: @z-index-5;
+@z-index-modal-backdrop: @z-index-6;
+@z-index-modal: @z-index-7;
+@z-index-popover: @z-index-8;
+@z-index-tooltip: @z-index-9;
+@z-index-notification: @z-index-10;
+
+// 特定组件 z-index（如果需要）
+@z-index-navbar: @z-index-sticky;
+@z-index-sidebar: @z-index-fixed;
+
+
 // 全局变量
 @navbar-height: 64px;
+
+// 基准颜色
+@btn-primary-color: #1890ff;
+@btn-danger-color: #ff4d4f;
 
 // 导航栏颜色
 @navbar-header-primary-color: #4a00e0;
@@ -10,7 +49,7 @@
 @layout-header-height: 180px;
 @layout-header-mobile-height: 68px;;
 
-// 其他全局变量
+// 动画
 @default-transition-duration: 0.3s;
 
 // 界面

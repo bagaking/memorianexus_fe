@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import CDNImage from '../Common/CDNImage';
 import { useParams } from 'react-router-dom';
 import { message } from 'antd';
 import { getPracticeMonsters, submitPracticeResult, getItemById, getDungeonDetail, PracticeResultResponse } from '../../api';
@@ -150,9 +151,10 @@ const CampaignChallenge: React.FC = () => {
         <PageLayout 
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
             backUrl={`/campaigns`} 
-            icon="/campaign_dungeon_icon.png"
+            icon="/layout/campaign_dungeon_icon.png"
         >
             <div className="campaign-challenge-container">
+                <CDNImage  className="campaign-challenge-background" src="/battlefield/battlefield_01.png" alt="战场背景"/>
                 <div className="campaign-challenge-content" ref={contentRef}>
                     <MonsterCarousel
                         monsters={monsters}

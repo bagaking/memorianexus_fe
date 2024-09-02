@@ -12,7 +12,7 @@ const rotate = keyframes`
     100% { transform: rotate(360deg); }
 `;
 
-const Button = styled.button<{ isRecording: boolean }>`
+const Button = styled.button<{ $isRecording: boolean }>`
     background: linear-gradient(135deg, #007aff, #0051a8);
     color: white;
     border: none;
@@ -24,8 +24,9 @@ const Button = styled.button<{ isRecording: boolean }>`
     justify-content: center;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    animation: ${props => props.isRecording ? css`${rotate} 1s linear infinite` : 'none'};
+    animation: ${props => props.$isRecording ? css`${rotate} 1s linear infinite` : 'none'};
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 
     &:hover {
         background: linear-gradient(135deg, #0051a8, #003d7a);
@@ -40,6 +41,11 @@ const Button = styled.button<{ isRecording: boolean }>`
         background-color: #b0b0b0;
         cursor: not-allowed;
     }
+
+    @media (max-width: 768px) {
+        width: 40px;
+        height: 40px;
+    }
 `;
 
 const Container = styled.div<{ position: 'left' | 'right' }>`
@@ -48,6 +54,12 @@ const Container = styled.div<{ position: 'left' | 'right' }>`
     ${props => props.position}: 20px;
     z-index: 1000;
     cursor: move;
+
+    @media (max-width: 768px) {
+        left: 50%;
+        transform: translateX(-50%);
+        ${props => props.position}: auto;
+    }
 `;
 
 interface RecordButtonProps {
@@ -210,7 +222,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, onTr
             position={position}
             onMouseDown={handleMouseDown}
         >
-            <Button isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording}>
+            <Button $isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording}>
                 {isRecording ? <FaStop size={24} /> : <FaMicrophone size={24} />}
             </Button>
         </Container>

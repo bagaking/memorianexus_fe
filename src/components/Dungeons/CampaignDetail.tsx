@@ -180,7 +180,7 @@ const CampaignDetail: React.FC = () => {
     }
 
     return (
-        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/campaign_dungeon_icon.png">
+        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/layout/campaign_dungeon_icon.png">
 
             <div className="campaign-progress" style={{display:"flex", flexDirection:"row"}}>
                 <h2 style={{minWidth:228}}>Campaign Progress</h2>

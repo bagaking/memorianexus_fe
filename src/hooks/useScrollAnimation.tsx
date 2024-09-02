@@ -16,9 +16,9 @@ const flashAnimation = keyframes`
   }
 `;
 
-const AnimatedTitleBase = styled.div<{ isFlashing: boolean }>`
+const AnimatedTitleBase = styled.div<{ $isFlashing: boolean }>`
   animation: ${flashAnimation} 0.5s ease-in-out;
-  animation-play-state: ${props => props.isFlashing ? 'running' : 'paused'};
+  animation-play-state: ${props => props.$isFlashing ? 'running' : 'paused'};
 `;
 
 export const useScrollAnimation = (
@@ -92,7 +92,7 @@ export const useScrollAnimation = (
     }, [loading, options, flashTitle, scrollToBottom]);
 
     const AnimatedTitle = useCallback<React.FC<React.PropsWithChildren<{}>>>(({ children }) => (
-        <AnimatedTitleBase isFlashing={isFlashing}>{children}</AnimatedTitleBase>
+        <AnimatedTitleBase $isFlashing={isFlashing}>{children}</AnimatedTitleBase>
     ), [isFlashing]);
 
     return { 

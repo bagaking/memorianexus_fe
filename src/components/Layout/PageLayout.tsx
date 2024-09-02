@@ -1,8 +1,8 @@
-// src/components/Layout/PageLayout.tsx
 import React from 'react';
 import { Layout, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import CDNImage from '../Common/CDNImage';
 import './PageLayout.less';
 
 interface PageLayoutProps {
@@ -27,7 +27,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ children, title, icon, s
                     </Link>
                 )}
                 <h1 className="page-title">
-                    {icon && <img src={icon} alt="Logo" className="menu-logo-48" />}
+                    {icon && <CDNImage src={icon} alt="Logo" className="menu-logo-48" />}
                     {title}
                 </h1>
             </Header>

@@ -145,7 +145,7 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
             return '更新中';
         };
 
-        console.log("Monster:", monster);
+        // console.log("render Monster:", monster);
 
         return (
             <div 

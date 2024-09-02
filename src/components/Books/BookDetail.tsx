@@ -95,7 +95,7 @@ const BookDetail: React.FC = () => {
     }
 
     return (
-        <PageLayout title={(id && id !== 'new') ? `Edit Book (id: ${id})` : 'Create Book'} backUrl={`/books?page=${currentPage}&limit=${limit}`} icon="/book_icon.png">
+        <PageLayout title={(id && id !== 'new') ? `Edit Book (id: ${id})` : 'Create Book'} backUrl={`/books?page=${currentPage}&limit=${limit}`} icon="/layout/book_icon.png">
             <div className="book-detail-container">
                 <Form form={form} onFinish={handleSubmit} className="book-detail-content">
                     <ActionButtons

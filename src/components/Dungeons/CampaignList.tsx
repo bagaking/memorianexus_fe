@@ -162,7 +162,7 @@ const CampaignList: React.FC = () => {
     );
 
     return (
-        <PageLayout title="战役" icon="/campaign_dungeon_icon.png">
+        <PageLayout title="战役" icon="/layout/campaign_dungeon_icon.png">
             <Row gutter={[16, 16]}>
                 <Col xs={24}>
                     <Link to="/campaigns/new">

@@ -83,7 +83,7 @@ const ItemDetail: React.FC = () => {
     }
 
     return (
-        <PageLayout title={(id && id !== 'new') ? `Edit Item (id: ${id})` : 'Create Item'} backUrl="/items" icon="/item_icon.png">
+        <PageLayout title={(id && id !== 'new') ? `Edit Item (id: ${id})` : 'Create Item'} backUrl="/items" icon="/layout/item_icon.png">
             <Form form={form} onFinish={handleSubmit}>
                 <MarkdownField name={"content"} rules={[{ required: true, message: 'Please enter the content!' }]}/>
 

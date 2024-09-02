@@ -4,6 +4,11 @@ import styled from 'styled-components';
 import PointsBar from './PointsBar';
 import { GoldOutlined, DollarOutlined, TrophyOutlined } from '@ant-design/icons';
 
+// 导入图标路径
+import goldIcon from '../../assets/icons/gold_icon.png';
+import gemIcon from '../../assets/icons/gem_icon.png';
+import vipIcon from '../../assets/icons/vip_icon.png';
+
 const StyledCard = styled(Card)`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 15px;
@@ -36,17 +41,17 @@ const StyledPointsBar = styled(PointsBar)`
 `;
 
 const pointItems = [
-    { icon: <GoldOutlined />, alt: "Cash", name: "Cash" },
-    { icon: <DollarOutlined />, alt: "Gem", name: "Gem" },
-    { icon: <TrophyOutlined />, alt: "VIP Score",  name: "VIP" },
-  ];
+  { icon: <GoldOutlined />, iconSrc: goldIcon, alt: "Cash", name: "Cash" },
+  { icon: <DollarOutlined />, iconSrc: gemIcon, alt: "Gem", name: "Gem" },
+  { icon: <TrophyOutlined />, iconSrc: vipIcon, alt: "VIP Score",  name: "VIP" },
+];
 
 const CoolPointsDisplay: React.FC = () => {
   return (
     <StyledCard>
       <Row justify="space-around" align="middle">
         <Col span={24}>
-          <StyledPointsBar showName={true} pointItems={pointItems} />
+          <StyledPointsBar showName={true} pointItems={pointItems} iconSize={32} />
         </Col>
       </Row>
     </StyledCard>

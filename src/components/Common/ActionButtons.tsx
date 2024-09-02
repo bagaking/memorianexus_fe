@@ -1,10 +1,9 @@
-// src/components/Common/ActionButtons.tsx
 import React from 'react';
 import { Button } from 'antd';
 import {ButtonType} from "antd/es/button";
 
 import './CommonStyles.css';
-import './ActionButtons.css';
+import './ActionButtons.less';
 
 interface ActionButtonsProps {
     isEditMode: boolean;

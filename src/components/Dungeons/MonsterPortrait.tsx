@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-
-// CDN 加速域名
-const CDN_DOMAIN = 'https://memnexus-img.kenv.tech';
+import CDNImage from '../Common/CDNImage';
 
 // 本地头像文件名数组
 const portraits = [
@@ -76,7 +74,7 @@ const ImageWrapper = styled.div`
 `;
 
 // 样式化的图片组件
-const PortraitImage = styled.img`
+const StyledCDNImage = styled(CDNImage)`
     width: 100%;
     object-fit: cover;
     object-position: center top;
@@ -85,26 +83,12 @@ const PortraitImage = styled.img`
 
 // 怪物头像组件
 const MonsterPortrait: React.FC<MonsterPortraitProps> = ({ id, alt }) => {
-    const [imageSrc, setImageSrc] = useState('');
-    const [useCDN, setUseCDN] = useState(true);
-
-    useEffect(() => {
-        const portraitFileName = getMonsterPortrait(id);
-        const cdnUrl = `${CDN_DOMAIN}/portraits/${portraitFileName}`;
-        const localUrl = `/portraits/${portraitFileName}`;
-        setImageSrc(useCDN ? cdnUrl : localUrl);
-    }, [id, useCDN]);
-
-    const handleImageError = () => {
-        if (useCDN) {
-            // 如果 CDN 加载失败，切换到本地图片
-            setUseCDN(false);
-        }
-    };
+    const portraitFileName = getMonsterPortrait(id);
+    const src = `/portraits/${portraitFileName}`;
 
     return (
         <ImageWrapper>
-            <PortraitImage src={imageSrc} alt={alt} onError={handleImageError} />
+            <StyledCDNImage src={src} alt={alt} />
         </ImageWrapper>
     );
 };

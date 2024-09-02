@@ -209,7 +209,7 @@ const ItemList: React.FC = () => {
     );
 
     return (
-        <PageLayout title="Items" icon="/item_icon.png">
+        <PageLayout title="Items" icon="/layout/item_icon.png">
             <div style={{ padding: isMobile ? '8px' : '24px' }}>
                 <Card className="item-list-card">
                     <ActionButtons />

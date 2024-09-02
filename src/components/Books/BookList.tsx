@@ -175,7 +175,7 @@ const BookList: React.FC = () => {
     };
 
     return (
-        <PageLayout title="Books" icon="/book_icon.png">
+        <PageLayout title="Books" icon="/layout/book_icon.png">
             <Link to={`/books/new`} state={{page: currentPage, limit}}>
                 <Button type="primary" className="create-new-one-button">Create New Book</Button>
             </Link>
