@@ -69,9 +69,18 @@ interface RecordButtonProps {
     onError?: (error: string) => void;
     position: 'left' | 'right';
     dragBounds?: { top: number, right: number, bottom: number, left: number };
+    playAfterRecording?: boolean; // 新增参数
 }
 
-const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, onTranscript, position, onError, dragBounds }) => {
+const RecordButton: React.FC<RecordButtonProps> = ({ 
+    onRecord, 
+    onAudioStop, 
+    onTranscript, 
+    position, 
+    onError, 
+    dragBounds,
+    playAfterRecording = false // 默认为 false
+}) => {
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
     const [dragging, setDragging] = useState(false);
@@ -86,6 +95,8 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, onTr
     };
 
     const playAudio = (audioBlob: Blob) => {
+        if (!playAfterRecording) return; // 如果 playAfterRecording 为 false，则不播放
+
         console.log('playAudio');
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
@@ -159,7 +170,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onRecord, onAudioStop, onTr
                 onRecord(false);
 
                 onAudioStop(audioBlob);
-                playAudio(audioBlob);
+                playAudio(audioBlob); // 这里会根据 playAfterRecording 参数决定是否播放
 
                 if (newRecognition) {
                     newRecognition.stop();

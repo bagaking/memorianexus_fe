@@ -1,10 +1,10 @@
 // src/components/Layout/Navbar.tsx
 import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Button, Drawer } from 'antd';
 import { Link } from 'react-router-dom';
-import { Menu, Layout, Drawer, Button,  } from 'antd';
 import { MenuOutlined, HomeOutlined, BookOutlined, FileOutlined, UserOutlined, AppstoreOutlined, UserAddOutlined, LoginOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
-import { getProfile, IProfile } from "../../api";
+import { getProfile, Profile } from "../../api";
 import PointsBar from "../Common/PointsBar";
 import './Navbar.less';
 
@@ -13,7 +13,7 @@ const { Header } = Layout;
 const Navbar: React.FC = () => {
     const [visible, setVisible] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    const [userProfile, setUserProfile] = useState<IProfile | null>(null);
+    const [userProfile, setUserProfile] = useState<Profile | null>(null);
     const auth = useAuth();
 
     useEffect(() => {
@@ -47,11 +47,11 @@ const Navbar: React.FC = () => {
             </Menu.Item>
             {auth?.isAuthenticated ? (
                 <>
+                    <Menu.Item key="items" icon={<FileOutlined/>}>
+                        <Link to="/items">词条</Link>
+                    </Menu.Item>
                     <Menu.Item key="books" icon={<BookOutlined/>}>
                         <Link to="/books">书籍</Link>
-                    </Menu.Item>
-                    <Menu.Item key="items" icon={<FileOutlined/>}>
-                        <Link to="/items">项目</Link>
                     </Menu.Item>
                     <Menu.Item key="campaigns" icon={<AppstoreOutlined/>}>
                         <Link to="/campaigns">副本</Link>

@@ -1,14 +1,14 @@
-// src/components/Books/BookDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Form, message } from 'antd';
+import { Form, message, Tooltip } from 'antd';
 import { getBookDetail, updateBook, createBook, deleteBook } from '../../api/books';
 import { PageLayout } from '../Layout/PageLayout';
 import { TitleField, MarkdownField } from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
-import { Book } from "../Basic/dto";
+import CopyableID from '../Common/CopyableID';
+import { Book, DEFAULT_BOOK } from "../../api";
 import BookItemList from "./BookItemList";
 
 import '../Common/CommonStyles.css';
@@ -32,16 +32,17 @@ const BookDetail: React.FC = () => {
                 if (id && id !== 'new') {
                     const response = await getBookDetail(id);
                     const data = response.data.data;
-                    // 确保 tags 是一个数组
                     if (typeof data.tags === 'string') {
                         data.tags = data.tags.split(',').map((tag: string) => tag.trim());
                     } else if (!Array.isArray(data.tags)) {
                         data.tags = [];
                     }
-                    setBook(data); // 仅用来 Loading
+                    setBook(data);
                     form.setFieldsValue(data);
                 } else {
-                    setBook({ id: '', title: '', description: '', tags: [] });
+                    const emptyBook: Book = DEFAULT_BOOK;
+                    setBook(emptyBook);
+                    form.resetFields();
                 }
             } catch (error) {
                 console.error(error);
@@ -53,9 +54,6 @@ const BookDetail: React.FC = () => {
     }, [id, form]);
 
     const handleSubmit = async (values: Book) => {
-        // 确保 tags 是一个数组
-        values.tags = values.tags || form.getFieldValue("tags"); // todo: 这块 form 的机制有点莫名其妙，列表的变更似乎不会引起 dirty
-
         try {
             if (id && id !== 'new') {
                 await updateBook(id, values);
@@ -95,25 +93,56 @@ const BookDetail: React.FC = () => {
     }
 
     return (
-        <PageLayout title={(id && id !== 'new') ? `Edit Book (id: ${id})` : 'Create Book'} backUrl={`/books?page=${currentPage}&limit=${limit}`} icon="/layout/book_icon.png">
+        <PageLayout title='Book Detail' 
+            // backUrl={`/books?page=${currentPage}&limit=${limit}`} 
+            icon="/layout/book_icon.png">
             <div className="book-detail-container">
-                <Form form={form} onFinish={handleSubmit} className="book-detail-content">
-                    <ActionButtons
-                        isEditMode={!!id && id !== 'new'}
-                        onDelete={showDeleteModal}
-                        // additionalButtons={[
-                        //     { label: 'Custom Button 1', onClick: () => console.log('Custom Button 1 clicked'), type: 'primary' },
-                        //     { label: 'Custom Button 2', onClick: () => console.log('Custom Button 2 clicked'), type: 'default' }
-                        // ]}
-                        layout="horizontal"
-                    />
-                    <TitleField />
-                    <MarkdownField name="description" placeholder="my description" rules={[{ required: true, message: 'Please enter the description!' }]} />
-                    <EditableTagField name="tags" />
+                {(id && id !== 'new') && (
+                    <div className="title-container">
+                        <h1>{(id && id !== 'new') ? 'Edit Book' : 'Create Book'} </h1>
+                        <div className="id-container">
+                            <CopyableID id={id} tooltipTitle="Copy Book ID" showBackground={false}/>
+                        </div>
+                    </div>
+                )}
+                <Form form={form} onFinish={handleSubmit} initialValues={book}>
+                    <Tooltip title="Enter a captivating title for your book!">
+                        <div className="pulse-animation">
+                            <TitleField />
+                        </div>
+                    </Tooltip>
+                    <Tooltip title="Describe your book in rich markdown format">
+                        <div>
+                            <MarkdownField 
+                                name="description" 
+                                placeholder="Embark on a journey through your book's pages..." 
+                                rules={[{ required: true, message: 'Please enter the description!' }]} 
+                            />
+                        </div>
+                    </Tooltip>
+                    <div className="bottom-container">
+                        <div className="tag-container">
+                            <Tooltip title="Add tags to categorize your book">
+                                <EditableTagField name="tags" />
+                            </Tooltip>
+                        </div>
+                        <div className="action-buttons-container">
+                            <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal} />
+                        </div>
+                    </div>
                 </Form>
-                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
-                {(id && id !== "new") && <BookItemList bookId={id} />}
             </div>
+            <DeleteModal 
+                visible={deleteModalVisible} 
+                onConfirm={handleDelete} 
+                onCancel={() => setDeleteModalVisible(false)} 
+            />
+            {(id && id !== "new") && (
+                <div className="book-items-container">
+                    <h2>Book Items</h2>
+                    <BookItemList bookId={id} />
+                </div>
+            )}
         </PageLayout>
     );
 };

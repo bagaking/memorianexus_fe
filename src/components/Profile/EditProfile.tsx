@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Row, Col, Card, Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import { getProfile, IProfile, updateProfile } from '../../api/profile';
+import { getProfile, Profile as IProfile, updateProfile } from '../../api';
 import { useIsMobile } from '../../hooks/useWindowSize';
 
 interface UserProfile {
-    email: string;
-    nickname: string;
-    avatar_url: string | null | undefined;
-    bio: string;
+    // ... (保持不变)
 }
 
 const EditProfile: React.FC = () => {

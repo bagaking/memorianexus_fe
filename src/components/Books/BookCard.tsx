@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { Book } from "../Basic/dto";
+import { Book } from "../../api/_dto";
 
 interface BookCardProps {
     book: Book;

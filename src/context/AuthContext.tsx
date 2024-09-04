@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as loginApi, register as registerApi } from '../api/auth';
-import Cookies from 'js-cookie';
+import * as authApi from '../api/auth';
 
 interface AuthContextProps {
     isAuthenticated: boolean;
@@ -9,6 +8,7 @@ interface AuthContextProps {
     login: (username: string, password: string) => Promise<void>;
     register: (username: string, email: string, password: string, confirmPassword: string) => Promise<void>;
     logout: () => void;
+    checkAuth: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -18,53 +18,77 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [user, setUser] = useState<{ username: string } | null>(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = Cookies.get('ACCESS_TOKEN');
-        const storedUser = Cookies.get('USER');
-        console.log('Loaded token:', token);
-        console.log('Loaded user:', storedUser);
-        if (token && storedUser) {
-            setIsAuthenticated(true);
-            setUser(JSON.parse(storedUser));
+    const checkAuth = async (): Promise<boolean> => {
+        const token = authApi.getToken();
+        if (!token) {
+            console.log('No token found, user is not authenticated');
+            setIsAuthenticated(false);
+            setUser(null);
+            return false;
         }
+
+        try {
+            await authApi.verifyToken();
+            const storedUser = authApi.getUser();
+            if (storedUser) {
+                setIsAuthenticated(true);
+                setUser(storedUser);
+            }
+            return true;
+        } catch (error) {
+            console.error('Token verification failed:', error);
+            try {
+                await authApi.refreshToken();
+                const storedUser = authApi.getUser();
+                if (storedUser) {
+                    setIsAuthenticated(true);
+                    setUser(storedUser);
+                }
+                return true;
+            } catch (refreshError) {
+                console.error('Token refresh by auth failed:', refreshError);
+                authApi.logout();
+                setIsAuthenticated(false);
+                setUser(null);
+                return false;
+            }
+        }
+    };
+
+    useEffect(() => {
+        checkAuth();
     }, []);
 
     const login = async (username: string, password: string) => {
         try {
-            const response = await loginApi({ username, password });
-            const token = response.data.token; // 假设响应中包含 token
+            await authApi.login({ username, password });
             setIsAuthenticated(true);
             setUser({ username });
-            Cookies.set('ACCESS_TOKEN', token, { expires: 7 }); // 设置 7 天过期
-            Cookies.set('USER', JSON.stringify({ username }), { expires: 7 });
-            console.log('Stored token:', token);
-            console.log('Stored user:', { username });
         } catch (error) {
             console.error('Failed to login', error);
             throw error;
         }
     };
 
-
     const register = async (username: string, email: string, password: string, confirmPassword: string) => {
         try {
-            await registerApi({ username, email, password, confirmPassword });
-            navigate('/login'); // 注册成功后跳转到登录页面
+            await authApi.register({ username, email, password, confirmPassword });
+            navigate('/login');
         } catch (error) {
             console.error('Failed to register', error);
+            throw error;
         }
     };
 
     const logout = () => {
+        authApi.logout();
         setIsAuthenticated(false);
         setUser(null);
-        Cookies.remove('ACCESS_TOKEN');
-        Cookies.remove('USER');
-        navigate('/login'); // 注销成功后跳转到登录页面
+        navigate('/login');
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, register, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, register, logout, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );

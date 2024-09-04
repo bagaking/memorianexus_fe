@@ -1,0 +1,126 @@
+// 颜色变量
+@primary-color: #1890ff;
+@text-color: rgba(0, 0, 0, 0.85);
+@white-color: #fff;
+
+// 尺寸变量
+@font-size-base: 12px;
+@tag-height: 24px;
+@tag-border-radius: 6px;
+@tag-padding: 0 8px;
+@gap-size: 6px;
+
+// 动画变量
+@transition-duration: 0.2s;
+
+// 混合
+.flex-center() {
+  display: flex;
+  align-items: center;
+}
+
+.tag-base() {
+  height: @tag-height;
+  border-radius: @tag-border-radius;
+  padding: @tag-padding;
+  font-size: @font-size-base;
+  transition: all @transition-duration;
+  cursor: pointer;
+  .flex-center();
+}
+
+.hover-effect() {
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.pulse-animation() {
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  &:active {
+    animation: pulse @transition-duration ease-in-out;
+  }
+}
+
+// 主样式
+.editable-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @gap-size;
+  margin-top: @gap-size;
+
+  .editable-tag {
+    .tag-base();
+    background-color: @primary-color;
+    color: @white-color;
+    border: none;
+    .hover-effect();
+
+    &:hover {
+      background-color: lighten(@primary-color, 10%);
+    }
+
+    .tag-actions {
+      margin-left: 4px;
+      .flex-center();
+
+      .edit-icon, .close-icon {
+        font-size: 10px;
+        margin-left: 2px;
+        opacity: 0.7;
+        transition: opacity @transition-duration;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .editable-tag-input {
+    .tag-base();
+    width: 100px;
+    border: 1px solid @primary-color;
+    background-color: @white-color;
+
+    &:focus {
+      box-shadow: 0 0 0 2px fade(@primary-color, 20%);
+    }
+
+    .confirm-icon {
+      color: @primary-color;
+      cursor: pointer;
+      transition: all @transition-duration;
+
+      &:hover {
+        color: darken(@primary-color, 10%);
+      }
+    }
+  }
+
+  .site-tag-plus {
+    .tag-base();
+    background: @white-color;
+    border: 1px dashed @primary-color;
+    color: @primary-color;
+    .hover-effect();
+
+    &:hover {
+      color: darken(@primary-color, 10%);
+      border-color: darken(@primary-color, 10%);
+    }
+
+    .anticon {
+      margin-right: 2px;
+    }
+  }
+
+  .editable-tag, .site-tag-plus {
+    .pulse-animation();
+  }
+}

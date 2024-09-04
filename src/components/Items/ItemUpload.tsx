@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Upload, message, Button, Modal } from 'antd';
+import { message, Button } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadItems } from '../../api/items';
 import AppendEntitiesModal, { EntityModalDataModel } from '../Common/AppendEntitiesModal';
 import { getBooks } from '../../api/books';
-import { Book } from "../Basic/dto";
+import { Book } from "../../api/_dto";
 
 interface ItemUploadProps {
     onUploadSuccess: () => void;

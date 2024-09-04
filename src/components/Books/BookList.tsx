@@ -8,7 +8,7 @@ import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import BookCard from './BookCard';
 import PaginationComponent from '../Common/PaginationComponent';
-import {Book, Item} from "../Basic/dto";
+import {Book, Item} from "../../api/_dto";
 import { useIsMobile } from '../../hooks/useWindowSize';
 import '../Common/CommonStyles.css';
 

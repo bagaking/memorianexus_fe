@@ -1,8 +1,8 @@
 // src/components/Common/EditableTagGroup.tsx
 import React, { useState, useRef } from 'react';
-import {Tag, Input, Tooltip, InputRef, Form} from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import './EditableTagGroup.css';
+import { Tag, Input, Tooltip, InputRef, Form } from 'antd';
+import { PlusOutlined, EditOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import './EditableTagGroup.less';
 
 interface EditableTagGroupProps {
     value?: string[];
@@ -56,9 +56,19 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ value, onCha
             {(value || []).map((tag, index) => {
                 const isLongTag: boolean = tag.length > 20;
                 const tagElem = (
-                    <Tag key={tag} closable className="editable-tag"
+                    <Tag key={tag} className="editable-tag"
                          onClose={() => handleClose(tag)} onClick={() => handleTagClick(index)}>
                         {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                        <span className="tag-actions">
+                            <EditOutlined className="edit-icon" onClick={(e) => {
+                                e.stopPropagation();
+                                handleTagClick(index);
+                            }} />
+                            <CloseOutlined className="close-icon" onClick={(e) => {
+                                e.stopPropagation();
+                                handleClose(tag);
+                            }} />
+                        </span>
                     </Tag>
                 );
                 return isLongTag ? (
@@ -70,8 +80,17 @@ export const EditableTagGroup: React.FC<EditableTagGroupProps> = ({ value, onCha
                 );
             })}
             {inputVisible && (
-                <Input ref={inputRef} type="text" size="small" className="editable-tag-input" value={inputValue}
-                       onChange={handleInputChange} onBlur={handleInputConfirm} onPressEnter={handleInputConfirm}/>
+                <Input
+                    ref={inputRef}
+                    type="text"
+                    size="small"
+                    className="editable-tag-input"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onBlur={handleInputConfirm}
+                    onPressEnter={handleInputConfirm}
+                    suffix={<CheckOutlined className="confirm-icon" onClick={handleInputConfirm} />}
+                />
             )}
             {!inputVisible && (
                 <Tag onClick={showInput} className="site-tag-plus">

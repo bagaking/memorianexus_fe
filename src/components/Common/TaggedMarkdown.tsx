@@ -1,16 +1,17 @@
 import React from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
-import { Typography, Tag } from 'antd';
+import { Typography, Tag, Divider } from 'antd';
 
 const { Text } = Typography;
 
 interface TaggedMarkdownProps {
-  children: string;
+  children: React.ReactNode; // 修改这里，允许接受任何 React 节点
   tagStyles?: {
     [key: string]: React.CSSProperties;
   };
   mode?: 'tag' | 'heading' | 'both';
   customRenderers?: Partial<Components>;
+  showDivider?: boolean; // 新增属性
 }
 
 const defaultTagStyles: { [key: string]: React.CSSProperties } = {
@@ -59,7 +60,8 @@ export const TaggedMarkdown: React.FC<TaggedMarkdownProps> = ({
   children, 
   tagStyles = {}, 
   mode = 'both',
-  customRenderers = {}
+  customRenderers = {},
+  showDivider = false // 默认不显示分隔线
 }) => {
   const mergedTagStyles = { ...defaultTagStyles, ...tagStyles };
   const defaultRenderers: Components = {
@@ -73,7 +75,34 @@ export const TaggedMarkdown: React.FC<TaggedMarkdownProps> = ({
 
   const mergedRenderers = { ...defaultRenderers, ...customRenderers };
 
-  return <ReactMarkdown components={mergedRenderers}>{children}</ReactMarkdown>;
+  const renderContent = (content: React.ReactNode, isFirstHeading: boolean = true): React.ReactNode => {
+    if (typeof content === 'string') {
+      const parts = content.split(/(?<=\n)(?=[#\s])/);
+      return (
+        <>
+          {parts.map((part, index) => (
+            <React.Fragment key={index}>
+              {showDivider && index === 1 && isFirstHeading && <Divider style={{ margin: '8px 0' }} />}
+              <ReactMarkdown components={mergedRenderers}>{part}</ReactMarkdown>
+            </React.Fragment>
+          ))}
+        </>
+      );
+    }
+    if (React.isValidElement(content)) {
+      return React.cloneElement(content, {
+        children: renderContent(content.props.children, false)
+      } as React.Attributes);
+    }
+    if (Array.isArray(content)) {
+      return content.map((child, index) => (
+        <React.Fragment key={index}>{renderContent(child, index === 0)}</React.Fragment>
+      ));
+    }
+    return content;
+  };
+
+  return <>{renderContent(children)}</>;
 };
 
 export default TaggedMarkdown;

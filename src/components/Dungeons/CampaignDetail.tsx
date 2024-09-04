@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, message, Button, Table, Avatar, Card, Progress, Select } from 'antd';
-import { Dungeon, getDungeonDetail, updateDungeon, deleteDungeon, createCampaign, getDungeonItemsId, addDungeonItems, removeDungeonItems } from '../../api/dungeons';
+import { Form, Input, message, Button, Avatar, Card, Progress, Select, Row, Col } from 'antd';
+import { Dungeon, getDungeonDetail, updateDungeon, deleteDungeon, createCampaign, getDungeonItemsId, addDungeonItems, removeDungeonItems, DEFAULT_DUNGEON } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
 import { TitleField, MarkdownField } from '../Common/FormFields';
 import { ActionButtons } from '../Common/ActionButtons';
 import { DeleteModal } from '../Common/DeleteModal';
 import { EditableTagField } from '../Common/EditableTagGroup';
 import { getItems } from "../../api/items";
-import { DungeonMonster } from "../Basic/dto";
+import { DungeonMonster, Item } from "../../api/_dto";
 import { getBookItems, getTagItems } from "../../api/books";
-import AppendEntitiesModal from '../Common/AppendEntitiesModal';
+import ItemCard from '../Basic/ItemCard';
+import EmbedItemPack from '../Basic/EmbedItemPack';
 
 import '../Common/CommonStyles.css';
-import './CampaignDetail.css';
+import './CampaignDetail.less';
+import { DifficultyImportance } from '../Basic/ItemComponents';
+import { useIsMobile } from '../../hooks/useWindowSize';
 
 const { Option } = Select;
 
@@ -22,11 +25,116 @@ const CampaignDetail: React.FC = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [dungeon, setDungeon] = useState<Dungeon | null>(null);
-    const [items, setItems] = useState<DungeonMonster[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-    const [addEntitiesModalVisible, setAddEntitiesModalVisible] = useState(false);
     const [importType, setImportType] = useState<'book' | 'tag' | null>(null);
-    const [importValue, setImportValue] = useState<string | null>(null);
+    const [importValue, setImportValue] = useState<string>('');
+
+    const isMobile = useIsMobile()
+
+    const fetchItems = useCallback(async (page: number, limit: number) => {
+        if (!id || id === "new") return { entities: [], total: 0, offset: 0, limit };
+        const response = await getDungeonItemsId(id, { page, limit });
+        return {
+            entities: response.data.data,
+            total: response.data.total,
+            offset: response.data.offset,
+            limit: response.data.limit
+        };
+    }, [id]);
+
+    const fetchEntities = useCallback(async (page: number, limit: number = 10, search: string = "") => {
+        let response: any;
+        if (importType && importValue) {
+            if (importType === 'book') {
+                response = await getBookItems({ page, limit, search, bookId: importValue });
+            } else if (importType === 'tag') {
+                response = await getTagItems({ page, limit, search, tag: importValue });
+            }
+        } else {
+            response = await getItems({ page, limit, search });
+        }
+        return {
+            entities: response.data.data,
+            total: response.data.total,
+            offset: response.data.offset,
+            limit: response.data.limit,
+        };
+    }, [importType, importValue]);
+
+    const handleAddItems = useCallback(async (itemIds: string[]) => {
+        if (!id || id === "new") return;
+        await addDungeonItems(id, itemIds);
+    }, [id]);
+
+    const handleDeleteItems = useCallback(async (itemIds: string[]) => {
+        if (!id || id === "new") return;
+        await removeDungeonItems(id, itemIds);
+    }, [id]);
+
+    const renderItem = useCallback((item: DungeonMonster, selected: boolean, onSelect: () => void) => (
+        <ItemCard 
+            item={item as unknown as Item} 
+            onClick={onSelect} 
+            selected={selected} 
+            showPreview={true} 
+            showActions={false} 
+            indentHeadings={false} 
+        />
+    ), []);
+
+    const itemsColumns = [
+        {
+            title: 'Avatar',
+            dataIndex: 'avatar',
+            key: 'avatar',
+            render: (text: string) => <Avatar src={text} />
+        },
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: 'Item ID',
+            dataIndex: 'item_id',
+            key: 'item_id',
+        },
+        {
+            title: 'Difficulty & Importance',
+            key: 'difficultyImportance',
+            render: (_: any, record: DungeonMonster) => (
+                <DifficultyImportance difficulty={record.difficulty} importance={record.importance} />
+            ),
+        },
+        {
+            title: 'Practice At',
+            dataIndex: 'practice_at',
+            key: 'practice_at',
+        },
+    ];
+
+    const customControlPanel = (
+        <div className="import-container">
+            <span>Import from:</span>
+            <Select 
+                placeholder="Import Type" 
+                style={{ width: 120 }} 
+                onChange={value => setImportType(value)}
+                value={importType}
+            >
+                <Option value="book">Book</Option>
+                <Option value="tag">Tag</Option>
+            </Select>
+            {importType && (
+                <Input
+                    placeholder={`Enter ${importType} ID`}
+                    style={{ width: 200 }}
+                    value={importValue}
+                    onChange={e => setImportValue(e.target.value)}
+                />
+            )}
+        </div>
+    );
 
     useEffect(() => {
         const fetchDungeon = async () => {
@@ -36,17 +144,10 @@ const CampaignDetail: React.FC = () => {
                     const data = response.data.data;
                     setDungeon(data);
                     form.setFieldsValue(data);
-
-                    // 获取 campaign items
-                    const itemIDsResponse = await getDungeonItemsId(id);
-                    setItems(itemIDsResponse.data.data);
                 } else {
-                    setDungeon({
-                        id: '',
-                        title: '',
-                        description: '',
-                        rule: ''
-                    });
+                    let data = DEFAULT_DUNGEON;
+                    setDungeon(data);
+                    form.setFieldsValue(data);
                 }
             } catch (error) {
                 console.error(error);
@@ -92,101 +193,19 @@ const CampaignDetail: React.FC = () => {
         }
     };
 
-    const handleItemDelete = async (itemIds: string[]) => {
-        try {
-            await removeDungeonItems(id!, itemIds);
-            message.success('Items deleted successfully');
-            setItems(items.filter(item => !itemIds.includes(item.item_id)));
-        } catch (error) {
-            console.error(error);
-            message.error('Failed to delete items');
-        }
-    };
-
-    const handleAddEntitiesSubmit = async (entityIds: string[]) => {
-        try {
-            await addDungeonItems(id!, entityIds);
-            message.success('Items added successfully');
-            const itemsResponse = await getDungeonItemsId(id!);
-            setItems(itemsResponse.data.data);
-            setAddEntitiesModalVisible(false);
-        } catch (error) {
-            console.error(error);
-            message.error('Failed to add items');
-        }
-    };
-
-    const fetchEntities = async (page: number, limit:number = 10, search:string = "") => {
-        // 根据 importType 和 importValue 来获取 items
-        let response;
-        if (!!importValue) {
-            if (importType === 'book') {
-                response = await getBookItems({ page, limit, search, bookId: importValue });
-            } else if (importType === 'tag') {
-                response = await getTagItems({ page, limit, search, tag: importValue });
-            }
-        } else {
-            response = await getItems({ page, limit, search });
-        }
-        if (!response || !response.data) {
-            return {
-                entities: [],
-                total: 0,
-                offset: 0,
-                limit: limit,
-            }
-        }
-        const data = response.data;
-        return {
-            entities: data.data,
-            total: data.total,
-            offset: data.offset,
-            limit: data.limit,
-        };
-    };
-
-    const columns = [
-        {
-            title: 'Avatar',
-            dataIndex: 'avatar',
-            key: 'avatar',
-            render: (text: string) => <Avatar src={text} />
-        },
-        {
-            title: 'Item ID',
-            dataIndex: 'item_id',
-            key: 'item_id',
-        },
-        {
-            title: 'Practice At',
-            dataIndex: 'practice_at',
-            key: 'practice_at',
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_: any, record: DungeonMonster) => (
-                <>
-                    <Button type="link" size="small" danger onClick={() => handleItemDelete([record.item_id])}>
-                        Delete
-                    </Button>
-                </>
-            ),
-        },
-    ];
-
     if (!dungeon) {
         return <div>Loading...</div>;
     }
 
     return (
         <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/layout/campaign_dungeon_icon.png">
-
-            <div className="campaign-progress" style={{display:"flex", flexDirection:"row"}}>
-                <h2 style={{minWidth:228}}>Campaign Progress</h2>
+            <div className="campaign-progress">
+                <h2>Campaign Progress</h2>
                 <Progress percent={0} status="active"/>
                 {(id && id !== 'new') &&
-                <Button style={{minWidth:228}} type="link" onClick={() => navigate(`/campaigns/${id}/monsters`)}><h2 style={{color:"#3399FF"}}>View Monsters</h2></Button>
+                <Button className="view-monsters-button" type="link" onClick={() => navigate(`/campaigns/${id}/monsters`)}>
+                    <h2>View Monsters</h2>
+                </Button>
                 }
             </div>
 
@@ -196,58 +215,42 @@ const CampaignDetail: React.FC = () => {
                     <MarkdownField name="description" placeholder="Description"
                                    rules={[{required: true, message: 'Please enter the description!'}]}/>
 
-                    <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal}/>
-                    {/*下边这俩还有必要吗?*/}
-                    <EditableTagField name="tags"/>
-                    <Form.Item name="book_ids">
-                        <Input placeholder="Books (comma separated)"/>
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <EditableTagField name="tags"/>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item name="book_ids">
+                                <Input placeholder="Books (comma separated)"/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
+                    <ActionButtons isEditMode={!!id && id !== 'new'} onDelete={showDeleteModal}/>
                 </Form>
 
                 <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)}/>
 
-                {(id && id !== 'new') ?
-
-                <div className="campaign-items-container">
-                    <h2>Campaign Items</h2>
-                    <Table className="min-height-table" style={{marginBottom:"16px"}} columns={columns} dataSource={items} rowKey="item_id"/>
-                    <Button type="primary" onClick={() => setAddEntitiesModalVisible(true)}>Add Items</Button>
-                    <span style={{margin:"10px"}}>OR</span>
-                    <Button
-                        type="primary"
-                        onClick={() => setAddEntitiesModalVisible(true)}
-                        disabled={!importValue}
-                        style={{ marginLeft: 8 }}
-                    >
-                        Import from {importType}
-                    </Button>
-                    <Select placeholder="Import Type" style={{ width: 120, marginLeft: 8 }} onChange={value => setImportType(value)}>
-                        <Option value="book">Book</Option>
-                        <Option value="tag">Tag</Option>
-                    </Select>
-                    {importType && (
-                        <Input
-                            placeholder={`Enter ${importType} ID`}
-                            style={{ width: 200, marginLeft: 8 }}
-                            onChange={e => setImportValue(e.target.value)}
+                {(id && id !== 'new') ? (
+                    <div className="campaign-items-container">
+                        <h2>Campaign Items</h2>
+                        <EmbedItemPack<DungeonMonster>
+                            fetchItems={fetchItems}
+                            fetchItemsToAdd={fetchEntities}
+                            enableSearchWhenAdd={true}
+                            addItems={handleAddItems}
+                            deleteItems={handleDeleteItems}
+                            itemsColumns={isMobile ? undefined : itemsColumns}
+                            renderItem={renderItem}
+                            rowKey="item_id"
+                            grid={{ gutter: 16, column: 4 }}
+                            customControlPanel={customControlPanel}
                         />
-                    )}
-
-                </div> : <span style={{marginTop:"16px", paddingTop:"16px", color: "gray"}}>- items can only be add to exist campaign -</span> }
-
-                <AppendEntitiesModal
-                    visible={addEntitiesModalVisible}
-                    onCancel={() => setAddEntitiesModalVisible(false)}
-                    onSubmit={handleAddEntitiesSubmit}
-                    fetchEntities={fetchEntities}
-                    abortedItems={
-                        items.map(monster => ({ id: monster.item_id, content: monster.description}))
-                    }
-                    enableSearch={false}
-                />
+                    </div>
+                ) : (
+                    <span className="items-not-available">- items can only be added to existing campaigns -</span>
+                )}
             </Card>
-
         </PageLayout>
     );
 };

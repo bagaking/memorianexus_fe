@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Form, Input, Button, message, Switch, Select, Layout, Modal, Divider, Card, Avatar, Row, Col, Affix, Spin } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import { IProfile, ISettingsMemorization, ISettingsAdvance, getProfile, updateProfile, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api/profile';
+import { Profile as IProfile, SettingsMemorization, SettingsAdvance, getProfile, updateProfile, getMemorizationSettings, updateMemorizationSettings, getAdvanceSettings, updateAdvanceSettings } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import { PageLayout } from '../Layout/PageLayout';
 import { MarkdownField } from "../Common/FormFields";
@@ -25,8 +25,8 @@ const { Content } = Layout;
 const Profile: React.FC = () => {
     const [form] = Form.useForm();
     const [profile, setProfile] = useState<IProfile | null>(null);
-    const [memorizationSettings, setMemorizationSettings] = useState<ISettingsMemorization | null>(null);
-    const [advanceSettings, setAdvanceSettings] = useState<ISettingsAdvance | null>(null);
+    const [memorizationSettings, setMemorizationSettings] = useState<SettingsMemorization | null>(null);
+    const [advanceSettings, setAdvanceSettings] = useState<SettingsAdvance | null>(null);
     const [logoutModalVisible, setLogoutModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const auth = useAuth();
@@ -83,9 +83,9 @@ const Profile: React.FC = () => {
     const handleProfileUpdate = async (values: Partial<IProfile>) => {
         try {
             // 确保 avatar_url 不为空字符串
-            const updatedValues = {
+            const updatedValues: Partial<IProfile> = {
                 ...values,
-                avatar_url: values.avatar_url || null
+                avatar_url: values.avatar_url || ""
             };
             
             await updateProfile(updatedValues);
@@ -106,7 +106,7 @@ const Profile: React.FC = () => {
         }
     };
 
-    const handleMemorizationSettingsUpdate = async (values: Partial<ISettingsMemorization>) => {
+    const handleMemorizationSettingsUpdate = async (values: Partial<SettingsMemorization>) => {
         try {
             await updateMemorizationSettings(values);
             message.success('记忆设置更新成功');
@@ -117,7 +117,7 @@ const Profile: React.FC = () => {
         }
     };
 
-    const handleAdvanceSettingsUpdate = async (values: Partial<ISettingsAdvance>) => {
+    const handleAdvanceSettingsUpdate = async (values: Partial<SettingsAdvance>) => {
         try {
             await updateAdvanceSettings(values);
             message.success('高级设置更新成功');
@@ -173,7 +173,7 @@ const Profile: React.FC = () => {
         <Card title="记忆设置" id="memorization-section">
             <Form onFinish={handleMemorizationSettingsUpdate} layout={isMobile ? 'vertical' : 'horizontal'} labelCol={{ span: isMobile ? 24 : 8 }} wrapperCol={{ span: isMobile ? 24 : 16 }}>
                 <Form.Item name="review_interval_setting" label="复习间隔设置">
-                    <Input defaultValue={memorizationSettings.review_interval_setting} />
+                    <Input defaultValue={memorizationSettings.review_interval} />
                 </Form.Item>
                 <Form.Item name="difficulty_preference" label="难度偏好">
                     <Input type="number" defaultValue={memorizationSettings.difficulty_preference} />

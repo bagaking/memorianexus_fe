@@ -1,7 +1,8 @@
 // src/context/UserPointsContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { getPoints } from '../api/profile';
-import { ParseUint64, Points } from "../components/Basic/dto";
+import { parseUint64, Points } from "../api";
+import { useAuth } from './AuthContext';
 
 interface UserPointsContextProps {
     points: Points | null;
@@ -25,41 +26,40 @@ interface UserPointsProviderProps {
     children: ReactNode;
 }
 
-const RETRY_INTERVAL = 60000; // 60 seconds
-const MAX_RETRIES = 3;
-
 export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children }) => {
+    const { isAuthenticated } = useAuth();
     const [points, setPoints] = useState<Points | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [initialized, setInitialized] = useState(false);
-    const [retryCount, setRetryCount] = useState(0);
 
     const fetchPoints = useCallback(async () => {
+        if (!isAuthenticated) {
+            setPoints(null);
+            setLoading(false);
+            setError(null);
+            setInitialized(false);
+            return;
+        }
+
+        setLoading(true);
         try {
             const updatedPoints = await getPoints();
             setPoints(updatedPoints);
-            setLoading(false);
             setError(null);
             setInitialized(true);
-            setRetryCount(0);
         } catch (err) {
             console.error('Error fetching points:', err);
             setError(err as Error);
-            if (retryCount < MAX_RETRIES) {
-                setTimeout(() => {
-                    setRetryCount(prevCount => prevCount + 1);
-                    fetchPoints();
-                }, RETRY_INTERVAL);
-            } else {
-                setLoading(false);
-            }
+        } finally {
+            setLoading(false);
         }
-    }, [retryCount]);
+    }, [isAuthenticated]);
 
     const updatePoints = useCallback(async (pointsUpdate?: Partial<Points>, isIncrement: boolean = true) => {
+        if (!isAuthenticated) return;
+
         if (!pointsUpdate) {
-            // 如果没有传入 pointsUpdate，则触发 fetchPoints
             await fetchPoints();
             return;
         }
@@ -71,27 +71,28 @@ export const UserPointsProvider: React.FC<UserPointsProviderProps> = ({ children
                 const typedKey = key as keyof Points;
                 if (newPoints[typedKey] !== undefined && pointsUpdate[typedKey] !== undefined) {
                     if (isIncrement) {
-                        newPoints[typedKey] = `${ParseUint64(newPoints[typedKey]) + ParseUint64(pointsUpdate[typedKey]!)}`;
+                        newPoints[typedKey] = `${parseUint64(newPoints[typedKey]) + parseUint64(pointsUpdate[typedKey]!)}`;
                     } else {
-                        newPoints[typedKey] = `${ParseUint64(pointsUpdate[typedKey]!)}`;
+                        newPoints[typedKey] = `${parseUint64(pointsUpdate[typedKey]!)}`;
                     }
                 }
             });
             return newPoints;
         });
-    }, [fetchPoints]);
+    }, [isAuthenticated, fetchPoints]);
 
     useEffect(() => {
-        fetchPoints();
-
-        const intervalId = setInterval(() => {
-            if (!loading && initialized) {
-                fetchPoints();
-            }
-        }, 60000); // 每分钟更新一次
-
-        return () => clearInterval(intervalId);
-    }, [fetchPoints, loading, initialized]);
+        if (isAuthenticated) {
+            fetchPoints();
+            const intervalId = setInterval(fetchPoints, 60000);
+            return () => clearInterval(intervalId);
+        } else {
+            setPoints(null);
+            setLoading(false);
+            setError(null);
+            setInitialized(false);
+        }
+    }, [isAuthenticated, fetchPoints]);
 
     return (
         <UserPointsContext.Provider value={{ points, loading, error, updatePoints, initialized }}>

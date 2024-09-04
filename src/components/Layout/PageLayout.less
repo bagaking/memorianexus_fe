@@ -19,7 +19,8 @@
 
   &-header {
     position: relative;
-    .flex-center();
+    display: flex;
+    align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #001529 0%, #4b6cb7 100%);
     padding: 0 24px;
@@ -29,6 +30,14 @@
     text-align: center;
     font-family: 'Cinzel', serif;
     border-radius: 8px;
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+    }
 
     &::before {
       content: '';
@@ -60,11 +69,12 @@
 
 .page-title {
   color: @navbar-header-text-color;
-  margin: 12px;
+  margin: 0;
   flex: 1;
   font-size: 36px;
   z-index: 1;
-  .flex-center();
+  display: flex;
+  align-items: center;
   justify-content: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 
@@ -76,15 +86,18 @@
 
 .back-button {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  .flex-center();
-  z-index: 1;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  color: @navbar-header-text-color;
+  font-size: 20px;
   padding: 8px;
   transition: transform @default-transition-duration;
 
   &:hover {
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1);
+    color: lighten(@navbar-header-text-color, 20%);
   }
 }
 
@@ -112,8 +125,7 @@
   }
 
   .back-button {
-    font-size: 14px;
+    font-size: 16px;
+    padding: 4px;
   }
 }
-
-// 其他可能需要的样式...

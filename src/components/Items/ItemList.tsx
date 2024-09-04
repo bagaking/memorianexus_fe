@@ -10,10 +10,11 @@ import { useIsMobile } from '../../hooks/useWindowSize';
 import { PlusOutlined } from '@ant-design/icons';
 import ItemCard from "../Basic/ItemCard";
 import TaggedMarkdown from '../Common/TaggedMarkdown';
-import { Item } from "../Basic/dto";
+import { Item } from "../../api/_dto";
 import { ColumnsType } from 'antd/es/table';
 import { Tag as AntdTag } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
+import ItemTable from '../Basic/ItemTable';
 
 import '../Common/CommonStyles.css';
 import './ItemList.less';
@@ -108,11 +109,14 @@ const ItemList: React.FC = () => {
         <Row gutter={[8, 8]}>
             {items.map(item => (
                 <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.id}>
+
+        {/* <ItemCard item={item} onClick={onSelect} selected={selected} showPreview={true} showActions={false} indentHeadings={false} /> */}
                     <ItemCard 
                         item={item}
                         showDeleteModal={showDeleteModal}
                         showPreview={true}
                         showActions={true}
+                        indentHeadings={false}
                     />
                 </Col>
             ))}
@@ -194,7 +198,7 @@ const ItemList: React.FC = () => {
             <Col xs={12} sm={12}>
                 <Link to="/items/new" style={{ display: 'block', height: '100%' }}>
                     <Button type="primary" icon={<PlusOutlined />} block className="create-button" style={{ height: '100%' }}>
-                        创建新项目
+                        创建新词条
                     </Button>
                 </Link>
             </Col>
@@ -217,18 +221,15 @@ const ItemList: React.FC = () => {
                     {isMobile ? (
                         <ItemCardList />
                     ) : (
-                        <Table
+                        <ItemTable
+                            items={items}
                             columns={columns}
-                            dataSource={items}
                             rowKey="id"
-                            expandedRowKeys={expandedRowKeys}
-                            onRow={(record) => ({
+                            loading={loading}
+                            expandable={{ expandedRowRender }}
+                            onRow={(record: Item) => ({
                                 onClick: () => handleExpand(record),
                             })}
-                            expandable={{ expandedRowRender }}
-                            pagination={false}
-                            loading={loading}
-                            scroll={{ x: '100%' }}
                         />
                     )}
                     <Divider />

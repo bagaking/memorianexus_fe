@@ -1,16 +1,6 @@
 import axios from './axios';
-
-export interface Dungeon {
-    id: string;
-    title: string;
-    description: string;
-    rule: string;
-    books?: string[];
-    items?: string[];
-    tag_names?: string[];
-    created_at?: string;
-    updated_at?: string;
-}
+import { Dungeon, PracticeResult, PracticeResultResponse } from './_dto';
+import { UInt64 } from './_common';
 
 // 创建复习计划
 export const createCampaign = async (data: Partial<Dungeon>) => {
@@ -90,7 +80,7 @@ export const removeDungeonTags = async (dungeonId: string, tags: string[]) => {
 };
 
 // 获取复习计划的 Monsters
-export const getPracticeMonsters = async (dungeonId: string, count: number) => {
+export const getPracticeMonsters = async (dungeonId: UInt64, count: number) => {
     return axios.get(`/dungeon/campaigns/${dungeonId}/practice`, { params: { count } });
 };
 
@@ -134,56 +124,13 @@ export const getPracticeMonsters = async (dungeonId: string, count: number) => {
     }
 }
 */
-export const submitPracticeResult = async (dungeonId: string, result: PracticeResult): Promise<PracticeResultResponse> => {
+export const submitPracticeResult = async (dungeonId: UInt64, result: PracticeResult): Promise<PracticeResultResponse> => {
     const resp = await axios.post(`/dungeon/campaigns/${dungeonId}/submit`, result);
     return resp.data
 };
 
-export type PracticeResultEnum = "defeat" | "miss" | "hit" | "kill" | "complete"
-
-export interface PracticeResult {
-    monster_id: string;
-    result: PracticeResultEnum;
-}
-
-export interface PracticeResultResponse {
-    message: string;
-    data: {
-        from: {
-            dungeon_id: string;
-            item_id: string;
-            practice_at: string;
-            next_practice_at: string;
-            practice_count: number;
-            familiarity: string;
-            difficulty: number;
-            importance: number;
-            description: string;
-            source_type: number;
-            source_id: string;
-            created_at: string;
-        };
-        updates: {
-            familiarity: number;
-            next_practice_at: string;
-            practice_at: string;
-            practice_count: {
-                SQL: string;
-                Vars: number[];
-                WithoutParentheses: boolean;
-            };
-            visibility: number;
-        };
-        points_update: {
-            cash: string;
-            gem: string;
-            vip_score: string;
-        };
-    };
-}
-
 // 获取复习计划的结果
-export const getPracticeResults = async (dungeonId: string) => {
+export const getPracticeResults = async (dungeonId: UInt64) => {
     return axios.get(`/dungeon/campaigns/${dungeonId}/results`);
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { DungeonMonsterWithResult, Item, ParsePercentage } from '../Basic/dto';
+import { DungeonMonsterWithResult, Item, parsePercentage } from "../../api";
 import MonsterHealthBar from './MonsterHealthBar';
 import MonsterPortrait from './MonsterPortrait';
 import { TaggedMarkdown } from '../Common/TaggedMarkdown';
@@ -163,7 +163,7 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
                         alt="Monster Avatar" 
                     />
                     <MonsterHealthBar 
-                        health={100 - ParsePercentage(monster.familiarity)} fillClassName={`${disableTransition ? 'no-transition' : ''}`}
+                        health={100 - parsePercentage(monster.familiarity)} fillClassName={`${disableTransition ? 'no-transition' : ''}`}
                     />
                     <div className="monster-title-container">
                         <div className="monster-title">
@@ -176,8 +176,8 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
                     {monster.submitResult && (
                         <div className="monster-result-info">
                             <p>熟练度: {monster.submitResult.familiarity}%</p>
-                            <p>下次复习: {new Date(monster.submitResult.next_practice_at).toLocaleString()}</p>
-                            <p>上次练习: {new Date(monster.submitResult.practice_at).toLocaleString()}</p>
+                            <p>下次复习: {new Date(monster.submitResult.next_practice_at || '').toLocaleString()}</p>
+                            <p>上次练习: {new Date(monster.submitResult.practice_at || '').toLocaleString()}</p>
                             <p>练习次数: {getPracticeCount(monster.submitResult.practice_count || 0)}</p>
                         </div>
                     )}

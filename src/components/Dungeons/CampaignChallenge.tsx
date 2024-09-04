@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import CDNImage from '../Common/CDNImage';
 import { useParams } from 'react-router-dom';
 import { message } from 'antd';
-import { getPracticeMonsters, submitPracticeResult, getItemById, getDungeonDetail, PracticeResultResponse } from '../../api';
+import { getPracticeMonsters, submitPracticeResult, getItemById, getDungeonDetail, PracticeResultResponse, PracticeResultEnum } from '../../api';
 import { PageLayout } from '../Layout/PageLayout';
-import { DungeonMonster, Item, DungeonMonsterWithResult, ParseUint64 } from '../Basic/dto';
+import { DungeonMonster, Item, DungeonMonsterWithResult, parseUint64 } from '../../api';
 import { showReward } from '../Common/RewardNotification';
 import { CloseCircleOutlined, StopOutlined, CheckCircleOutlined, FireOutlined, TrophyOutlined } from '@ant-design/icons';
 import SkillCard from './SkillCard';
@@ -80,7 +80,7 @@ const CampaignChallenge: React.FC = () => {
         fetchMonstersAndDetails();
     }, [id]);
 
-    const handleAttackResult = async (result: "defeat" | "miss" | "hit" | "kill" | "complete") => {
+    const handleAttackResult = async (result: PracticeResultEnum) => {
         try {
             const submitResult = await submitPracticeResult(id!, {
                 monster_id: monsters[currentMonsterIndex].item_id,
@@ -92,7 +92,7 @@ const CampaignChallenge: React.FC = () => {
             console.log("respData", respData);
             if (respData && respData.points_update) {
                 updatePoints(respData.points_update);
-                await showReward(ParseUint64(respData.points_update.cash));
+                await showReward(parseUint64(respData.points_update.cash));
                 
                 // 更新当前怪物的提交结果
                 const updatedMonsters = [...monsters];
@@ -150,7 +150,7 @@ const CampaignChallenge: React.FC = () => {
     return (
         <PageLayout 
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
-            backUrl={`/campaigns`} 
+            // backUrl={`/campaigns`} 
             icon="/layout/campaign_dungeon_icon.png"
         >
             <div className="campaign-challenge-container">

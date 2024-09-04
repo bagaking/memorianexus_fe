@@ -1,35 +1,14 @@
 import axios from './axios';
-import {Points} from "../components/Basic/dto";
-
-export interface IProfile {
-    id: string;
-    nickname: string;
-    email: string;
-    avatar_url: string | null | undefined;
-    bio: string;
-    created_at: string;
-}
-
-export interface ISettingsMemorization {
-    review_interval_setting: string; // Adjust the type according to your actual settings
-    difficulty_preference: number;
-    quiz_mode: string;
-}
-
-export interface ISettingsAdvance {
-    theme: string;
-    language: string;
-    email_notifications: boolean;
-    push_notifications: boolean;
-}
+import {Points, Profile, SettingsMemorization, SettingsAdvance} from "./_dto";
+ 
 
 
-export const getProfile = async (): Promise<IProfile> => {
+export const getProfile = async (): Promise<Profile> => {
     const response = await axios.get('/profile/me');
     return response.data.data;
 };
 
-export const updateProfile = async (profile: Partial<IProfile>): Promise<void> => {
+export const updateProfile = async (profile: Partial<Profile>): Promise<void> => {
     await axios.put('/profile/me', profile);
 };
 
@@ -38,20 +17,20 @@ export const getPoints = async (): Promise<Points> => {
     return response.data.data;
 };
 
-export const getMemorizationSettings = async (): Promise<ISettingsMemorization> => {
+export const getMemorizationSettings = async (): Promise<SettingsMemorization> => {
     const response = await axios.get('/profile/settings/memorization');
     return response.data.data;
 };
 
-export const updateMemorizationSettings = async (settings: Partial<ISettingsMemorization>): Promise<void> => {
+export const updateMemorizationSettings = async (settings: Partial<SettingsMemorization>): Promise<void> => {
     await axios.put('/profile/settings/memorization', settings);
 };
 
-export const getAdvanceSettings = async (): Promise<ISettingsAdvance> => {
+export const getAdvanceSettings = async (): Promise<SettingsAdvance> => {
     const response = await axios.get('/profile/settings/advance');
     return response.data.data;
 };
 
-export const updateAdvanceSettings = async (settings: Partial<ISettingsAdvance>): Promise<void> => {
+export const updateAdvanceSettings = async (settings: Partial<SettingsAdvance>): Promise<void> => {
     await axios.put('/profile/settings/advance', settings);
 };

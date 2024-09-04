@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Table, Button, List, Input, Space, Card } from 'antd';
 import { Key, RowSelectMethod, TableRowSelection } from "antd/es/table/interface";
-import FirstLine from "./Firstline";
+
 import PaginationComponent from "./PaginationComponent";
+import FirstLine from "./FirstLineMD";
 
 interface AppendEntitiesModalProps {
     title?: React.ReactNode;
@@ -15,6 +16,7 @@ interface AppendEntitiesModalProps {
     defaultSelection?: EntityModalDataModel[];
     maxCount?: number;
     enableSearch?: boolean;
+    renderItem?: (item: any, selected: boolean, onSelect: () => void) => React.ReactNode;
 }
 
 export interface EntityModalDataModel {
@@ -25,7 +27,8 @@ export interface EntityModalDataModel {
 const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                                                                      title, footer, visible,
                                                                      onCancel, onSubmit, fetchEntities,
-                                                                     abortedItems = [], defaultSelection = [], maxCount, enableSearch
+                                                                     abortedItems = [], defaultSelection = [], maxCount, enableSearch,
+                                                                     renderItem // 添加这个
                                                                  }) => {
     const [form] = Form.useForm();
     const [selectedEntities, setSelectedEntities] = useState<EntityModalDataModel[]>([...abortedItems]);
@@ -88,7 +91,10 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             title: 'Name',
             dataIndex: 'content',
             key: 'name',
-            render: (text: string) => <FirstLine content={text} />,
+            render: (text: string, record: EntityModalDataModel) => 
+                renderItem ? 
+                    renderItem(record, selectedEntities.some(e => e.id === record.id), () => handleAddFromSearch(record)) : 
+                    <FirstLine content={text} />,
         },
         {
             title: 'Action',
@@ -179,7 +185,10 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                                     title={entity.id}
                                     size="small"
                                     extra={[<Button type="link" danger onClick={() => handleRemoveEntity(entity.id)}>Rem</Button>]}>
-                                    <FirstLine content={content} showName={title} />
+                                    {renderItem ? 
+                                        renderItem(entity, true, () => {}) : 
+                                        <FirstLine content={content} showName={title} />
+                                    }
                                 </Card>
                             </List.Item>
                         })()
