@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card, Row, Col, Typography, Divider } from 'antd';
+import { message, Button, Card, Row, Col, Typography } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getItems, deleteItem } from '../../api/items';
 import { PageLayout } from '../Layout/PageLayout';
@@ -7,7 +7,7 @@ import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import ItemUpload from './ItemUpload';
 import { useIsMobile } from '../../hooks/useWindowSize';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ItemCard from "../Basic/ItemCard";
 import TaggedMarkdown from '../Common/TaggedMarkdown';
 import { Item } from "../../api/_dto";
@@ -15,6 +15,7 @@ import { ColumnsType } from 'antd/es/table';
 import { Tag as AntdTag } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
 import ItemTable from '../Basic/ItemTable';
+import GradientButton from '../Common/GradientButton';
 
 import '../Common/CommonStyles.css';
 import './ItemList.less';
@@ -194,20 +195,34 @@ const ItemList: React.FC = () => {
     );
 
     const ActionButtons: React.FC = () => (
-        <Row gutter={[16, 16]} className="action-buttons">
-            <Col xs={12} sm={12}>
-                <Link to="/items/new" style={{ display: 'block', height: '100%' }}>
-                    <Button type="primary" icon={<PlusOutlined />} block className="create-button" style={{ height: '100%' }}>
-                        创建新词条
-                    </Button>
-                </Link>
-            </Col>
-            <Col xs={12} sm={12}>
+        <Row gutter={[16, 16]} justify={isMobile ? 'center' : 'end'} style={{ marginBottom: 24 }}>
+            <Col>
                 <ItemUpload
-                    className="upload-button"
                     onUploadSuccess={() => fetchItems(currentPage, limit)}
-                    style={{ height: '100%' }}
-                />
+                >
+                    <GradientButton 
+                        icon={<UploadOutlined />}
+                        startColor="#88d3ce"
+                        endColor="#6e45e2" 
+                        animation="shine"
+                        animationDuration="0.8s"
+                    >
+                        上传词条本
+                    </GradientButton>
+                </ItemUpload>
+            </Col>
+            <Col>
+                <Link to="/items/new">
+                    <GradientButton  
+                        icon={<PlusOutlined />}
+                        startColor="#88d3ce"
+                        endColor="#6e45e2" 
+                        animation="shine"
+                        animationDuration="0.8s"
+                    >
+                        创建新词条
+                    </GradientButton>
+                </Link>
             </Col>
         </Row>
     );
@@ -215,33 +230,29 @@ const ItemList: React.FC = () => {
     return (
         <PageLayout title="Items" icon="/layout/item_icon.png">
             <div style={{ padding: isMobile ? '8px' : '24px' }}>
-                <Card className="item-list-card">
-                    <ActionButtons />
-                    <Divider />
-                    {isMobile ? (
-                        <ItemCardList />
-                    ) : (
-                        <ItemTable
-                            items={items}
-                            columns={columns}
-                            rowKey="id"
-                            loading={loading}
-                            expandable={{ expandedRowRender }}
-                            onRow={(record: Item) => ({
-                                onClick: () => handleExpand(record),
-                            })}
-                        />
-                    )}
-                    <Divider />
-                    <PaginationComponent
-                        currentPage={currentPage}
-                        totalItems={totalItems}
-                        limit={limit}
-                        pageDataLength={items.length}
-                        onPageChange={handlePageChange}
-                        onLimitChange={handleLimitChange}
+                <ActionButtons />
+                {isMobile ? (
+                    <ItemCardList />
+                ) : (
+                    <ItemTable
+                        items={items}
+                        columns={columns}
+                        rowKey="id"
+                        loading={loading}
+                        expandable={{ expandedRowRender }}
+                        onRow={(record: Item) => ({
+                            onClick: () => handleExpand(record),
+                        })}
                     />
-                </Card>
+                )}
+                <PaginationComponent
+                    currentPage={currentPage}
+                    totalItems={totalItems}
+                    limit={limit}
+                    pageDataLength={items.length}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                />
             </div>
             <DeleteModal 
                 visible={deleteModalVisible} 

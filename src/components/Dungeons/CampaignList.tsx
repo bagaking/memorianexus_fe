@@ -1,205 +1,203 @@
-import React, { useEffect, useState } from 'react';
-import { message, Button, Card, Space, Row, Col, Typography, Table } from 'antd';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
+import React, { useEffect, useState, useCallback } from 'react';
+import { message, Card, Typography, Button, Tooltip } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { PlusOutlined, DeleteOutlined, InfoCircleOutlined, RocketOutlined, BugOutlined } from '@ant-design/icons';
 import { getDungeons, deleteDungeon } from '../../api/dungeons';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
-import '../Common/CommonStyles.css';
 import { useIsMobile } from '../../hooks/useWindowSize';
-import styled from 'styled-components';
+import GradientButton from '../Common/GradientButton';
+import './CampaignList.less';
+import CDNImage from '../Common/CDNImage';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 interface Dungeon {
     id: string;
     title: string;
+    
     description: string;
+    difficulty: string;
+    recommendedLevel: number;
+    mapImageUrl: string;
 }
-
-const CreateCampaignButton = styled(Button)`
-  height: 60px;
-  font-size: 18px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, #6e45e2, #88d3ce);
-  border: none;
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-
-  &:hover, &:focus {
-    background: linear-gradient(135deg, #5a36c7, #7ac7c0);
-    transform: translateY(-2px);
-    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-  }
-
-  .anticon {
-    font-size: 24px;
-    margin-right: 10px;
-  }
-`;
 
 const CampaignList: React.FC = () => {
     const [dungeons, setDungeons] = useState<Dungeon[]>([]);
-    const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [dungeonToDelete, setDungeonToDelete] = useState<Dungeon | null>(null);
     const [totalDungeons, setTotalDungeons] = useState(0);
     const [loading, setLoading] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
+    const isMobile = useIsMobile(); 
 
     const queryParams = new URLSearchParams(location.search);
     const [currentPage, setCurrentPage] = useState(Number(queryParams.get('page')) || 1);
     const [limit, setLimit] = useState(Number(queryParams.get('limit')) || 10);
-    const isMobile = useIsMobile();
 
-    const fetchDungeons = async (page: number, limit: number) => {
+    const fetchDungeons = useCallback(async (page: number, limit: number) => {
         setLoading(true);
         try {
             const response = await getDungeons({ page, limit });
-            const data = response.data.data;
+            const { data, total } = response.data;
             if (Array.isArray(data)) {
                 setDungeons(data);
-                if (response.data.total) {
-                    setTotalDungeons(response.data.total);
-                }
+                setTotalDungeons(total || 0);
             } else {
-                console.log("dungeons resp", response);
-                message.error('Invalid dungeons data format');
+                message.error('无效的副本数据格式');
             }
         } catch (error) {
             console.error(error);
-            message.error('Failed to fetch dungeons');
+            message.error('获取副本列表失败');
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchDungeons(currentPage, limit);
-    }, [currentPage, limit]);
+    }, [currentPage, limit, fetchDungeons]);
 
-    const handleExpand = (record: Dungeon) => {
-        setExpandedRowKeys(prevKeys =>
-            prevKeys.includes(record.id) ? prevKeys.filter(key => key !== record.id) : [record.id]
-        );
-    };
-
-    const showDeleteModal = (dungeon: Dungeon) => {
+    const showDeleteModal = useCallback((dungeon: Dungeon) => {
         setDungeonToDelete(dungeon);
         setDeleteModalVisible(true);
-    };
+    }, []);
 
-    const handleDelete = async () => {
+    const handleDelete = useCallback(async () => {
         if (dungeonToDelete) {
             try {
                 await deleteDungeon(dungeonToDelete.id);
-                message.success('Dungeon deleted successfully');
+                message.success('副本删除成功');
                 fetchDungeons(currentPage, limit);
             } catch (error) {
                 console.error(error);
-                message.error('Failed to delete dungeon');
+                message.error('删除副本失败');
             } finally {
                 setDeleteModalVisible(false);
                 setDungeonToDelete(null);
             }
         }
-    };
+    }, [dungeonToDelete, currentPage, limit, fetchDungeons]);
 
-    const handlePageChange = (page: number, pageSize?: number) => {
+    const handlePageChange = useCallback((page: number, pageSize?: number) => {
         setCurrentPage(page);
         if (pageSize && pageSize !== limit) {
             setLimit(pageSize);
         }
         navigate(`/campaigns?page=${page}&limit=${pageSize || limit}`);
-    };
+    }, [limit, navigate]);
 
-    const handleLimitChange = (newLimit: number) => {
+    const handleLimitChange = useCallback((newLimit: number) => {
         setLimit(newLimit);
-        setCurrentPage(1); // 重置到第一页
+        setCurrentPage(1);
         navigate(`/campaigns?page=1&limit=${newLimit}`);
-    };
+    }, [navigate]);
 
-
-    const columns = [
-        {
-            title: '标题',
-            dataIndex: 'title',
-            key: 'title',
-        },
-        {
-            title: '描述',
-            dataIndex: 'description',
-            key: 'description',
-            ellipsis: true,
-        },
-        {
-            title: '操作',
-            key: 'actions',
-            render: (_: any, record: Dungeon) => (
-                <Space>
-                    <Link to={`/campaigns/${record.id}/challenge`}>挑战</Link>
-                    <Link to={`/campaigns/${record.id}`}>信息</Link>
-                    <Link to={`/campaigns/${record.id}/monsters`}>怪物</Link>
-                    <Button type="link" danger onClick={() => showDeleteModal(record)}>删除</Button>
-                </Space>
-            ),
-        },
-    ];
+    const ActionButton: React.FC<{
+        tooltip: string;
+        icon: React.ReactNode;
+        onClick: () => void;
+        type?: "primary" | "default" | "link" | "text" | "dashed";
+        danger?: boolean;
+        children: React.ReactNode;
+    }> = ({ tooltip, icon, onClick, type = "default", danger = false, children }) => (
+        <Tooltip title={tooltip}>
+            <Button
+                type={type}
+                icon={icon}
+                onClick={onClick}
+                className="action-button"
+                danger={danger}
+            >
+                {children}
+            </Button>
+        </Tooltip>
+    );
 
     const DungeonCard: React.FC<{ dungeon: Dungeon }> = ({ dungeon }) => (
-        <Card
-            title={dungeon.title}
-            extra={<Link to={`/campaigns/${dungeon.id}/challenge`}>挑战</Link>}
-            actions={[
-                <Link to={`/campaigns/${dungeon.id}`}>信息</Link>,
-                <Link to={`/campaigns/${dungeon.id}/monsters`}>怪物</Link>,
-                <Button type="text" danger onClick={() => showDeleteModal(dungeon)}>删除</Button>
-            ]}
-        >
-            <Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '更多' }}>
-                {dungeon.description}
-            </Paragraph>
+        <Card className="campaign-card" hoverable>
+            <div className="campaign-card-content">
+                <CDNImage 
+                    className="campaign-map"
+                    src={dungeon.mapImageUrl || "portraits/sea_warrior_03.png"}
+                />
+                <div className="campaign-info">
+                    <Title level={3} className="campaign-title">{dungeon.title}</Title>
+                    <Paragraph className="campaign-description" ellipsis={{ rows: 2, expandable: true, symbol: '更多' }}>
+                        {dungeon.description}
+                    </Paragraph>
+                    <div className="campaign-details">
+                        <Text>难度: {dungeon.difficulty}</Text>
+                        <Text>推荐等级: {dungeon.recommendedLevel}</Text>
+                    </div>
+                    <div className="action-buttons">
+                        <ActionButton
+                            tooltip="开始挑战"
+                            icon={<RocketOutlined />}
+                            onClick={() => navigate(`/campaigns/${dungeon.id}/challenge`)}
+                            type="primary"
+                        >
+                            挑战
+                        </ActionButton>
+                        <ActionButton
+                            tooltip="查看详细信息"
+                            icon={<InfoCircleOutlined />}
+                            onClick={() => navigate(`/campaigns/${dungeon.id}`)}
+                        >
+                            信息
+                        </ActionButton>
+                        <ActionButton
+                            tooltip="管理怪物"
+                            icon={<BugOutlined />}
+                            onClick={() => navigate(`/campaigns/${dungeon.id}/monsters`)}
+                        >
+                            怪物
+                        </ActionButton>
+                        <ActionButton
+                            tooltip="删除副本"
+                            icon={<DeleteOutlined />}
+                            onClick={() => showDeleteModal(dungeon)}
+                            danger
+                        >
+                            删除
+                        </ActionButton>
+                    </div>
+                </div>
+            </div>
         </Card>
     );
 
-    const DungeonList: React.FC = () => (
-        <Table
-            columns={columns}
-            dataSource={dungeons}
-            rowKey="id"
-            pagination={false}
-            loading={loading}
-        />
-    );
-
-    const DungeonCardList: React.FC = () => (
-        <Row gutter={[16, 16]}>
-            {dungeons.map(dungeon => (
-                <Col xs={24} sm={12} key={dungeon.id}>
-                    <DungeonCard dungeon={dungeon} />
-                </Col>
-            ))}
-        </Row>
-    );
-
+ 
     return (
-        <PageLayout title="战役" icon="/layout/campaign_dungeon_icon.png">
-            <Row gutter={[16, 24]}>
-                <Col xs={24}>
-                    <Link to="/campaigns/new">
-                        <CreateCampaignButton type="primary" icon={<PlusOutlined />} block>
-                            创建新战役
-                        </CreateCampaignButton>
-                    </Link>
-                </Col>
-                <Col xs={24}>
-                    {isMobile ? <DungeonCardList /> : <DungeonList />}
-                </Col>
-                <Col xs={24}>
+        <PageLayout 
+            title="史诗战役" 
+            icon="/layout/campaign_dungeon_icon.png" 
+        >
+           
+            <div  className="campaign-list-container">
+                <div className="campaign-list-header">
+                    <GradientButton 
+                        type="primary" 
+                        icon={<PlusOutlined />}
+                        onClick={() => navigate('/campaigns/new')}
+                        startColor="#88d3ce"
+                        endColor="#6e45e2" 
+                        hoverStartColor="#5a36c7"
+                        hoverEndColor="#7ac7c0"
+                        animation="shine"
+                        animationDuration="0.8s"
+                    >
+                        创建新战役
+                    </GradientButton>
+                </div>
+                <div className="campaign-list">
+                    {dungeons.map(dungeon => (
+                        <DungeonCard key={dungeon.id} dungeon={dungeon} />
+                    ))}
+                </div>
+                <div className="campaign-list-footer">
                     <PaginationComponent
                         currentPage={currentPage}
                         totalItems={totalDungeons}
@@ -208,8 +206,8 @@ const CampaignList: React.FC = () => {
                         onPageChange={handlePageChange}
                         onLimitChange={handleLimitChange}
                     />
-                </Col>
-            </Row>
+                </div>
+            </div>
             <DeleteModal 
                 visible={deleteModalVisible} 
                 onConfirm={handleDelete}

@@ -1,18 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { message, Button } from 'antd';
+import { message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadItems } from '../../api/items';
 import AppendEntitiesModal, { EntityModalDataModel } from '../Common/AppendEntitiesModal';
 import { getBooks } from '../../api/books';
 import { Book } from "../../api/_dto";
+import GradientButton from '../Common/GradientButton';
 
 interface ItemUploadProps {
     onUploadSuccess: () => void;
-    className?: string;
-    style?: React.CSSProperties;
+    children: React.ReactNode;
 }
 
-const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className, style }) => {
+const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, children }) => {
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
@@ -78,16 +78,10 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className, sty
     };
 
     return (
-        <div className={className} style={style}>
-            <Button
-                type="primary"
-                icon={<UploadOutlined />}
-                loading={loading}
-                onClick={handleButtonClick}
-                style={{ width: '100%', height: '100%' }}
-            >
-                上传条目
-            </Button>
+        <>
+            <div onClick={handleButtonClick}>
+                {children}
+            </div>
             <input
                 type="file"
                 ref={fileInputRef}
@@ -101,7 +95,7 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className, sty
                 fetchEntities={fetchBooks}
                 maxCount={1} // 限制最多选择1本书
             />
-        </div>
+        </>
     );
 };
 

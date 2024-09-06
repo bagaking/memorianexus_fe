@@ -7,6 +7,7 @@
 }
 
 @scrolled-header-height: @layout-header-height * 0.5;
+@scrolled-header-height-mobile: @layout-header-height-mobile * 0.5;
 
 // PageLayout 样式
 .page-layout {
@@ -163,9 +164,10 @@
 
     &-header {
       height: @layout-header-height-mobile;
+      top: @navbar-height-mobile;
 
       &.scrolled {
-        height: @layout-header-height-mobile * 0.7; // 移动端滚动时的高度
+        height: @scrolled-header-height-mobile; // 移动端滚动时的高度
       }
     }
 

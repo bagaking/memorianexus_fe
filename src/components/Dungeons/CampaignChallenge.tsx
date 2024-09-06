@@ -150,12 +150,15 @@ const CampaignChallenge: React.FC = () => {
     return (
         <PageLayout 
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
-            // backUrl={`/campaigns`} 
             icon="/layout/campaign_dungeon_icon.png"
             enableShrink={true}
         >
             <div className="campaign-challenge-container">
-                <CDNImage  className="campaign-challenge-background" src="/battlefield/battlefield_01.png" alt="战场背景"/>
+                <CDNImage
+                    className="campaign-challenge-background"
+                    src="backgrounds/stone-texture.png"
+                    alt="Stone texture background"
+                />
                 <div className="campaign-challenge-content" ref={contentRef}>
                     <MonsterCarousel
                         monsters={monsters}
@@ -182,7 +185,7 @@ const CampaignChallenge: React.FC = () => {
                             onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
                             onAudioStop={handleAudioStop} 
                             position="right" 
-                        /> {/* 添加录音按钮 */}
+                        /> {/* 添加录���按钮 */}
                     </div>
                 </div>
             </div>

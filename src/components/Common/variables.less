@@ -54,11 +54,28 @@
 @spacing-sm: 8px;
 @spacing-md: 16px;
 @spacing-lg: 24px;
+@spacing-xl: 32px;
+
+// Padding
+@padding-xs: @spacing-xs;
+@padding-sm: @spacing-sm;
+@padding-md: @spacing-md;
+@padding-lg: @spacing-lg;
+@padding-xl: @spacing-xl;
+
+// Margin
+@margin-xs: @spacing-xs;
+@margin-sm: @spacing-sm;
+@margin-md: @spacing-md;
+@margin-lg: @spacing-lg;
+@margin-xl: @spacing-xl;
 
 // 边框和阴影
 // -----------------------------
-@border-radius-base: 4px;
 @border-radius-large: 20px;
+@border-radius-base: 4px;
+@border-radius-sm: 2px;
+@border-radius-lg: 8px;
 @box-shadow-navbar: 0 1px 3px rgba(0, 0, 0, 0.1);
 
 // 动画
@@ -159,4 +176,26 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+// 响应式断点
+@screen-xs: 480px;
+@screen-sm: 576px;
+@screen-md: 768px;
+
+@screen-lg: 992px;
+@screen-xl: 1200px;
+@screen-xxl: 1600px;
+
+// 你可能还想添加一些常用的媒体查询混合，例如：
+.responsive(@minWidth, @rules) {
+  @media (min-width: @minWidth) {
+    @rules();
+  }
+}
+
+.responsive-max(@maxWidth, @rules) {
+  @media (max-width: @maxWidth) {
+    @rules();
+  }
 }
