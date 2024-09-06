@@ -1,64 +1,8 @@
 import { Percentage, UInt64 } from './_common';
 import { DifficultyLevel, ImportanceLevel, DungeonType, RecallIntervalLevel, QuizMode, PriorityMode, MonsterSource, PracticeResultEnum,  } from './_enums';
 
-// 通用响应类型
-// ---------------
-
-/**
- * 通用成功响应接口
- */
-export interface RespSuccess<T> {
-    message: string;
-    data?: T;
-}
-
-/**
- * 更新器接口
- */
-export interface Updater<T> {
-    from?: T;
-    to?: T;
-    updates?: Record<string, any>;
-}
-
-/**
- * 分页器接口
- */
-export interface Pager {
-    offset: number;
-    limit: number;
-    total: number;
-}
-
-/**
- * 带分页的成功响应接口
- */
-export interface RespSuccessPage<T> extends Pager {
-    message: string;
-    data: T[];
-    extra?: any;
-}
-
-/**
- * ID列表响应类型
- */
-export type RespIDList = RespSuccessPage<UInt64>;
-
 // 具体业务类型
 // ---------------
-
-/**
- * 书籍接口
- */
-export interface Book {
-    id: UInt64;
-    user_id: UInt64;
-    title: string;
-    description: string;
-    created_at: string;
-    updated_at: string;
-    tags?: string[];
-}
 
 /**
  * 学习词条接口
@@ -74,6 +18,25 @@ export interface Item {
     difficulty: DifficultyLevel;
     importance: ImportanceLevel;
 }
+
+/**
+ * 书籍接口
+ */
+export interface Book {
+    id: UInt64;
+    user_id: UInt64;
+    title: string;
+    description: string;
+    created_at: string;
+    updated_at: string;
+    tags?: string[];
+}
+
+export interface BookItem {
+    book_id: UInt64;
+    item_id: UInt64;
+}
+
 
 /**
  * 记忆设置接口
@@ -173,6 +136,50 @@ export interface DungenUpdateResults {
 }
 
 
+// 通用响应类型
+// ---------------
+
+/**
+ * 通用成功响应接口
+ */
+export interface RespSuccess<T> {
+    message: string;
+    data?: T;
+}
+
+/**
+ * 更新器接口
+ */
+export interface Updater<T> {
+    from?: T;
+    to?: T;
+    updates?: Record<string, any>;
+}
+
+/**
+ * 分页器接口
+ */
+export interface Pager {
+    offset: number;
+    limit: number;
+    total: number;
+}
+
+/**
+ * 带分页的成功响应接口
+ */
+export interface RespSuccessPage<T> extends Pager {
+    message: string;
+    data: T[];
+    extra?: any;
+}
+
+
+/**
+ * ID列表响应类型
+ */
+export type RespIDList = RespSuccessPage<UInt64>;
+
 // 响应类型
 // ---------------
 
@@ -181,6 +188,10 @@ export type RespBookCreate = RespSuccess<Book>;
 export type RespBookUpdate = RespSuccess<Book>;
 export type RespBookDelete = RespSuccess<UInt64>;
 export type RespBooks = RespSuccessPage<Book>;
+
+
+export type RespBookAddItems = RespSuccess<BookItem[]>;
+export type RespBookRemoveItems = RespSuccess<BookItem[]>;
 
 export type RespItemGet = RespSuccess<Item>;
 export type RespItemDelete = RespSuccess<Item>;

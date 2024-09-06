@@ -152,6 +152,7 @@ const CampaignChallenge: React.FC = () => {
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
             // backUrl={`/campaigns`} 
             icon="/layout/campaign_dungeon_icon.png"
+            enableShrink={true}
         >
             <div className="campaign-challenge-container">
                 <CDNImage  className="campaign-challenge-background" src="/battlefield/battlefield_01.png" alt="战场背景"/>

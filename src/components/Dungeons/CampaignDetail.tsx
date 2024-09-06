@@ -198,14 +198,22 @@ const CampaignDetail: React.FC = () => {
     }
 
     return (
-        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} backUrl="/campaigns" icon="/layout/campaign_dungeon_icon.png">
+        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} icon="/layout/campaign_dungeon_icon.png">
             <div className="campaign-progress">
                 <h2>Campaign Progress</h2>
-                <Progress percent={0} status="active"/>
+                <Progress 
+                    percent={50} 
+                    status="active" 
+                    strokeColor={{ 
+                        '0%': '#ffd700', 
+                        '100%': '#ff8c00' 
+                    }} 
+                    strokeWidth={12}
+                />
                 {(id && id !== 'new') &&
-                <Button className="view-monsters-button" type="link" onClick={() => navigate(`/campaigns/${id}/monsters`)}>
-                    <h2>View Monsters</h2>
-                </Button>
+                    <Button className="view-monsters-button" type="link" onClick={() => navigate(`/campaigns/${id}/monsters`)}>
+                        <h2>View Monsters</h2>
+                    </Button>
                 }
             </div>
 

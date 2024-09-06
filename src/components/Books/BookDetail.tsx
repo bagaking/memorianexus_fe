@@ -32,13 +32,19 @@ const BookDetail: React.FC = () => {
                 if (id && id !== 'new') {
                     const response = await getBookDetail(id);
                     const data = response.data.data;
-                    if (typeof data.tags === 'string') {
-                        data.tags = data.tags.split(',').map((tag: string) => tag.trim());
-                    } else if (!Array.isArray(data.tags)) {
-                        data.tags = [];
+                    if (data) {
+                        if (typeof data.tags === 'string') {
+                            data.tags = (data.tags as string).split(',').map((tag: string) => tag.trim());
+                        } else if (!Array.isArray(data.tags)) {
+                            data.tags = [];
+                        }
+                        setBook(data);
+                        form.setFieldsValue(data);
+                    } else {
+                        const emptyBook: Book = DEFAULT_BOOK;
+                        setBook(emptyBook);
+                        form.setFieldsValue(emptyBook);
                     }
-                    setBook(data);
-                    form.setFieldsValue(data);
                 } else {
                     const emptyBook: Book = DEFAULT_BOOK;
                     setBook(emptyBook);

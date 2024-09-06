@@ -24,7 +24,6 @@ const BookItemList: React.FC<ItemListProps> = ({ bookId }) => {
             total: response.data.total,
             offset: response.data.offset,
             limit: response.data.limit,
-            error: response.data.error,
         };
     }, [bookId]);
 

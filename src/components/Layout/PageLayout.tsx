@@ -1,51 +1,108 @@
-import React from 'react';
-import { Layout, Button } from 'antd';
+import React, { useEffect, useState, ReactNode } from 'react';
+import { Layout, Button, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import CDNImage from '../Common/CDNImage';
 import './PageLayout.less';
 
-interface PageLayoutProps {
-    title: string | React.ReactNode;
-    icon: string;
-    style?: React.CSSProperties;
-    bannerUrl?: string;
-    backUrl?: string;
-    children: React.ReactNode;
+const { Content } = Layout;
+
+interface SubMenuItem {
+  key: string;
+  label: string;
+  path: string;
 }
 
-const { Header, Content } = Layout;
+interface SubMenu {
+  selectedKey: string;
+  items: SubMenuItem[];
+}
 
-export const PageLayout: React.FC<PageLayoutProps> = ({ children, title, icon, style, bannerUrl, backUrl }) => {
+interface PageLayoutProps {
+  children: ReactNode;
+  title: string | ReactNode; // 将 title 类型改为 ReactNode
+  icon?: string;
+  style?: React.CSSProperties;
+  bannerUrl?: string;
+  backUrl?: string;
+  subMenu?: SubMenu;
+  enableShrink?: boolean; // 新增控制是否启用缩小效果的 prop
+}
+
+export const PageLayout: React.FC<PageLayoutProps> = ({ 
+    children, 
+    title, 
+    icon, 
+    style, 
+    bannerUrl, 
+    backUrl,
+    subMenu,
+    enableShrink = false // 默认启用缩小效果
+}) => {
     const navigate = useNavigate();
+    const [scrolled, setScrolled] = useState(false);
 
-    const handleGoBack = () => {
+    useEffect(() => {
+        if (!enableShrink) return; // 如果不启用缩小效果，直接返回
+
+        const handleScroll = () => {
+            const isScrolled = window.scrollY > 30; // 降低滚动触发阈值
+            if (isScrolled !== scrolled) {
+                setScrolled(isScrolled);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [scrolled, enableShrink]);
+
+    const headerClassName = `page-layout-header ${scrolled && enableShrink ? 'scrolled' : ''}`;
+    const headerContentClassName = `header-content ${scrolled && enableShrink ? 'scrolled' : ''}`;
+
+    const handleBack = () => {
         if (backUrl) {
             navigate(backUrl);
         } else {
-            navigate(-1);
+            navigate(-1); // 默认行为：返回上一页
         }
     };
 
     return (
         <Layout className="page-layout-container" style={style}>
-            <Header className="page-layout-header" style={{ backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined }}>
-                <div className="header-content">
-                    <Button 
-                        type="text" 
-                        className="back-button" 
-                        onClick={handleGoBack}
+            <div className={headerClassName} style={{ backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined }}>
+                <div className={headerContentClassName}>
+                    <Button
+                        className="back-button"
                         icon={<ArrowLeftOutlined />}
+                        onClick={handleBack}
                     />
                     <h1 className="page-title">
-                        {icon && <CDNImage src={icon} alt="Logo" className="menu-logo-48" />}
+                        {icon && <CDNImage className="menu-logo-48" src={icon} />}
                         {title}
                     </h1>
                 </div>
-            </Header>
+                {subMenu && (
+                    <div className="sub-menu">
+                        <Menu mode="horizontal" selectedKeys={[subMenu.selectedKey]}>
+                            {subMenu.items.map((item: SubMenuItem) => (
+                                <Menu.Item key={item.key} onClick={() => navigate(item.path)}>
+                                    {item.label}
+                                </Menu.Item>
+                            ))}
+                        </Menu>
+                    </div>
+                )}
+            </div>
             <Content className="page-layout-content">
-                {children}
+                <div className="page-layout-inner">
+                    {children}
+                </div>
             </Content>
         </Layout>
     );
 };
+
+export default PageLayout;

@@ -64,25 +64,57 @@
 }
 
 .campaign-progress {
-  display: flex;
-  flex-direction: row;
-  margin-top: 40px;
-  padding: 20px;
-  background: #fafafa;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, @color-primary-dark, @color-primary-light);
+  border-radius: @border-radius-large;
+  padding: @spacing-lg;
+  margin-bottom: @spacing-lg;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
   h2 {
-    min-width: 228px;
-    font-size: 24px;
-    color: #001529;
-    margin-bottom: 20px;
+    color: @color-text-light;
+    margin-bottom: @spacing-md;
+    font-size: @font-size-lg;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .ant-progress {
+    .ant-progress-outer {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: @border-radius-base;
+    }
+
+    .ant-progress-inner {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .ant-progress-bg {
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .ant-progress-text {
+      color: @color-text-light;
+      font-weight: @font-weight-medium;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
   }
 
   .view-monsters-button {
-    min-width: 228px;
+    margin-top: @spacing-md;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: @color-text-light;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
     h2 {
-      color: #3399FF;
+      margin: 0;
+      font-size: @font-size-md;
     }
   }
 }

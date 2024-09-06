@@ -1,22 +1,16 @@
 @import '../Common/variables.less';
 
-// 混合
-.flex-center() {
-  display: flex;
-  align-items: center;
-}
-
-// 主样式
 .navbar {
   &-header {
     padding: 0;
-    background: linear-gradient(45deg, @navbar-header-primary-color, @navbar-header-secondary-color);
+    background: linear-gradient(45deg, @navbar-bg-color-start, @navbar-bg-color-end);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: @z-index-navbar;
     height: @navbar-height;
+    box-shadow: @box-shadow-navbar;
   }
 
   &-content {
@@ -24,7 +18,9 @@
     justify-content: space-between;
     width: 100%;
     height: 100%;
-    padding: 0 20px;
+    padding: 0 @navbar-padding-horizontal;
+    max-width: @max-content-width;
+    margin: 0 auto;
   }
 
   &-left {
@@ -32,20 +28,21 @@
   }
 
   &-logo {
-    height: 32px;
-    margin-right: 16px;
-    transition: transform @default-transition-duration ease;
+    height: @navbar-logo-height;
+    margin: @navbar-logo-margin;
+    transition: @navbar-transition;
 
     &:hover {
-      transform: scale(1.1);
+      filter: brightness(1.2);
     }
   }
 
   &-title {
-    color: @navbar-header-text-color;
-    font-size: 20px;
-    font-weight: bold;
+    color: @navbar-text-color;
+    font-size: @navbar-title-font-size;
+    font-weight: @font-weight-medium;
     white-space: nowrap;
+    letter-spacing: 0.5px;
   }
 
   &-menu {
@@ -56,13 +53,15 @@
     justify-content: flex-end;
 
     .ant-menu-item {
-      color: @navbar-header-text-color;
-      font-weight: 500;
-      transition: all @default-transition-duration ease;
-      margin: 0 4px;
-      padding: 0 10px;
+      color: @navbar-text-color;
+      font-weight: @font-weight-normal;
+      font-size: @navbar-item-font-size;
+      transition: @navbar-transition;
+      margin: @navbar-item-margin;
+      padding: @navbar-item-padding;
       position: relative;
       overflow: hidden;
+      border-bottom: none;
 
       &::after {
         content: '';
@@ -70,14 +69,14 @@
         bottom: 0;
         left: 50%;
         width: 0;
-        height: 2px;
-        background: @navbar-header-highlight-color;
-        transition: all @default-transition-duration ease;
+        height: 1px;
+        background: @navbar-highlight-color;
+        transition: @navbar-transition;
       }
 
       &:hover {
-        color: @navbar-header-highlight-color;
-        background-color: rgba(255, 255, 255, 0.1);
+        color: @navbar-text-color-hover;
+        background-color: rgba(@color-white, @opacity-hover);
 
         &::after {
           width: 100%;
@@ -86,8 +85,8 @@
       }
 
       &-active {
-        color: @navbar-header-highlight-color;
-        background-color: rgba(255, 255, 255, 0.2);
+        color: @navbar-text-color-hover;
+        background-color: rgba(@color-white, @opacity-active);
 
         &::after {
           width: 100%;
@@ -96,18 +95,14 @@
       }
 
       .anticon {
-        margin-right: 5px;
-        transition: transform @default-transition-duration ease;
+        margin-right: @spacing-xs;
+        transition: @navbar-transition;
       }
 
       &:hover .anticon {
-        transform: scale(1.2);
+        opacity: 0.8;
       }
     }
-  }
-
-  &-mobile-right {
-    .flex-center();
   }
 
   &-profile {
@@ -121,15 +116,36 @@
     }
 
     &-avatar {
-      width: 24px;
-      height: 24px;
+      width: 32px;  // 固定宽度
+      height: 32px; // 固定高度
       margin-right: 8px;
       border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      overflow: hidden; // 确保内容不会溢出
+      flex-shrink: 0; // 防止头像被压缩
+      position: relative; // 为绝对定位的图片提供参考
+      
+      img {
+        position: absolute; // 使用绝对定位
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); // 居中图片
+        width: 100%;
+        height: 100%;
+        object-fit: cover; // 确保图片填充整个容器
+      }
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.6);
+        transform: scale(1.05); // 添加一个小的悬停效果
+      }
     }
 
     &-name {
       margin-right: 8px;
-      color: @navbar-header-text-color;
+      color: @navbar-text-color;
+      font-weight: @font-weight-normal;
     }
   }
 }
@@ -138,20 +154,24 @@
   display: none;
   background: transparent;
   border: none;
-  color: @navbar-header-text-color;
+  color: #e6e6fa;
   font-size: 20px;
   cursor: pointer;
-  transition: all @default-transition-duration ease;
+  transition: all 0.3s ease;
   padding: 0 10px;
 
   &:hover {
-    color: lighten(@navbar-header-secondary-color, 30%);
+    color: #ffffff;
   }
 }
 
 // 响应式设计
 @media (max-width: 768px) {
   .navbar {
+    &-header {
+      height: @navbar-height-mobile;
+    }
+
     &-content {
       padding: 0 10px;
     }
@@ -161,7 +181,7 @@
     }
 
     &-title {
-      font-size: 16px;
+      font-size: 18px;
     }
 
     &-menu {
@@ -182,7 +202,7 @@
 // 抽屉菜单样式
 .navbar-drawer {
   .ant-drawer-content-wrapper {
-    width: 250px !important;
+    width: @drawer-menu-width !important;
   }
 
   .ant-drawer-body {
@@ -190,17 +210,17 @@
   }
 
   &-menu {
-    background: linear-gradient(to bottom, @navbar-header-primary-color, @navbar-header-secondary-color);
+    background: linear-gradient(to bottom, @navbar-bg-color-start, @navbar-bg-color-end);
     height: 100%;
 
     .ant-menu-item {
-      color: @navbar-header-text-color;
-      font-weight: 500;
-      transition: all @default-transition-duration ease;
+      color: @navbar-text-color;
+      font-weight: @font-weight-normal;
+      transition: @navbar-transition;
       margin: 0;
-      padding: 0 24px;
-      height: 50px;
-      line-height: 50px;
+      padding: @drawer-menu-item-padding;
+      height: @drawer-menu-item-height;
+      line-height: @drawer-menu-item-height;
       position: relative;
       overflow: hidden;
 
@@ -210,14 +230,14 @@
         bottom: 0;
         left: 0;
         width: 0;
-        height: 2px;
-        background: @navbar-header-highlight-color;
-        transition: all @default-transition-duration ease;
+        height: 1px;
+        background: @navbar-highlight-color;
+        transition: @navbar-transition;
       }
 
       &:hover {
-        color: @navbar-header-highlight-color;
-        background-color: rgba(255, 255, 255, 0.2);
+        color: @navbar-text-color-hover;
+        background-color: rgba(@color-white, @opacity-hover);
 
         &::after {
           width: 100%;
@@ -225,8 +245,8 @@
       }
 
       &-selected {
-        color: @navbar-header-highlight-color;
-        background-color: rgba(255, 255, 255, 0.2);
+        color: @navbar-text-color-hover;
+        background-color: rgba(@color-white, @opacity-active);
 
         &::after {
           width: 100%;
@@ -235,46 +255,45 @@
 
       .anticon {
         margin-right: 10px;
-        transition: transform @default-transition-duration ease;
+        transition: @navbar-transition;
       }
 
       &:hover .anticon {
-        transform: translateX(5px);
+        opacity: 0.8;
       }
     }
   }
 }
 
 // 添加菜单项的进入动画
-@keyframes fadeInDown {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .navbar-menu .ant-menu-item,
 .navbar-drawer-menu .ant-menu-item {
-  animation: fadeInDown 0.3s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 // 积分条样式
 .points-bar {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 2px 10px;
-  font-size: 14px;
-  color: @navbar-header-text-color;
-  margin-right: 10px;
+  background: @points-bar-bg-color;
+  border-radius: @border-radius-large;
+  padding: @points-bar-padding;
+  font-size: @points-bar-font-size;
+  color: @points-bar-text-color;
+  margin: @points-bar-margin;
   white-space: nowrap;
-  transition: all @default-transition-duration ease;
+  transition: @navbar-transition;
+  border: 1px solid @points-bar-border-color;
 
   &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    background: rgba(@color-white, @opacity-active);
+    border-color: rgba(@color-white, @opacity-border-hover);
   }
 }

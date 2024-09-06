@@ -1,56 +1,66 @@
+import { AxiosResponse } from 'axios';
 import axios from './axios';
+import { 
+    RespBookCreate, 
+    RespBookDelete, 
+    RespBookGet, 
+    RespBookUpdate, 
+    RespBooks, 
+    RespItemList, 
+    RespBookAddItems, 
+    RespBookRemoveItems 
+} from './_dto';
+import { UInt64 } from './_common';
 
 // 创建书籍
-export const createBook = async (data: { title: string; description: string; tags?: string[] }) => {
-    return axios.post('/books', data);
+export const createBook = async (data: { title: string; description: string; tags?: string[] }): Promise<AxiosResponse<RespBookCreate>> => {
+    return axios.post<RespBookCreate>('/books', data);
 };
 
 // 获取所有书籍
-export const getBooks = async (params: { page: number, limit: number }) => {
-    return axios.get('/books', { params });
+export const getBooks = async (params: { page: number, limit: number, search?: string }): Promise<AxiosResponse<RespBooks>> => {
+    return axios.get<RespBooks>('/books', { params });
 };
+
 // 获取书籍详情
-export const getBookDetail = async (id: string) => {
-    return axios.get(`/books/${id}`);
+export const getBookDetail = async (id: UInt64): Promise<AxiosResponse<RespBookGet>> => {
+    return axios.get<RespBookGet>(`/books/${id}`);
 };
 
 // 更新书籍信息
-export const updateBook = async (id: string, data: { title: string; description: string; tags?: string[] }) => {
-    return axios.put(`/books/${id}`, data);
+export const updateBook = async (id: UInt64, data: { title: string; description: string; tags?: string[] }): Promise<AxiosResponse<RespBookUpdate>> => {
+    return axios.put<RespBookUpdate>(`/books/${id}`, data);
 };
 
 // 删除书籍
-export const deleteBook = async (id: string) => {
-    return axios.delete(`/books/${id}`);
+export const deleteBook = async (id: UInt64): Promise<AxiosResponse<RespBookDelete>> => {
+    return axios.delete<RespBookDelete>(`/books/${id}`);
 };
 
-export const getBookItems = async (data: { bookId: string, page: number, limit: number, search?: string }) => {
-    let {bookId, page, limit, search } = data
-    // todo: BE search are not supported yet
-    return axios.get(`/books/${bookId}/items`, { params: {page, limit, search}});
-}
-
-export const getTagItems = async (data: { tag: string, page: number, limit: number, search?: string }) => {
-    // todo: 后端还提供的接口还是 tag_id
-    // todo: BE search are not supported yet
-    let {tag, page, limit, search } = data
-    return axios.get(`/tags/name/${tag}/items`, { params: {page, limit, search}});
-}
-
-export const addBookItem = (data: {bookId: string, itemId: string}) => {
-    let {bookId, itemId } = data
-    return axios.post(`/books/${bookId}/items`, { "item_ids": [ itemId ] });
+export const getBookItems = async (data: { bookId: UInt64, page: number, limit: number, search?: string }): Promise<AxiosResponse<RespItemList>> => {
+    const { bookId, page, limit, search } = data;
+    return axios.get<RespItemList>(`/books/${bookId}/items`, { params: { page, limit, search }});
 };
 
-export const addBookItems = (data: {bookId: string, itemIds: string[]}) => {
-    let {bookId, itemIds } = data
-    return axios.post(`/books/${bookId}/items`, { "item_ids": itemIds });
+export const getTagItems = async (data: { tag: string, page: number, limit: number, search?: string }): Promise<AxiosResponse<RespItemList>> => {
+    const { tag, page, limit, search } = data;
+    return axios.get<RespItemList>(`/tags/name/${tag}/items`, { params: { page, limit, search }});
 };
 
-export const removeBookItems = (data: {bookId: string, itemIds: string[]}) => {
-    let {bookId, itemIds } = data
+export const addBookItem = (data: { bookId: UInt64, itemId: UInt64 }): Promise<AxiosResponse<RespBookAddItems>> => {
+    const { bookId, itemId } = data;
+    return axios.post<RespBookAddItems>(`/books/${bookId}/items`, { item_ids: [itemId] });
+};
+
+export const addBookItems = (data: { bookId: UInt64, itemIds: UInt64[] }): Promise<AxiosResponse<RespBookAddItems>> => {
+    const { bookId, itemIds } = data;
+    return axios.post<RespBookAddItems>(`/books/${bookId}/items`, { item_ids: itemIds });
+};
+
+export const removeBookItems = (data: { bookId: UInt64, itemIds: UInt64[] }): Promise<AxiosResponse<RespBookRemoveItems>> => {
+    const { bookId, itemIds } = data;
     if (!itemIds || !itemIds.length) {
-        return null;
+        return Promise.resolve({} as AxiosResponse<RespBookRemoveItems>);
     }
-    return axios.delete(`/books/${bookId}/items`, { params: { item_ids: itemIds.join(',') } });
+    return axios.delete<RespBookRemoveItems>(`/books/${bookId}/items`, { params: { item_ids: itemIds.join(',') } });
 };

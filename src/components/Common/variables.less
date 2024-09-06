@@ -1,7 +1,73 @@
-// 层级
-// 现有的变量保持不变
+// 全站设计思路
+// -----------------------------
+// 本站采用了一个深紫色为主的高贵优雅风格，同时融入了游戏元素。
+// 颜色方案以深紫到浅紫的渐变为主，辅以金色和白色作为点缀。
+// 整体设计注重层次感和交互体验，通过阴影、透明度和动画效果来增强用户体验。
+
+// 如何使用这些样式
+// -----------------------------
+// 1. 导入此文件：@import '../Common/variables.less';
+// 2. 使用变量：background-color: @color-primary-dark;
+// 3. 使用混合：.flex-center();
+// 4. 注意响应式设计，使用媒体查询来适配移动端
+
+// 全局设置
+// -----------------------------
+@max-content-width: 100vw;
+
+// 颜色系统
+// -----------------------------
+@color-primary-dark: #2c0052;
+@color-primary-light: #5a0099;
+@color-text-light: #f0e6ff;
+@color-text-lighter: #e6e6fa;
+@color-white: #ffffff;
+@page-background-color: #f0f2f5;
+@page-text-color: #333;
+
+// 添加这行
+@page-header-primary-color: #3498db;
+
+// 按钮颜色
+@btn-primary-color: #1890ff;
+@btn-danger-color: #ff4d4f;
+
+// 透明度
+@opacity-hover: 0.05;
+@opacity-active: 0.1;
+@opacity-border: 0.2;
+@opacity-border-hover: 0.3;
+
+// 排版
+// -----------------------------
+@font-size-sm: 14px;
+@font-size-md: 16px;
+@font-size-lg: 18px;
+@font-size-xl: 22px;
+
+@font-weight-normal: 400;
+@font-weight-medium: 500;
+
+// 间距
+// -----------------------------
+@spacing-xs: 4px;
+@spacing-sm: 8px;
+@spacing-md: 16px;
+@spacing-lg: 24px;
+
+// 边框和阴影
+// -----------------------------
+@border-radius-base: 4px;
+@border-radius-large: 20px;
+@box-shadow-navbar: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+// 动画
+// -----------------------------
+@transition-duration-base: 0.3s;
+@default-transition-duration: 0.3s;
 
 // Z-index 系统
+// -----------------------------
 @z-index-negative: -1;
 @z-index-zero: 0;
 @z-index-1: 100;
@@ -15,7 +81,7 @@
 @z-index-9: 900;
 @z-index-10: 1000;
 
-// 语义化 z-index 变量
+// 语义化 z-index
 @z-index-background: @z-index-zero;
 @z-index-default: @z-index-1;
 @z-index-hover: @z-index-2;
@@ -28,37 +94,69 @@
 @z-index-tooltip: @z-index-9;
 @z-index-notification: @z-index-10;
 
-// 特定组件 z-index（如果需要）
-@z-index-navbar: @z-index-sticky;
+// 特定组件 z-index
+@z-index-navbar: @z-index-fixed;
 @z-index-sidebar: @z-index-fixed;
 
-
-// 全局变量
+// Navbar 样式
+// -----------------------------
 @navbar-height: 64px;
+@navbar-height-mobile: 56px;
+@navbar-bg-color-start: @color-primary-dark;
+@navbar-bg-color-end: @color-primary-light;
+@navbar-text-color: @color-text-light;
+@navbar-text-color-hover: @color-white;
+@navbar-highlight-color: @color-white;
+@navbar-padding-horizontal: @spacing-lg;
+@navbar-item-padding: 0 @spacing-md;
+@navbar-item-margin: 0 @spacing-xs;
+@navbar-title-font-size: @font-size-xl;
+@navbar-item-font-size: @font-size-md;
+@navbar-transition: all @transition-duration-base ease;
+@navbar-logo-height: 32px;
+@navbar-logo-margin: 0 @spacing-md 0 0;
 
-// 基准颜色
-@btn-primary-color: #1890ff;
-@btn-danger-color: #ff4d4f;
+// 积分条样式
+@points-bar-bg-color: rgba(@color-white, @opacity-hover);
+@points-bar-border-color: rgba(@color-white, @opacity-border);
+@points-bar-text-color: @color-text-light;
+@points-bar-padding: @spacing-xs @spacing-md;
+@points-bar-margin: 0 @spacing-sm 0 0;
+@points-bar-font-size: @font-size-sm;
 
-// 导航栏颜色
-@navbar-header-primary-color: #4a00e0;
-@navbar-header-secondary-color: #8e2de2;
-@navbar-header-text-color: white;
-@navbar-header-highlight-color: #ffd700;
+// 移动端菜单
+@menu-button-color: @color-text-light;
+@menu-button-size: @font-size-lg;
+@menu-button-padding: @spacing-xs;
 
+// 抽屉菜单
+@drawer-menu-width: 250px;
+@drawer-menu-item-height: 50px;
+@drawer-menu-item-padding: 0 @spacing-lg;
+
+// 页面布局
+// -----------------------------
 @layout-header-height: 180px;
-@layout-header-mobile-height: 68px;;
-
-// 动画
-@default-transition-duration: 0.3s;
-
-// 界面
-@page-background-color: #f0f2f5;
-@page-header-primary-color: #3498db;
-@page-header-secondary-color: #2ecc71;
-@page-text-color: #333;
-
+@layout-header-height-mobile: 68px;
+@page-header-bg-color: #4a00e0;
+@page-header-text-color: white;
+@sub-menu-bg-color: #4a00e0;
+@sub-menu-order-color-base: #8e2de2;
+@sub-menu-text-color: #ffd700;
 @page-container-border-radius: 8px;
-
 @campaign-container-padding: 10px;
 @campaign-skills-container-height: 148px;
+
+// 混合
+// -----------------------------
+.flex-center() {
+  display: flex;
+  align-items: center;
+}
+
+// 动画
+// -----------------------------
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

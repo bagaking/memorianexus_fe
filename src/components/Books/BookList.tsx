@@ -1,20 +1,18 @@
-// src/components/Books/BookList.tsx
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Card } from 'antd';
+import { message, Button, Row, Col } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getBooks, deleteBook } from '../../api/books';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
-import BookCard from './BookCard';
 import PaginationComponent from '../Common/PaginationComponent';
-import {Book, Item} from "../../api/_dto";
-import { useIsMobile } from '../../hooks/useWindowSize';
+import { Book } from "../../api";
 import '../Common/CommonStyles.css';
+import './BookList.less';
 
 const BookList: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
-    const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([]);
+    const [flippedBooks, setFlippedBooks] = useState<Set<string>>(new Set());
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
     const [totalBooks, setTotalBooks] = useState(0);
@@ -52,14 +50,22 @@ const BookList: React.FC = () => {
     useEffect(() => {
         fetchBooks(currentPage, limit);
     }, [currentPage, limit]);
+ 
 
-    const handleExpand = (record: Book) => {
-        setExpandedRowKeys(prevKeys =>
-            prevKeys.includes(record.id) ? prevKeys.filter(key => key !== record.id) : [record.id]
-        );
+    const handleBookClick = (bookId: string) => {
+        setFlippedBooks(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(bookId)) {
+                newSet.delete(bookId);
+            } else {
+                newSet.add(bookId);
+            }
+            return newSet;
+        });
     };
 
-    const showDeleteModal = (book: Book) => {
+    const showDeleteModal = (book: Book, event: React.MouseEvent) => {
+        event.stopPropagation();
         setBookToDelete(book);
         setDeleteModalVisible(true);
     };
@@ -91,106 +97,72 @@ const BookList: React.FC = () => {
         navigate(`/books?page=1&limit=${newLimit}`);
     };
 
-    const columns = [
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: 200,
-        },
-        {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-            render: (text: string) => <ReactMarkdown className="markdown-content">{text}</ReactMarkdown>,
-        },
-        {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-            render: (text: string) => <ReactMarkdown className="markdown-content">{text}</ReactMarkdown>,
-        },
-        {
-            title: 'Tags',
-            dataIndex: 'tags',
-            key: 'tags',
-            render: (tags: string[]) => (tags || []).join(', '),
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_: any, record: Book) => (
-                <>
-                    <Button type="link" size="small">
-                        <Link to={`/books/${record.id}`} state={{page:currentPage, limit}}>Details</Link>
-                    </Button>
-                    <Button type="link" size="small" danger onClick={() => showDeleteModal(record)} style={{ marginLeft: '8px' }}>
-                        Delete
-                    </Button>
-                </>
-            ),
-        },
-    ];
-
-    const expandedRowRender = (record: Book) => (
-        <Card key={record.id} style={{ margin: '-17px', borderRadius: '0px 0px 8px 8px ' }}>
-            <h2>{record.title}</h2>
-            <ReactMarkdown className="markdown-content">{record.description}</ReactMarkdown>
-        </Card>
-    );
-
-    const isMobile = useIsMobile();
-
-    const renderBookList = () => {
-        if (!isMobile) {
-            return (
-                <Table
-                    columns={columns}
-                    dataSource={books}
-                    rowKey="id"
-                    expandedRowKeys={expandedRowKeys}
-                    onRow={(record) => ({
-                        onClick: () => handleExpand(record),
-                    })}
-                    expandable={{expandedRowRender}}
-                    pagination={false}
-                    loading={loading}
-                />
-            );
-        } else {
-            return (
-                <div>
-                    {books.map(book => (
-                        <BookCard
-                            key={book.id}
-                            book={book}
-                            onDelete={() => showDeleteModal(book)}
-                            currentPage={currentPage}
-                            limit={limit}
-                        />
-                    ))}
-                </div>
-            );
-        }
+    const renderBookshelf = () => {
+        return (
+            <div className="bookshelf">
+                {books.map(book => (
+                    <div key={book.id} className="book-container">
+                        <div 
+                            className={`book ${flippedBooks.has(book.id) ? 'flipped' : ''}`}
+                            onClick={() => handleBookClick(book.id)}
+                        >
+                            <div className="book-front">
+                                <div className="book-spine">
+                                    <h3>{book.title}</h3>
+                                </div>
+                                <div className="book-cover">
+                                    <h2>{book.title}</h2>
+                                </div>
+                            </div>
+                            <div className="book-back">
+                                <ReactMarkdown className="markdown-content">{book.description}</ReactMarkdown>
+                                <div className="book-tags">
+                                    {book.tags?.map(tag => (
+                                        <span key={tag} className="book-tag">{tag}</span>
+                                    ))}
+                                </div>
+                                <div className="book-actions">
+                                    <Link to={`/books/${book.id}`} state={{page:currentPage, limit}} onClick={(e) => e.stopPropagation()}>
+                                        <Button type="primary" size="middle" className="details-button">详情</Button>
+                                    </Link>
+                                    <Button type="primary" danger size="small" onClick={(e) => showDeleteModal(book, e)}>
+                                        删除
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
     };
 
     return (
-        <PageLayout title="Books" icon="/layout/book_icon.png">
-            <Link to={`/books/new`} state={{page: currentPage, limit}}>
-                <Button type="primary" className="create-new-one-button">Create New Book</Button>
-            </Link>
-
-            <div className="table-container">
-                {renderBookList()}
+        <PageLayout title="我的书架" icon="/layout/book_icon.png">
+            <div className="bookshelf-page">
+                <div className="bookshelf-container">
+                    {renderBookshelf()}
+                </div>
+                <div className="bookshelf-footer">
+                    <Row justify="space-between" align="middle">
+                        <Col>
+                            <PaginationComponent
+                                currentPage={currentPage}
+                                totalItems={totalBooks}
+                                pageDataLength={books.length}
+                                limit={limit}
+                                onPageChange={handlePageChange}
+                                onLimitChange={handleLimitChange}
+                            />
+                        </Col>
+                        <Col>
+                            <Link to={`/books/new`} state={{page: currentPage, limit}}>
+                                <Button type="primary" className="create-new-one-button">添加新书</Button>
+                            </Link>
+                        </Col>
+                    </Row>
+                </div>
             </div>
-            <PaginationComponent
-                currentPage={currentPage}
-                totalItems={totalBooks}
-                pageDataLength={books.length}
-                limit={limit}
-                onPageChange={handlePageChange}
-                onLimitChange={handleLimitChange}
-            />
             <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
         </PageLayout>
     );

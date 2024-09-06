@@ -6,98 +6,151 @@
   align-items: center;
 }
 
+@scrolled-header-height: @layout-header-height * 0.5;
+
 // PageLayout 样式
 .page-layout {
   &-container {
-    width: 100%;
     min-height: calc(100vh - @navbar-height);
-    background-color: #f0f2f5;
-    padding: calc(@navbar-height + 4px) 8px 8px 8px; 
+    padding-top: calc(@navbar-height + @layout-header-height);
     display: flex;
     flex-direction: column;
   }
 
   &-header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #001529 0%, #4b6cb7 100%);
-    padding: 0 24px;
+    position: fixed;
+    top: @navbar-height;
+    left: 0;
+    right: 0;
+    z-index: @z-index-sticky;
     height: @layout-header-height;
+    background: linear-gradient(135deg, @page-header-bg-color, darken(@page-header-bg-color, 10%));
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    color: @navbar-header-text-color;
-    text-align: center;
-    font-family: 'Cinzel', serif;
-    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
 
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      position: relative;
+    &.scrolled {
+      height: @scrolled-header-height;
     }
 
     &::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: inherit;
-      background-size: cover;
-      opacity: 0.5;
-      z-index: -1;
-      filter: blur(8px);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 80%);
+      transform: rotate(30deg);
     }
   }
 
   &-content {
     flex: 1;
-    padding: 2px 0;
-    margin: 6px 0;
+    width: 100%;
+    background-color: @page-background-color;
+  }
 
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
-      color: #333;
-    }
+  &-inner {
+    max-width: @max-content-width;
+    margin: 0 auto;
+    padding: @spacing-lg;
+  }
+}
+
+.header-content {
+  .flex-center();
+  justify-content: flex-start; // 改为 flex-start，确保返回按钮在左侧
+  max-width: @max-content-width;
+  margin: 0 auto;
+  padding: 0 @spacing-lg;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+
+  .scrolled & {
+    padding-top: @spacing-xs;
+    padding-bottom: @spacing-xs;
   }
 }
 
 .page-title {
-  color: @navbar-header-text-color;
+  color: @page-header-text-color;
   margin: 0;
-  flex: 1;
-  font-size: 36px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-size: @font-size-xl;
+  font-weight: @font-weight-medium;
+  .flex-center();
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 
   .menu-logo-48 {
-    height: 48px;
-    margin-right: 16px;
+    height: 32px;
+    margin-right: @spacing-md;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
   }
+
+  .scrolled & {
+    font-size: @font-size-md; // 当滚动时，字体变得更小
+  }
+  margin-left: @spacing-md; // 添加左边距，与返回按钮保持一定距离
 }
 
 .back-button {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  color: @navbar-header-text-color;
-  font-size: 20px;
-  padding: 8px;
-  transition: transform @default-transition-duration;
+  color: @page-header-text-color;
+  font-size: @font-size-lg;
+  padding: @spacing-sm;
+  background: transparent; // 确保背景透明
+  border: none; // 移除边框
+  box-shadow: none; // 移除阴影
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-50%) scale(1.1);
-    color: lighten(@navbar-header-text-color, 20%);
+    color: @color-white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
+
+  .anticon {
+    font-size: @font-size-lg;
+  }
+
+  .scrolled & {
+    font-size: @font-size-md;
+    padding: @spacing-xs;
+  }
+}
+
+.sub-menu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: @sub-menu-bg-color;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  
+  .ant-menu {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 @spacing-lg;
+    background: transparent;
+    border-bottom: none;
+
+    .ant-menu-item {
+      color: @sub-menu-text-color;
+      font-weight: 500;
+      
+      &:hover, &-active {
+        color: lighten(@sub-menu-text-color, 20%);
+        border-bottom-color: @sub-menu-text-color;
+      }
+
+      &::after {
+        border-bottom: 2px solid @sub-menu-text-color;
+      }
+    }
   }
 }
 
@@ -105,27 +158,38 @@
 @media (max-width: 768px) {
   .page-layout {
     &-container {
-      padding: calc(@navbar-height + 2px) 2px 2px 2px;
+      padding-top: calc(@navbar-height-mobile + @layout-header-height-mobile);
     }
 
     &-header {
-      padding: 0 16px;
-      height: @layout-header-mobile-height;
-      border-radius: 4px;
+      height: @layout-header-height-mobile;
+
+      &.scrolled {
+        height: @layout-header-height-mobile * 0.7; // 移动端滚动时的高度
+      }
     }
 
-    &-content {
-      padding: 4px 0;
-      margin-top: 2px;
+    &-inner {
+      padding: @spacing-md;
     }
+  }
+
+  .header-content {
+    padding: 0 @spacing-md;
   }
 
   .page-title {
-    font-size: 20px;
+    font-size: @font-size-lg;
   }
 
   .back-button {
-    font-size: 16px;
-    padding: 4px;
+    font-size: @font-size-md;
+    padding: @spacing-xs;
+  }
+
+  .sub-menu {
+    .ant-menu {
+      padding: 0 @spacing-md;
+    }
   }
 }

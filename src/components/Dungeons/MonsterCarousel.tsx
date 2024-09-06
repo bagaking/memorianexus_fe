@@ -181,7 +181,7 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
                             <p>练习次数: {getPracticeCount(monster.submitResult.practice_count || 0)}</p>
                         </div>
                     )}
-                    <TaggedMarkdown mode='both'>{itemDetail?.content || ''}</TaggedMarkdown>
+                    <TaggedMarkdown mode='tag'>{itemDetail?.content || ''}</TaggedMarkdown>
                 </div>
             </div>
         );

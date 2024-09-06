@@ -71,7 +71,7 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, className, sty
                 id: b.id,
                 content: `## ${b.title}\n\n${b.description}\n`,
             })),
-            page: data.page,
+            offset: data.offset,
             limit: data.limit,
             total: data.total,
         };

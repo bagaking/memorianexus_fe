@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { message, Button, Card, Space, Row, Col, Typography, Table } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { PlusOutlined } from '@ant-design/icons';
 import { getDungeons, deleteDungeon } from '../../api/dungeons';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import '../Common/CommonStyles.css';
 import { useIsMobile } from '../../hooks/useWindowSize';
+import styled from 'styled-components';
 
 const { Title, Paragraph } = Typography;
 
@@ -15,6 +17,29 @@ interface Dungeon {
     title: string;
     description: string;
 }
+
+const CreateCampaignButton = styled(Button)`
+  height: 60px;
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #6e45e2, #88d3ce);
+  border: none;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:hover, &:focus {
+    background: linear-gradient(135deg, #5a36c7, #7ac7c0);
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .anticon {
+    font-size: 24px;
+    margin-right: 10px;
+  }
+`;
 
 const CampaignList: React.FC = () => {
     const [dungeons, setDungeons] = useState<Dungeon[]>([]);
@@ -163,12 +188,12 @@ const CampaignList: React.FC = () => {
 
     return (
         <PageLayout title="战役" icon="/layout/campaign_dungeon_icon.png">
-            <Row gutter={[16, 16]}>
+            <Row gutter={[16, 24]}>
                 <Col xs={24}>
                     <Link to="/campaigns/new">
-                        <Button type="primary" style={{width: "100%"}} className="create-new-one-button">
+                        <CreateCampaignButton type="primary" icon={<PlusOutlined />} block>
                             创建新战役
-                        </Button>
+                        </CreateCampaignButton>
                     </Link>
                 </Col>
                 <Col xs={24}>
