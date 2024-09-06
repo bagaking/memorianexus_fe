@@ -150,15 +150,12 @@ const CampaignChallenge: React.FC = () => {
     return (
         <PageLayout 
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
+            // backUrl={`/campaigns`} 
             icon="/layout/campaign_dungeon_icon.png"
             enableShrink={true}
         >
             <div className="campaign-challenge-container">
-                <CDNImage
-                    className="campaign-challenge-background"
-                    src="backgrounds/stone-texture.png"
-                    alt="Stone texture background"
-                />
+                <CDNImage  className="campaign-challenge-background" src="/battlefield/battlefield_01.png" alt="战场背景"/>
                 <div className="campaign-challenge-content" ref={contentRef}>
                     <MonsterCarousel
                         monsters={monsters}
@@ -175,18 +172,18 @@ const CampaignChallenge: React.FC = () => {
                             <SkillCard
                                 key={index}
                                 icon={card.icon}
-                                onClick={() => handleAttackResult(card.resultType as any)}
+                                onClick={() => handleAttackResult(card.resultType as PracticeResultEnum)}
                                 resultType={card.resultType}
-                                title={isMobile ? '' : card.title}
+                                title={card.title}
                                 backgroundImage={card.backgroundImage}
                             />
                         ))}
-                        <RecordButton 
-                            onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
-                            onAudioStop={handleAudioStop} 
-                            position="right" 
-                        /> {/* 添加录���按钮 */}
                     </div>
+                    <RecordButton 
+                        onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
+                        onAudioStop={handleAudioStop} 
+                        position="right" 
+                    />
                 </div>
             </div>
         </PageLayout>

@@ -1,25 +1,29 @@
 import React from 'react';
-import { Card } from 'antd';
+import { useIsMobile } from '../../hooks/useWindowSize';
 import './SkillCard.less';
 
 interface SkillCardProps {
     icon: React.ReactNode;
-    onClick: () => void;
     title: string;
-    backgroundImage: string;
     resultType: string;
+    onClick: () => void;
+    backgroundImage: string;
 }
 
-const SkillCard: React.FC<SkillCardProps> = ({ icon, onClick, title, backgroundImage, resultType }) => {
+const SkillCard: React.FC<SkillCardProps> = ({ icon, title, resultType, onClick, backgroundImage }) => {
+    const isMobile = useIsMobile();
+
     return (
-        <Card
-            className={`skill-card ${resultType}`}
+        <div 
+            className={`skill-card ${resultType} ${isMobile ? 'mobile' : ''}`} 
             onClick={onClick}
             style={{ backgroundImage: `url(${backgroundImage})` }}
         >
-            <div className="skill-icon">{icon}</div>
-            {title && <div className="skill-title">{title}</div>}
-        </Card>
+            <div className="skill-card-content">
+                <div className="skill-card-icon">{icon}</div>
+                {!isMobile && <div className="skill-card-title">{title}</div>}
+            </div>
+        </div>
     );
 };
 
