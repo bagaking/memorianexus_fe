@@ -27,6 +27,7 @@ interface PageLayoutProps {
   backUrl?: string;
   subMenu?: SubMenu;
   enableShrink?: boolean; // 新增控制是否启用缩小效果的 prop
+  fullWidthContent?: boolean; // 新增控制内容是否全宽的 prop
 }
 
 export const PageLayout: React.FC<PageLayoutProps> = ({ 
@@ -37,7 +38,8 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
     bannerUrl, 
     backUrl,
     subMenu,
-    enableShrink = false // 默认启用缩小效果
+    enableShrink = false, // 默认启用缩小效果
+    fullWidthContent = false // 默认不全宽
 }) => {
     const navigate = useNavigate();
     const [scrolled, setScrolled] = useState(false);
@@ -61,6 +63,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
 
     const headerClassName = `page-layout-header ${scrolled && enableShrink ? 'scrolled' : ''}`;
     const headerContentClassName = `header-content ${scrolled && enableShrink ? 'scrolled' : ''}`;
+    const contentClassName = `page-layout-content ${fullWidthContent ? 'full-width' : ''}`;
 
     const handleBack = () => {
         if (backUrl) {
@@ -96,10 +99,12 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
                     </div>
                 )}
             </div>
-            <Content className="page-layout-content">
-                <div className="page-layout-inner">
-                    {children}
-                </div>
+            <Content className={contentClassName}>
+                {fullWidthContent ? children : (
+                    <div className="page-layout-inner">
+                        {children}
+                    </div>
+                )}
             </Content>
         </Layout>
     );
