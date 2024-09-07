@@ -1,12 +1,15 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { Avatar } from 'antd';
+import { Link, useParams } from 'react-router-dom';
+import { Avatar } from 'antd'; // 导入 Button
+import { FireFilled } from '@ant-design/icons';
 import { PageLayout } from '../Layout/PageLayout';
 import {DungeonMonster, Item} from "../../api/_dto";
 import EmbedItemPack from "../Basic/EmbedItemPack";
 import {addDungeonItems, getItems, getCampaignMonsters, removeDungeonItems} from "../../api";
-import MonsterCard from "./MonsterCard";
+import MonsterCard from "./MonsterDisplayCard";
+import GradientButton from '../Common/GradientButton';
 import '../Common/CommonStyles.css';
+import './CampaignMonster.less';
 
 const DungeonMonsters: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -103,25 +106,42 @@ const DungeonMonsters: React.FC = () => {
 
     return (
         <PageLayout title="Campaign Monsters" 
-            // backUrl={`/campaigns`} 
-            icon="/layout/campaign_dungeon_icon.png">
+            icon="/layout/campaign_dungeon_icon.png"
+            fullWidthContent={true}
+            >
 
-            <EmbedItemPack<DungeonMonster, Item>
-                fetchItems={fetchItems}
+            <div className="dungeon-monsters-container">
+            <Link to={`/campaigns/${id}/challenge`}>
+                <GradientButton 
+                    type="primary"
+                    icon={<FireFilled />}
+                    startColor="#88d3ce"
+                    endColor="#6e45e2" 
+                    animation="shine"
+                    animationDuration="0.8s"
+                    style={{marginBottom: '20px', width: '100%'}}
+                    size="large"
+                >进入挑战
+                </GradientButton></Link>
+                
+                <EmbedItemPack<DungeonMonster, Item>
+                    fetchItems={fetchItems}
 
-                fetchItemsToAdd={fetchItemsToAdd}
-                enableSearchWhenAdd={true}
-                addItems={addItems}
+                    fetchItemsToAdd={fetchItemsToAdd}
+                    enableSearchWhenAdd={true}
+                    addItems={addItems}
 
-                deleteItems={deleteItems}
-                itemsColumns={columns}
-                renderItem={(monster, selected, onSelect) => <MonsterCard
-                    monster={monster}
-                    onClick={onSelect}
-                    selected={selected}
-                />}
-                rowKey="item_id"
-            />
+                    deleteItems={deleteItems}
+                    itemsColumns={columns}
+                    renderItem={(monster, selected, onSelect) => <MonsterCard
+                        monster={monster}
+                        onClick={onSelect}
+                        selected={selected}
+                    />}
+                    rowKey="item_id"
+                    view='grid'
+                />
+            </div>
         </PageLayout>
     );
 };

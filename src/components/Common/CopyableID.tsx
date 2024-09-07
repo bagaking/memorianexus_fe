@@ -48,7 +48,9 @@ const CopyableID: React.FC<CopyableIDProps> = ({
   style,
   tooltipTitle = "点击复制 ID"
 }) => {
-  const copyToClipboard = () => {
+  const copyToClipboard = (event: React.MouseEvent) => {
+    event.stopPropagation(); // 防止事件冒泡
+    
     navigator.clipboard.writeText(id).then(() => {
       message.success('已复制到剪贴板');
     }, () => {

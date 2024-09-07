@@ -1,0 +1,45 @@
+// src/components/Dungeons/CampaignMonster.less
+@import '../Common/variables.less'; // 导入变量
+
+.dungeon-monsters-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - @navbar-height);
+    padding: @spacing-lg @spacing-xl;
+    
+    background-color: @color-primary-dark;
+    background-image: radial-gradient(circle, #3c1053, #1c0628);
+    background-blend-mode: overlay;
+    background-size: 200px 200px, cover;
+    background-position: center;
+    background-repeat: repeat, no-repeat;
+}
+
+.dungeon-monsters-container h2 {
+    font-size: @font-size-xl; // 使用变量
+    color: @color-primary-dark; // 使用变量
+    margin-bottom: @margin-lg; // 使用变量
+}
+
+.dungeon-monsters-content {
+    background: @color-white; // 使用变量
+    padding: @padding-lg; // 使用变量
+    border-radius: @border-radius-md; // 使用变量
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform @transition-duration-base, box-shadow @transition-duration-base; // 使用变量
+}
+
+.dungeon-monsters-content:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.dungeon-monsters-content h2 {
+    margin-top: 0;
+}
+
+.dungeon-monsters-content .ant-table {
+    background: @color-white; // 使用变量
+    border-radius: @border-radius-md; // 使用变量
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

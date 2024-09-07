@@ -2,6 +2,7 @@
 
 @book-width: 200px;
 @book-height: calc(@book-width * 1.6);
+
 @book-back-background-color: #e8eaf6; // 更柔和的背景色
 @book-cover-background-color: #8e44ad; // 深紫色
 @book-cover-background-color-secondary: #9b59b6; // 较浅的紫色
@@ -115,13 +116,19 @@
 
         .markdown-content {
           font-size: @font-size-sm;
-          overflow: hidden;
+          overflow: hidden; // 添加溢出隐藏
+          display: block; // 添加标准属性
+          max-height: calc(@font-size-sm * 5); // 设置最大高度以实现兼容性
           text-overflow: ellipsis;
+          
+          
+          color: @color-primary-dark;
+          margin-bottom: @spacing-sm;
+
+          line-clamp: 2; // 添加标准属性以实现兼容性
           display: -webkit-box;
           -webkit-line-clamp: 5;
           -webkit-box-orient: vertical;
-          color: @color-primary-dark;
-          margin-bottom: @spacing-sm;
         }
 
         .book-tags {

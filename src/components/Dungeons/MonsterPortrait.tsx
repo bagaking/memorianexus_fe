@@ -63,6 +63,7 @@ export const getMonsterPortrait = (id: string): string => {
 interface MonsterPortraitProps {
     id: string;
     alt: string;
+    style?: React.CSSProperties;
 }
 
 // 样式化的容器组件
@@ -82,13 +83,13 @@ const StyledCDNImage = styled(CDNImage)`
 `;
 
 // 怪物头像组件
-const MonsterPortrait: React.FC<MonsterPortraitProps> = ({ id, alt }) => {
+const MonsterPortrait: React.FC<MonsterPortraitProps> = ({ id, alt, style }) => {
     const portraitFileName = getMonsterPortrait(id);
     const src = `/portraits/${portraitFileName}`;
 
     return (
         <ImageWrapper>
-            <StyledCDNImage src={src} alt={alt} />
+            <StyledCDNImage src={src} alt={alt} style={style} />
         </ImageWrapper>
     );
 };

@@ -115,10 +115,15 @@
       margin-bottom: @margin-sm;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      font-size: 14px;
+      
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
-      font-size: 14px;
+      display: box; // 添加标准属性以实现兼容性
+      line-clamp: 2; // 添加标准属性以实现兼容性
+      box-orient: vertical; // 添加标准属性以实现兼容性
     }
 
     .campaign-details {

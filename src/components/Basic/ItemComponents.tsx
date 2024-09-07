@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Tag, Tooltip } from 'antd';
+import { Tag, Tooltip, Progress } from 'antd'; // 导入 Progress 组件
 import { StarFilled, TrophyFilled, LinkOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
@@ -34,11 +34,16 @@ const IconWrapper = styled.span<{ level: number }>`
 interface DifficultyImportanceProps {
   difficulty: number | undefined;
   importance: number | undefined;
+  familiarity?: number | string; // 修改 familiarity 属性为可能的浮点数或字符串
 }
 
-export const DifficultyImportance: React.FC<DifficultyImportanceProps> = ({ difficulty, importance }) => {
+export const DifficultyImportance: React.FC<DifficultyImportanceProps> = ({ difficulty, importance, familiarity }) => {
   const difficultyLevel = difficulty ? Math.floor(difficulty / 16) : 0; // 0 to 4
   const importanceLevel = importance ? Math.min(Math.floor(importance / 20), 5) : 0; // 0 to 5
+
+  // 处理 familiarity，支持浮点数和字符串
+  const familiarityValue = typeof familiarity === 'string' ? parseFloat(familiarity) : familiarity;
+  const familiarityLevel = familiarityValue ? Math.min(Math.floor(familiarityValue / 20), 5) : 0; // 0 to 5
 
   return (
     <DifficultyImportanceWrapper>
@@ -54,6 +59,18 @@ export const DifficultyImportance: React.FC<DifficultyImportanceProps> = ({ diff
           ))}
         </div>
       </Tooltip>
+      {familiarityValue !== undefined && (
+        <Tooltip title={`Familiarity: ${familiarityValue || 'N/A'}`}>
+          <div style={{ width: '100px' }}> {/* 设置宽度以保持一致性 */}
+            <Progress 
+              percent={(familiarityValue / 100) * 100} // 假设 familiarity 的最大值为 100
+              strokeColor="#52c41a" 
+              showInfo={false} 
+              size="small" 
+            />
+          </div>
+        </Tooltip>
+      )}
     </DifficultyImportanceWrapper>
   );
 };

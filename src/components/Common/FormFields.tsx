@@ -7,25 +7,27 @@ import 'react-markdown-editor-lite/lib/index.css';
 import styled from 'styled-components';
 import { useIsMobile } from '../../hooks/useWindowSize';
 
-const TyItemFlashCard = "flash_card"
-const TyItemMultipleChoice = "multiple_choice"
-const TyItemCompletion = "completion"
+const TyItemFlashCard = "flash_card";
+const TyItemMultipleChoice = "multiple_choice";
+const TyItemCompletion = "completion";
 
 interface MarkdownEditorProps {
     name: string;
     label?: string;
     placeholder?: string;
     value?: string;
-    rules: any
+    rules: any;
     onChange?: (value: string) => void;
+    view?: { menu?: boolean; md?: boolean; html?: boolean }; // 添加可配置的 view 属性
+    style?: React.CSSProperties;
 }
 
 const mdParser = new MarkdownIt();
 
-const StyledMdEditor = styled(MdEditor)`
+const StyledMdEditor = styled(MdEditor)<{ isRounded?: boolean }>`
   .rc-md-editor {
     border: 1px solid #d9d9d9;
-    border-radius: 4px;
+    border-radius: ${props => (props.isRounded ? '8px' : '0')} !important; // 根据 isRounded 属性设置圆角
   }
 
   .rc-md-navigation {
@@ -35,7 +37,6 @@ const StyledMdEditor = styled(MdEditor)`
   }
 
   @media (max-width: 768px) {
-
     .rc-md-navigation {
       justify-content: center;
       font-size: 12px;
@@ -77,9 +78,15 @@ export const MarkdownField: React.FC<MarkdownEditorProps> = ({
     value,
     onChange,
     rules,
+    view = { menu: true, md: true, html: false }, // 设置默认值
     ...rest
 }) => {
    const isMobile = useIsMobile();
+   const isRounded = view.md && !view.html; // 只有 md 时设置圆角
+
+   const renderHTML = (text: string) => {
+       return mdParser.render(text); // 使用 markdown-it 渲染
+   };
 
    return (
      <Form.Item 
@@ -90,12 +97,19 @@ export const MarkdownField: React.FC<MarkdownEditorProps> = ({
        rules={rules}
      >
        <StyledMdEditor 
-         value={value} 
+         defaultValue={value || ''} // 确保 value 被正确传递
          placeholder={placeholder} 
-         onChange={(e: { text: string }) => onChange && onChange(e.text)}
-         renderHTML={(text: string) => mdParser.render(text)} 
+         onChange={(e: { text: string }) => {
+           onChange && onChange(e.text);
+         }}
+         renderHTML={renderHTML} // 使用自定义的 renderHTML 函数
          style={{width: '100%'}} 
-         view={{ menu: true, md: true, html: !isMobile }}
+         view={{ 
+           menu: view.menu !== undefined ? view.menu : true, 
+           md: view.md !== undefined ? view.md : true, 
+           html: view.html !== undefined ? view.html : !isMobile 
+         }} // 使用可配置的 view 属性
+         isRounded={isRounded} // 传递 isRounded 属性
          {...rest}
        />
      </Form.Item>

@@ -138,7 +138,7 @@
 @z-index-8: 800;
 @z-index-9: 900;
 @z-index-10: 1000;
-
+@z-index-11: 1100;
 // 语义化 z-index
 @z-index-background: @z-index-zero;
 @z-index-default: @z-index-1;
@@ -152,9 +152,11 @@
 @z-index-tooltip: @z-index-9;
 @z-index-notification: @z-index-10;
 
+// 特定布局 z-index
+@z-index-navbar: @z-index-11;
+@z-index-layout-header: calc(@z-index-navbar - 1);
+
 // 特定组件 z-index
-@z-index-navbar: @z-index-fixed;
-@z-index-layout-header: @z-index-fixed;
 @z-index-sidebar: @z-index-fixed;
 @z-index-in-page-control-panel: calc(@z-index-dropdown + 1);
 

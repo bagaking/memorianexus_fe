@@ -31,6 +31,8 @@ interface EmbedItemPackProps<T, TAdd> {
 
     // 新增：自定义控制面板
     customControlPanel?: React.ReactNode;
+
+    view?: 'grid' | 'table';
 }
 
 const Container = styled.div`
@@ -76,17 +78,18 @@ const DeleteButton = styled(StyledButton)`
 `;
 
 const StyledSwitch = styled(Switch)`
-  &.ant-switch-checked {
-    background: linear-gradient(45deg, #2ecc71, #27ae60);
-  }
-  
-  &.ant-switch {
-    background-color: #bdc3c7;
-  }
+&.ant-switch-checked {
+  background: linear-gradient(45deg, #2ecc71, #27ae60);
+  position: relative; // 添加相对定位
+}
 
-  .ant-switch-handle::before {
-    background-color: #ecf0f1;
-  }
+&.ant-switch {
+  background-color: #bdc3c7;
+}
+
+.ant-switch-handle::before {
+  background-color: #ecf0f1;
+}
 `;
 
 const borderAnimation = keyframes`
@@ -100,7 +103,7 @@ const StyledListItem = styled(List.Item)<{ $selected: boolean }>`
   transition: all 0.3s ease;
   border-radius: 10px;
   overflow: hidden;
-  background: ${props => props.$selected ? 'rgba(46, 204, 113, 0.2)' : 'transparent'};
+  background: ${props => props.$selected ? 'rgba(46, 204, 113, 0.4)' : 'transparent'}; // 增强选中背景透明度
   color: #ecf0f1; // 确保列表项文字颜色适合深色背景
 
   &::before {
@@ -119,8 +122,8 @@ const StyledListItem = styled(List.Item)<{ $selected: boolean }>`
   }
 
   ${props => props.$selected && `
-    transform: scale(1.02);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    // transform: scale(1.01); // 增加选中时的缩放效果
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); // 增强阴影效果
   `}
 
   &:hover {
@@ -198,6 +201,7 @@ const EmbedItemPack = <T extends Record<string, any>, TAdd extends Item>({
     rowKey,
     grid,
     customControlPanel,
+    view = 'table',
 }: EmbedItemPackProps<T, TAdd>) => {
     const [items, setItems] = useState<T[]>([]);
     const [totalItems, setTotalItems] = useState(0);
@@ -207,7 +211,7 @@ const EmbedItemPack = <T extends Record<string, any>, TAdd extends Item>({
     const [currentItemLimit, setCurrentItemLimit] = useState(10);
     const [addEntitiesModalVisible, setAddEntitiesModalVisible] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>(view);
 
     const { width } = useWindowSize();
     const isMobile = width <= 767; // 假设移动设备的断点是 767px

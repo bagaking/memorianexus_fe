@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import { Typography, Tag, Divider } from 'antd';
+import FirstLineMD from './FirstLineMD';
 
 const { Text } = Typography;
 

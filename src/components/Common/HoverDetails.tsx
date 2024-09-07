@@ -23,6 +23,8 @@ const TriggerDiv = styled.div<{ $bgColor: string; $isHovered: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: ${props => props.$isHovered ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none'};
+  z-index: 1000;
+  
   & > * {
     margin: 0;
     padding: 0;
@@ -36,8 +38,20 @@ const ContentWrapper = styled.div<{ $width: number }>`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   padding: 16px;
   width: ${props => props.$width}px;
+  max-width: 90vw;
   max-height: 80vh;
   overflow: auto;
+
+  & > * {
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 75vw;
+    max-height: none;
+  }
+
 `;
 
 const StyledTooltip = styled(Tooltip)`
@@ -178,7 +192,7 @@ const HoverDetails: React.FC<HoverDetailsProps> = ({
     return (
         <StyledTooltip
             title={
-                <ContentWrapper ref={tooltipRef} $width={contentWidth}>
+                <ContentWrapper ref={tooltipRef} $width={contentWidth} onClick={(e) => e.stopPropagation()}>
                     {content}
                 </ContentWrapper>
             }
@@ -196,6 +210,7 @@ const HoverDetails: React.FC<HoverDetailsProps> = ({
                 $isHovered={isVisible}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
+                onClick={(e) => e.stopPropagation()}
                 {...rest}
             >
                 {trigger}

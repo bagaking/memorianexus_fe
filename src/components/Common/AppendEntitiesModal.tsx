@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Table, Button, List, Input, Space, Card } from 'antd';
+import { Modal, Form, Table, Button, List, Input, Card } from 'antd';
 import { Key, RowSelectMethod, TableRowSelection } from "antd/es/table/interface";
 
 import PaginationComponent from "./PaginationComponent";
-import FirstLine from "./FirstLineMD";
+import FirstLineMD from "./FirstLineMD";
 
 interface AppendEntitiesModalProps {
     title?: React.ReactNode;
@@ -94,7 +94,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             render: (text: string, record: EntityModalDataModel) => 
                 renderItem ? 
                     renderItem(record, selectedEntities.some(e => e.id === record.id), () => handleAddFromSearch(record)) : 
-                    <FirstLine content={text} />,
+                    <FirstLineMD content={text} />,
         },
         {
             title: 'Action',
@@ -187,7 +187,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                                     extra={[<Button type="link" danger onClick={() => handleRemoveEntity(entity.id)}>Rem</Button>]}>
                                     {renderItem ? 
                                         renderItem(entity, true, () => {}) : 
-                                        <FirstLine content={content} showName={title} />
+                                        <FirstLineMD content={content} showName={title} />
                                     }
                                 </Card>
                             </List.Item>
