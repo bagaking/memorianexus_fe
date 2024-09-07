@@ -1,0 +1,54 @@
+@import './variables.less';
+
+.in-page-control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: @spacing-md @spacing-md; /* 居中并设置底部间距 */
+    
+    width: calc(100% - @padding-md * 2); /* 使其占满可用宽度 */
+    height: fit-content;
+    padding: @padding-xs @padding-lg; /* 减小上下内边距 */
+
+    background: rgba(255, 255, 255, 0.3); /* 使用灰色调的亮色 */
+    border-radius: @border-radius-lg;
+    box-shadow: 0 4px 20px #AAA3; /* 增强阴影效果，增加立体感 */
+
+    backdrop-filter: blur(10px); /* 添加模糊效果，增强层次感 */
+    position: relative; /* 为伪元素定位 */
+
+    // 添加背景动画
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(254, 234, 234, 0.2), rgba(255, 255, 255, 0.1));
+        opacity: 0.5;
+        animation: backgroundAnimation 5s infinite alternate; /* 背景动画 */
+        border-radius: @border-radius-lg; /* 保持圆角 */
+        z-index: 0; /* 确保在内容下方 */
+    }
+
+    .control-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: @spacing-md; /* 控件之间的间距 */
+        position: relative; /* 确保内容在伪元素之上 */
+        z-index: 1; /* 确保内容在伪元素之上 */
+    }
+}
+
+// 背景动画关键帧
+@keyframes backgroundAnimation {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.05); /* 轻微放大效果 */
+    }
+}

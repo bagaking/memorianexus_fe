@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { message, Button, Row, Col } from 'antd';
+import { message, Row, Col } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getBooks, deleteBook } from '../../api/books';
@@ -7,8 +7,11 @@ import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
 import PaginationComponent from '../Common/PaginationComponent';
 import { Book } from "../../api";
+import InPageControlPanel from '../Common/InPageControlPanel'; // 导入 InPageControlPanel
+import GradientButton from '../Common/GradientButton'; // 导入 GradientButton
 import '../Common/CommonStyles.css';
 import './BookList.less';
+import { PlusCircleFilled } from '@ant-design/icons';
 
 const BookList: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
@@ -50,7 +53,6 @@ const BookList: React.FC = () => {
     useEffect(() => {
         fetchBooks(currentPage, limit);
     }, [currentPage, limit]);
- 
 
     const handleBookClick = (bookId: string) => {
         setFlippedBooks(prev => {
@@ -123,11 +125,11 @@ const BookList: React.FC = () => {
                                 </div>
                                 <div className="book-actions">
                                     <Link to={`/books/${book.id}`} state={{page:currentPage, limit}} onClick={(e) => e.stopPropagation()}>
-                                        <Button type="primary" size="middle" className="details-button">详情</Button>
+                                        <GradientButton type="primary" size="middle" className="details-button">详情</GradientButton>
                                     </Link>
-                                    <Button type="primary" danger size="small" onClick={(e) => showDeleteModal(book, e)}>
+                                    <GradientButton type="primary" danger size="small" onClick={(e) => showDeleteModal(book, e)}>
                                         删除
-                                    </Button>
+                                    </GradientButton>
                                 </div>
                             </div>
                         </div>
@@ -141,29 +143,29 @@ const BookList: React.FC = () => {
         <PageLayout title="我的书架" icon="/layout/book_icon.png">
             <div className="bookshelf-page">
                 <div className="bookshelf-container">
+                    <InPageControlPanel>
+                        <Link to={`/books/new`} state={{page: currentPage, limit}}>
+                            <GradientButton 
+                             icon={<PlusCircleFilled />}
+                             startColor="#88d3ce"
+                             endColor="#6e45e2" 
+                             animation="shine"
+                             animationDuration="0.8s"
+                            type="primary">添加新书</GradientButton>
+                        </Link>
+                        <PaginationComponent
+                            currentPage={currentPage}
+                            totalItems={totalBooks}
+                            pageDataLength={books.length}
+                            limit={limit}
+                            onPageChange={handlePageChange}
+                            onLimitChange={handleLimitChange}
+                        />
+                    </InPageControlPanel>
                     {renderBookshelf()}
                 </div>
-                <div className="bookshelf-footer">
-                    <Row justify="space-between" align="middle">
-                        <Col>
-                            <PaginationComponent
-                                currentPage={currentPage}
-                                totalItems={totalBooks}
-                                pageDataLength={books.length}
-                                limit={limit}
-                                onPageChange={handlePageChange}
-                                onLimitChange={handleLimitChange}
-                            />
-                        </Col>
-                        <Col>
-                            <Link to={`/books/new`} state={{page: currentPage, limit}}>
-                                <Button type="primary" className="create-new-one-button">添加新书</Button>
-                            </Link>
-                        </Col>
-                    </Row>
-                </div>
+                <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
             </div>
-            <DeleteModal visible={deleteModalVisible} onConfirm={handleDelete} onCancel={() => setDeleteModalVisible(false)} />
         </PageLayout>
     );
 };

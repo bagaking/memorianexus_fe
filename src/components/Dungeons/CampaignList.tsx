@@ -5,6 +5,7 @@ import { PlusOutlined, DeleteOutlined, InfoCircleOutlined, RocketOutlined, BugOu
 import { getDungeons, deleteDungeon } from '../../api/dungeons';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
+import InPageControlPanel from '../Common/InPageControlPanel'; // 导入新组件
 import PaginationComponent from '../Common/PaginationComponent';
 import { useIsMobile } from '../../hooks/useWindowSize';
 import GradientButton from '../Common/GradientButton';
@@ -176,31 +177,29 @@ const CampaignList: React.FC = () => {
             fullWidthContent={true}
         >
             <div className="campaign-list-container">
-                <div className="campaign-controller">
-                    <div className="controller-content">
-                        <GradientButton 
-                            type="primary" 
-                            icon={<PlusOutlined />}
-                            onClick={() => navigate('/campaigns/new')}
-                            startColor="#88d3ce"
-                            endColor="#6e45e2" 
-                            hoverStartColor="#5a36c7"
-                            hoverEndColor="#7ac7c0"
-                            animation="shine"
-                            animationDuration="0.8s"
-                        >
-                            创建新战役
-                        </GradientButton>
-                        <PaginationComponent
-                            currentPage={currentPage}
-                            totalItems={totalDungeons}
-                            limit={limit}
-                            pageDataLength={dungeons.length}
-                            onPageChange={handlePageChange}
-                            onLimitChange={handleLimitChange}
-                        />
-                    </div>
-                </div>
+                <InPageControlPanel>
+                    <GradientButton 
+                        type="primary" 
+                        icon={<PlusOutlined />}
+                        onClick={() => navigate('/campaigns/new')}
+                        startColor="#88d3ce"
+                        endColor="#6e45e2" 
+                        hoverStartColor="#5a36c7"
+                        hoverEndColor="#7ac7c0"
+                        animation="shine"
+                        animationDuration="0.8s"
+                    >
+                        创建新战役
+                    </GradientButton>
+                    <PaginationComponent
+                        currentPage={currentPage}
+                        totalItems={totalDungeons}
+                        limit={limit}
+                        pageDataLength={dungeons.length}
+                        onPageChange={handlePageChange}
+                        onLimitChange={handleLimitChange}
+                    />
+                </InPageControlPanel>
                 <div className="campaign-list">
                     {dungeons.map(dungeon => (
                         <DungeonCard key={dungeon.id} dungeon={dungeon} />
