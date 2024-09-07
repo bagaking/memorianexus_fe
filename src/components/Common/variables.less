@@ -18,13 +18,29 @@
 // 颜色系统
 // -----------------------------
 
-// background
-@color-primary-dark: #2c0052;
-@color-primary-light: #5a0099;
+// main background
+@color-primary-dark: #3e1a78; // 深紫色，显得更优雅
+@color-primary-light: #7a3e9d; // 浅紫色，增加层次感
+@color-primary: #5c2b8a; // 中间紫色，提升视觉吸引力
+@color-secondary-color: #6a1b9a; // 较深的紫色，增加对比度
 
-@color-secondary-color: #4a00e0;
+// page background
+@page-background-color: #f7f9fc; // 更柔和的背景色，提升整体优雅感
+@page-text-color: #444; // 更深的文本颜色，增强可读性
 
+// banner background
+@color-banner-primary: @color-primary; // 使用主色作为 Banner 颜色
+@color-banner-primary-light: lighten(@color-banner-primary, 10%); // 轻微变亮的 Banner 颜色
 
+// react-colorful
+@color-success: #4CAF50; // 深绿色，代表成功
+@color-warning: #FFC107; // 金色，代表警告
+@color-error: #F44336; // 深红色，代表错误
+@color-danger: #D32F2F; // 深红色，代表危险
+@color-gradient-success: linear-gradient(135deg, #4CAF50, #81C784); // 成功渐变
+@color-gradient-warning: linear-gradient(135deg, #FFC107, #FFB300); // 警告渐变
+@color-gradient-error: linear-gradient(135deg, #F44336, #EF5350); // 错误渐变
+@color-gradient-danger: linear-gradient(135deg, #D32F2F, #E57373); // 危险渐变
 
 // text
 @color-text-light: #f0e6ff;
@@ -32,11 +48,12 @@
 @color-text-secondary: #c0c0c0;
 @color-white: #ffffff;
 
-@color-banner-primary: #4a00e0;
-@color-banner-primary-light: #8e2de2;
+// card
+@color-card-border: #e6e6fa;
 
-@page-background-color: #f0f2f5;
-@page-text-color: #333;
+
+
+
 
 
 // 添加这行
@@ -63,6 +80,7 @@
 
 @font-weight-normal: 400;
 @font-weight-medium: 500;
+@font-weight-bold: 700;
 
 
 
@@ -88,12 +106,17 @@
 @margin-lg: @spacing-lg;
 @margin-xl: @spacing-xl;
 
+
 // 边框和阴影
 // -----------------------------
-@border-radius-large: 20px;
-@border-radius-base: 4px;
+
+
 @border-radius-sm: 2px;
+@border-radius-md: 4px;
 @border-radius-lg: 8px;
+
+@border-radius-large: 20px;
+
 @box-shadow-navbar: 0 1px 3px rgba(0, 0, 0, 0.1);
 
 // 动画
