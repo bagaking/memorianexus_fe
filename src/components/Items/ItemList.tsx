@@ -4,7 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getItems, deleteItem } from '../../api/items';
 import { PageLayout } from '../Layout/PageLayout';
 import { DeleteModal } from '../Common/DeleteModal';
-import PaginationComponent from '../Common/PaginationComponent';
 import ItemUpload from './ItemUpload';
 import { useIsMobile } from '../../hooks/useWindowSize';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
@@ -16,6 +15,8 @@ import { Tag as AntdTag } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
 import ItemTable from '../Basic/ItemTable';
 import GradientButton from '../Common/GradientButton';
+import InPageControlPanel from '../Common/InPageControlPanel'; // 导入 InPageControlPanel
+import PaginationComponent from '../Common/PaginationComponent'; // 导入 PaginationComponent
 
 import '../Common/CommonStyles.css';
 import './ItemList.less';
@@ -110,8 +111,6 @@ const ItemList: React.FC = () => {
         <Row gutter={[8, 8]}>
             {items.map(item => (
                 <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.id}>
-
-        {/* <ItemCard item={item} onClick={onSelect} selected={selected} showPreview={true} showActions={false} indentHeadings={false} /> */}
                     <ItemCard 
                         item={item}
                         showDeleteModal={showDeleteModal}
@@ -195,11 +194,9 @@ const ItemList: React.FC = () => {
     );
 
     const ActionButtons: React.FC = () => (
-        <Row gutter={[16, 16]} justify={isMobile ? 'center' : 'end'} style={{ marginBottom: 24 }}>
-            <Col>
-                <ItemUpload
-                    onUploadSuccess={() => fetchItems(currentPage, limit)}
-                >
+        <InPageControlPanel>
+            <div className="left-items">
+                <ItemUpload onUploadSuccess={() => fetchItems(currentPage, limit)}>
                     <GradientButton 
                         icon={<UploadOutlined />}
                         startColor="#88d3ce"
@@ -210,8 +207,6 @@ const ItemList: React.FC = () => {
                         上传词条本
                     </GradientButton>
                 </ItemUpload>
-            </Col>
-            <Col>
                 <Link to="/items/new">
                     <GradientButton  
                         icon={<PlusOutlined />}
@@ -223,8 +218,18 @@ const ItemList: React.FC = () => {
                         创建新词条
                     </GradientButton>
                 </Link>
-            </Col>
-        </Row>
+            </div>
+            <div className="right-item">
+                <PaginationComponent
+                    currentPage={currentPage}
+                    totalItems={totalItems}
+                    limit={limit}
+                    pageDataLength={items.length}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                />
+            </div>
+        </InPageControlPanel>
     );
 
     return (
@@ -245,14 +250,6 @@ const ItemList: React.FC = () => {
                         })}
                     />
                 )}
-                <PaginationComponent
-                    currentPage={currentPage}
-                    totalItems={totalItems}
-                    limit={limit}
-                    pageDataLength={items.length}
-                    onPageChange={handlePageChange}
-                    onLimitChange={handleLimitChange}
-                />
             </div>
             <DeleteModal 
                 visible={deleteModalVisible} 

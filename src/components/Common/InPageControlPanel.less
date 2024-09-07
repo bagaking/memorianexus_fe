@@ -2,7 +2,7 @@
 
 .in-page-control-panel {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* 默认左右分列 */
     align-items: center;
     margin: @spacing-md @spacing-md; /* 居中并设置底部间距 */
     
@@ -12,7 +12,8 @@
 
     background: rgba(255, 255, 255, 0.3); /* 使用灰色调的亮色 */
     border-radius: @border-radius-lg;
-    box-shadow: 0 4px 20px #AAA3; /* 增强阴影效果，增加立体感 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* 增强阴影效果，增加立体感 */
+    z-index: @z-index-in-page-control-panel; /* 设置 z-index */
 
     backdrop-filter: blur(10px); /* 添加模糊效果，增强层次感 */
     position: relative; /* 为伪元素定位 */
@@ -29,17 +30,34 @@
         opacity: 0.5;
         animation: backgroundAnimation 5s infinite alternate; /* 背景动画 */
         border-radius: @border-radius-lg; /* 保持圆角 */
-        z-index: 0; /* 确保在内容下方 */
+        z-index: -1; /* 确保在内容下方 */
     }
 
     .control-content {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-between; /* 默认左右分列 */
         align-items: center;
         width: 100%;
         gap: @spacing-md; /* 控件之间的间距 */
         position: relative; /* 确保内容在伪元素之上 */
         z-index: 1; /* 确保内容在伪元素之上 */
+
+        // 响应式设计
+        @media (max-width: @screen-md) {
+            flex-direction: column; /* 在小屏幕上垂直排列 */
+            align-items: flex-start; /* 左对齐 */
+        }
+ 
+        .left-items {
+            display: flex;
+            flex: 1; /* 左侧两项占满空间 */
+            justify-content: flex-start; /* 左侧两项左对齐 */
+            gap: @spacing-md; /* 左侧项之间的间距 */
+        }
+        .right-item {
+            margin-left: auto; /* 右侧项自动对齐 */
+        }
+        
     }
 }
 
