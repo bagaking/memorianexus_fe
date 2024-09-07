@@ -12,13 +12,14 @@ const rotate = keyframes`
     100% { transform: rotate(360deg); }
 `;
 
-const Button = styled.button<{ $isRecording: boolean }>`
+const Button = styled.button<{ $isRecording: boolean; $shape: 'circle' | 'rounded' }>`
     background: linear-gradient(135deg, #007aff, #0051a8);
     color: white;
     border: none;
-    border-radius: 50%;
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,6 +28,11 @@ const Button = styled.button<{ $isRecording: boolean }>`
     animation: ${props => props.$isRecording ? css`${rotate} 1s linear infinite` : 'none'};
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+
+    ${props => props.$shape === 'circle' 
+        ? css`border-radius: 50%;` 
+        : css`border-radius: 10px;`
+    }
 
     &:hover {
         background: linear-gradient(135deg, #0051a8, #003d7a);
@@ -45,20 +51,41 @@ const Button = styled.button<{ $isRecording: boolean }>`
     @media (max-width: 768px) {
         width: 40px;
         height: 40px;
+        min-width: 40px;
+        min-height: 40px;
     }
 `;
 
-const Container = styled.div<{ position: 'left' | 'right' }>`
+const Container = styled.div<{ position: 'left' | 'right' | 'bottom' }>`
     position: fixed;
-    bottom: 20px;
-    ${props => props.position}: 20px;
     z-index: 1000;
     cursor: move;
 
+    ${props => {
+        switch (props.position) {
+            case 'left':
+                return css`
+                    left: 20px;
+                    bottom: 20px;
+                `;
+            case 'right':
+                return css`
+                    right: 20px;
+                    bottom: 20px;
+                `;
+            case 'bottom':
+                return css`
+                    left: 50%;
+                    bottom: 20px;
+                    transform: translateX(-50%);
+                `;
+        }
+    }}
+
     @media (max-width: 768px) {
         left: 50%;
+        bottom: 20px;
         transform: translateX(-50%);
-        ${props => props.position}: auto;
     }
 `;
 
@@ -67,9 +94,10 @@ interface RecordButtonProps {
     onAudioStop: (audioBlob: Blob) => void;
     onTranscript?: (transcript: string) => void;
     onError?: (error: string) => void;
-    position: 'left' | 'right';
+    position: 'left' | 'right' | 'bottom';
+    shape?: 'circle' | 'rounded';
     dragBounds?: { top: number, right: number, bottom: number, left: number };
-    playAfterRecording?: boolean; // 新增参数
+    playAfterRecording?: boolean;
 }
 
 const RecordButton: React.FC<RecordButtonProps> = ({ 
@@ -77,9 +105,10 @@ const RecordButton: React.FC<RecordButtonProps> = ({
     onAudioStop, 
     onTranscript, 
     position, 
+    shape = 'circle',
     onError, 
     dragBounds,
-    playAfterRecording = false // 默认为 false
+    playAfterRecording = false
 }) => {
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -95,7 +124,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({
     };
 
     const playAudio = (audioBlob: Blob) => {
-        if (!playAfterRecording) return; // 如果 playAfterRecording 为 false，则不播放
+        if (!playAfterRecording) return;
 
         console.log('playAudio');
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -110,7 +139,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({
         });
     };
 
-    const initializeTranscription = () => { // 用浏览器默认的识别，不太行，还是考虑用第三方服务的 ASR
+    const initializeTranscription = () => {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         if (!SpeechRecognition) {
             console.error('浏览器不支持语音识别');
@@ -170,7 +199,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({
                 onRecord(false);
 
                 onAudioStop(audioBlob);
-                playAudio(audioBlob); // 这里会根据 playAfterRecording 参数决定是否播放
+                playAudio(audioBlob);
 
                 if (newRecognition) {
                     newRecognition.stop();
@@ -233,7 +262,11 @@ const RecordButton: React.FC<RecordButtonProps> = ({
             position={position}
             onMouseDown={handleMouseDown}
         >
-            <Button $isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording}>
+            <Button 
+                $isRecording={isRecording} 
+                $shape={shape}
+                onClick={isRecording ? stopRecording : startRecording}
+            >
                 {isRecording ? <FaStop size={24} /> : <FaMicrophone size={24} />}
             </Button>
         </Container>

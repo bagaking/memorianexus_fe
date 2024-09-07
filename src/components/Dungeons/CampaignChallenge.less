@@ -51,7 +51,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start; // 改为 flex-start，让内容从顶部开始
     padding: @spacing-xl;
     max-width: 1200px;
     margin: 0 auto;
@@ -79,7 +79,8 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: @border-radius-lg;
     position: relative;
-    overflow: visible; // 允许卡片溢出
+    overflow: visible;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3); // 添加上方阴影，增强桌面感
 }
 
 // 技能卡片
@@ -89,7 +90,7 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: @border-radius-lg;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, transform 0.1s ease; // 添加更快的transform过渡
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     position: relative; // 为了让 z-index 生效
     z-index: 1; // 默认 z-index
@@ -98,6 +99,10 @@
         transform: translateY(-15px) scale(1.05);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 107, 0, 0.6);
         z-index: 2; // 悬停时提高 z-index
+    }
+
+    &:active {
+        transform: translateY(5px) scale(0.95); // 添加按下效果
     }
 
     .skill-card-content {
@@ -146,6 +151,12 @@
 }
 
 @media (max-width: @screen-sm) { 
+
+    .campaign-challenge-content {
+        padding-bottom: calc(@campaign-skills-container-height + 20px); // 为技能容器留出空间
+        overflow-y: auto; // 允许内容滚动
+    }
+    
     .challenge-title {
         font-size: 2rem;
         margin-bottom: @spacing-md;
@@ -158,11 +169,12 @@
         right: 0;
         flex-wrap: nowrap;
         overflow-x: auto;
-        justify-content: flex-start;
+        justify-content: center; // 居中显示技能卡片
         padding: @spacing-xs;
         background: rgba(0, 0, 0, 0.5); // 半透明背景
         margin: 0; // 移除边距
-        height: @campaign-skills-container-height; // 使用预定义的高度变量
+        height: @campaign-skills-container-height-mobile; // 使用预定义的高度变量
+        
 
         &::-webkit-scrollbar {
             display: none;
@@ -222,15 +234,61 @@
 
 // 针对录音按钮的样式
 .record-button-container {
-    position: fixed;
-    bottom: calc(@campaign-skills-container-height + 20px); // 调整位置以避免与技能容器重叠
-    right: 20px;
     z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @media (min-width: @screen-md) {
+        position: static;
+        margin-left: 20px;
+    }
+
+    @media (max-width: @screen-md) {
+        position: fixed;
+        right: 20px;
+        bottom: calc(@campaign-skills-container-height + 20px);
+    }
 }
 
 // 为小屏幕调整
 @media (max-width: @screen-md) {
     .campaign-challenge-content {
         max-width: 95vw;
+    }
+
+    .skills-and-record-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .skills-container {
+        width: 100%;
+    }
+}
+
+// 新增：PC 上技能容器和录音按钮的布局调整
+@media (min-width: @screen-md) {
+    .campaign-challenge-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .skills-and-record-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .skills-container {
+        margin-right: 20px;
+    }
+
+    .record-button-container {
+        align-self: flex-end;
     }
 }

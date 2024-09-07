@@ -150,13 +150,12 @@ const CampaignChallenge: React.FC = () => {
     return (
         <PageLayout 
             title={<AnimatedTitle>{`${campaignName || "Campaign Challenge"}`}</AnimatedTitle>}
-            // backUrl={`/campaigns`} 
             icon="/layout/campaign_dungeon_icon.png"
             enableShrink={true}
             fullWidthContent={true}
         >
             <div className="campaign-challenge-container">
-                <CDNImage  className="campaign-challenge-background" src="/battlefield/battlefield_01.png" alt="战场背景"/>
+                <CDNImage className="campaign-challenge-background" src="/battlefield/battlefield_01.png" alt="战场背景"/>
                 <div className="campaign-challenge-content" ref={contentRef}>
                     <MonsterCarousel
                         monsters={monsters}
@@ -168,24 +167,37 @@ const CampaignChallenge: React.FC = () => {
                         onCardChange={handleCardChange}
                         ref={carouselRef}
                     />
-                    <div className={`skills-container ${isMobile ? 'mobile' : ''}`}>
-                        {skillCards.map((card, index) => (
-                            <SkillCard
-                                key={index}
-                                icon={card.icon}
-                                onClick={() => handleAttackResult(card.resultType as PracticeResultEnum)}
-                                resultType={card.resultType}
-                                title={card.title}
-                                backgroundImage={card.backgroundImage}
+                    <div className="skills-and-record-container">
+                        <div className={`skills-container ${isMobile ? 'mobile' : ''}`}>
+                            {skillCards.map((card, index) => (
+                                <SkillCard
+                                    key={index}
+                                    icon={card.icon}
+                                    onClick={() => handleAttackResult(card.resultType as PracticeResultEnum)}
+                                    resultType={card.resultType}
+                                    title={card.title}
+                                    backgroundImage={card.backgroundImage}
+                                />
+                            ))}
+                        </div>
+                        {!isMobile && (
+                            <RecordButton 
+                                onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
+                                onAudioStop={handleAudioStop} 
+                                position="right"
+                                shape="rounded"
                             />
-                        ))}
+                        )}
                     </div>
+                </div>
+                {isMobile && (
                     <RecordButton 
                         onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
                         onAudioStop={handleAudioStop} 
-                        position="right" 
+                        position="bottom"
+                        shape="circle"
                     />
-                </div>
+                )}
             </div>
         </PageLayout>
     );
