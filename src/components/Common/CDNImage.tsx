@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 
 // CDN 加速域名
 const CDN_DOMAIN = 'http://memnexus-img.kenv.tech';
 
 // 判断是否为测试环境
 const isTestEnvironment = (): boolean => {
-//   return false // 用于测试 CDN
   return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 };
+
+type AlignDirection = 'top' | 'bottom' | 'left' | 'right';
 
 interface CDNImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   fallbackSrcs?: string[];
+  align?: AlignDirection;
 }
 
-const CDNImage: React.FC<CDNImageProps> = ({ src, alt, fallbackSrcs = [], ...props }) => {
+const CDNImage: React.FC<CDNImageProps> = ({ src, alt, fallbackSrcs = [], align = 'top', style, ...props }) => {
   const [currentSrc, setCurrentSrc] = useState<string>(src);
   const [fallbackIndex, setFallbackIndex] = useState<number>(-1);
 
@@ -55,7 +57,31 @@ const CDNImage: React.FC<CDNImageProps> = ({ src, alt, fallbackSrcs = [], ...pro
     }
   }, [fallbackIndex, fallbackSrcs, src]);
 
-  return <img src={currentSrc} alt={alt} onError={handleImageError} {...props} />;
+  const getAlignStyles = (): CSSProperties => {
+    const baseStyles: CSSProperties = {
+      objectFit: 'cover',
+    };
+
+    switch (align) {
+      case 'top':
+        return { ...baseStyles, objectPosition: 'center top' };
+      case 'bottom':
+        return { ...baseStyles, objectPosition: 'center bottom' };
+      case 'left':
+        return { ...baseStyles, objectPosition: 'left center' };
+      case 'right':
+        return { ...baseStyles, objectPosition: 'right center' };
+      default:
+        return baseStyles;
+    }
+  };
+
+  const combinedStyles: CSSProperties = {
+    ...getAlignStyles(),
+    ...style,
+  };
+
+  return <img src={currentSrc} alt={alt} onError={handleImageError} style={combinedStyles} {...props} />;
 };
 
 export default CDNImage;

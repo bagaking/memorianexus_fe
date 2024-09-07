@@ -169,43 +169,42 @@ const CampaignList: React.FC = () => {
         </Card>
     );
 
- 
     return (
         <PageLayout 
             title="史诗战役" 
             icon="/layout/campaign_dungeon_icon.png" 
+            fullWidthContent={true}
         >
-           
-            <div  className="campaign-list-container">
-                <div className="campaign-list-header">
-                    <GradientButton 
-                        type="primary" 
-                        icon={<PlusOutlined />}
-                        onClick={() => navigate('/campaigns/new')}
-                        startColor="#88d3ce"
-                        endColor="#6e45e2" 
-                        hoverStartColor="#5a36c7"
-                        hoverEndColor="#7ac7c0"
-                        animation="shine"
-                        animationDuration="0.8s"
-                    >
-                        创建新战役
-                    </GradientButton>
+            <div className="campaign-list-container">
+                <div className="campaign-controller">
+                    <div className="controller-content">
+                        <GradientButton 
+                            type="primary" 
+                            icon={<PlusOutlined />}
+                            onClick={() => navigate('/campaigns/new')}
+                            startColor="#88d3ce"
+                            endColor="#6e45e2" 
+                            hoverStartColor="#5a36c7"
+                            hoverEndColor="#7ac7c0"
+                            animation="shine"
+                            animationDuration="0.8s"
+                        >
+                            创建新战役
+                        </GradientButton>
+                        <PaginationComponent
+                            currentPage={currentPage}
+                            totalItems={totalDungeons}
+                            limit={limit}
+                            pageDataLength={dungeons.length}
+                            onPageChange={handlePageChange}
+                            onLimitChange={handleLimitChange}
+                        />
+                    </div>
                 </div>
                 <div className="campaign-list">
                     {dungeons.map(dungeon => (
                         <DungeonCard key={dungeon.id} dungeon={dungeon} />
                     ))}
-                </div>
-                <div className="campaign-list-footer">
-                    <PaginationComponent
-                        currentPage={currentPage}
-                        totalItems={totalDungeons}
-                        limit={limit}
-                        pageDataLength={dungeons.length}
-                        onPageChange={handlePageChange}
-                        onLimitChange={handleLimitChange}
-                    />
                 </div>
             </div>
             <DeleteModal 

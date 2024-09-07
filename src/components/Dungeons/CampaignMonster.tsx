@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Avatar } from 'antd';
 import { PageLayout } from '../Layout/PageLayout';
-import {DungeonMonster} from "../../api/_dto";
+import {DungeonMonster, Item} from "../../api/_dto";
 import EmbedItemPack from "../Basic/EmbedItemPack";
 import {addDungeonItems, getItems, getCampaignMonsters, removeDungeonItems} from "../../api";
 import MonsterCard from "./MonsterCard";
@@ -106,7 +106,7 @@ const DungeonMonsters: React.FC = () => {
             // backUrl={`/campaigns`} 
             icon="/layout/campaign_dungeon_icon.png">
 
-            <EmbedItemPack<DungeonMonster>
+            <EmbedItemPack<DungeonMonster, Item>
                 fetchItems={fetchItems}
 
                 fetchItemsToAdd={fetchItemsToAdd}

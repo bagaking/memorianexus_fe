@@ -99,7 +99,7 @@ const BookItemList: React.FC<ItemListProps> = ({ bookId }) => {
     // ), [itemsColumns]);
 
     return (
-        <EmbedItemPack<Item>
+        <EmbedItemPack<Item, Item>
             fetchItems={fetchItems}
             fetchItemsToAdd={fetchItemsToAdd}
             enableSearchWhenAdd={true}

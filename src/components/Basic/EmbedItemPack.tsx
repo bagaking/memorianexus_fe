@@ -7,14 +7,15 @@ import { ListGridType } from "antd/es/list";
 import { useWindowSize } from '../../hooks/useWindowSize';
 import styled, { keyframes, css } from 'styled-components';
 import ItemTable from './ItemTable';
+import { Item } from '../../api';
 
-interface EmbedItemPackProps<T> {
+interface EmbedItemPackProps<T, TAdd> {
     fetchItems: (page: number, limit: number) => Promise<{ entities: T[], total: number, offset?: number, limit?: number, error?: string }>;
 
     // for mod items
     deleteItems?: (entityIds: string[]) => Promise<void>;
 
-    fetchItemsToAdd: (page: number, limit: number, search?: string) => Promise<{ entities: T[], total: number, offset?: number, limit?: number }>;
+    fetchItemsToAdd: (page: number, limit: number, search?: string) => Promise<{ entities: TAdd[], total: number, offset?: number, limit?: number }>;
     enableSearchWhenAdd?: boolean
     addItems?: (entityIds: string[]) => Promise<void>;
 
@@ -186,7 +187,7 @@ const StyledPagination = styled(PaginationComponent)`
   }
 `;
 
-const EmbedItemPack = <T extends Record<string, any>>({
+const EmbedItemPack = <T extends Record<string, any>, TAdd extends Item>({
     fetchItems,
     fetchItemsToAdd,
     enableSearchWhenAdd,
@@ -197,7 +198,7 @@ const EmbedItemPack = <T extends Record<string, any>>({
     rowKey,
     grid,
     customControlPanel,
-}: EmbedItemPackProps<T>) => {
+}: EmbedItemPackProps<T, TAdd>) => {
     const [items, setItems] = useState<T[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(true);

@@ -22,7 +22,7 @@ const ItemUpload: React.FC<ItemUploadProps> = ({ onUploadSuccess, children }) =>
         setLoading(true);
         try {
             const response = await uploadItems(file, { book_id: selectedBookId || undefined });
-            message.success(`Successfully uploaded ${response.data.data.length} items`);
+            message.success(`Successfully uploaded ${response.data.data?.length || 0} items`);
             onUploadSuccess(); // 调用上传成功后的回调函数
         } catch (error) {
             console.error(error);

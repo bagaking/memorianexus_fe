@@ -195,7 +195,7 @@ export type RespBookRemoveItems = RespSuccess<BookItem[]>;
 
 export type RespItemGet = RespSuccess<Item>;
 export type RespItemDelete = RespSuccess<Item>;
-export type RespItemCreate = RespSuccess<Item>;
+export type RespItemCreate = RespSuccess<Item[]>;
 export type RespItemUpdate = RespSuccess<Item>;
 export type RespItemList = RespSuccessPage<Item>;
 

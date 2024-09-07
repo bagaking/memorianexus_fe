@@ -198,7 +198,9 @@ const CampaignDetail: React.FC = () => {
     }
 
     return (
-        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} icon="/layout/campaign_dungeon_icon.png">
+        <PageLayout title={(id && id !== 'new') ? `Edit Campaign (id: ${id})` : 'Create Campaign'} 
+            icon="/layout/campaign_dungeon_icon.png" 
+        >
             <div className="campaign-progress">
                 <h2>Campaign Progress</h2>
                 <Progress 
@@ -242,7 +244,7 @@ const CampaignDetail: React.FC = () => {
                 {(id && id !== 'new') ? (
                     <div className="campaign-items-container">
                         <h2>Campaign Items</h2>
-                        <EmbedItemPack<DungeonMonster>
+                        <EmbedItemPack<DungeonMonster, Item>
                             fetchItems={fetchItems}
                             fetchItemsToAdd={fetchEntities}
                             enableSearchWhenAdd={true}

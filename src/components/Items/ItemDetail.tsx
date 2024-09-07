@@ -28,8 +28,12 @@ const ItemDetail: React.FC = () => {
                 if (id && id !== "new") {
                     const response = await getItemById(id);
                     const data = response.data.data;
-                    setItem(data);
-                    form.setFieldsValue(data);
+                    if (data) {
+                        setItem(data);
+                        form.setFieldsValue(data);
+                    } else {
+                        message.error('未能获取到有效的条目数据');
+                    }
                 } else {
                     setItem(DEFAULT_ITEM);
                     form.resetFields();
