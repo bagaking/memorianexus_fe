@@ -1,57 +1,161 @@
-@primary-color: #FFD700;  // 金色
-@text-color: #000000;  // 黑色文字
-@shadow-color: rgba(0, 0, 0, 0.2);  // 轻微阴影
+@import './variables.less';
+
+@gold-color: #FFD700;
+@dark-gold: #B8860B;
+@light-gold: #FFFACD;
+
+.reward-container {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: @z-index-notification;
+}
 
 .custom-reward-message {
-  padding: 10px 15px;
-  background-color: @primary-color;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px @shadow-color;
-  animation: appear 0.3s ease-out;
-  max-width: 300px;
+  padding: @padding-sm @padding-sm;
   margin: 0 auto;
+
+  background: linear-gradient(135deg, @dark-gold, @gold-color, @light-gold);
+  border-radius: @border-radius-lg;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.4);
+  animation: appear 0.5s @transition-timing-function, glow 2s ease-in-out infinite alternate;
+  max-width: 400px;
+  border: 2px solid @light-gold;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .reward-message {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: @text-color;
+  font-size: @font-size-lg;
+  color: @color-text-light;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
 }
 
 .reward-icon {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
+  width: 36px;
+  height: 36px;
+  margin-right: @margin-md;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .reward-amount {
-  font-weight: bold;
+  font-weight: @font-weight-bold;
+  font-size: @font-size-xxl;
+  color: @color-white;
+  text-shadow: 2px 2px 4px rgba(41, 32, 21, 0.6);
+  animation: bounce 0.5s @transition-timing-function;
+}
+
+.reward-details {
+  font-size: @font-size-md;
+  color: @dark-gold;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  margin-top: @margin-sm;
+}
+
+.light-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 60deg,
+    rgba(255, 255, 255, 0.1) 60deg 120deg,
+    transparent 120deg 180deg,
+    rgba(255, 255, 255, 0.1) 180deg 240deg,
+    transparent 240deg 300deg,
+    rgba(255, 255, 255, 0.1) 300deg 360deg
+  );
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: rotate-beams 20s linear infinite;
+  z-index: 1;
 }
 
 @keyframes appear {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(-50px) scale(0.9);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes disappear {
   from {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0.8);
+    transform: translateY(50px) scale(0.9);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.4);
+  }
+  to {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 0 80px rgba(255, 215, 0, 0.6);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-15px);
+  }
+  60% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes rotate-beams {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
 .custom-reward-message-leave {
-  animation: disappear 0.3s ease-in forwards;
+  animation: disappear 1s @transition-timing-function forwards;
 }
+
+// 响应式设计
+.responsive-max(@screen-md, {
+  .custom-reward-message {
+    max-width: 94%;
+    padding: @padding-sm @padding-sm;
+  }
+
+  .reward-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .reward-amount {
+    font-size: @font-size-lg;
+  }
+
+  .reward-details {
+    font-size: @font-size-sm;
+  }
+});

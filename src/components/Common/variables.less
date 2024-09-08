@@ -142,7 +142,7 @@
 @z-index-8: 800;
 @z-index-9: 900;
 @z-index-10: 1000;
-@z-index-11: 1100;
+@z-index-max: 9999;
 
 // 语义化 z-index
 @z-index-background: @z-index-zero;
@@ -155,7 +155,7 @@
 @z-index-modal: @z-index-7;
 @z-index-popover: @z-index-8;
 @z-index-tooltip: @z-index-9;
-@z-index-notification: @z-index-10;
+@z-index-notification: @z-index-max;
 
 // 特定布局 z-index
 @z-index-navbar: @z-index-fixed;
@@ -215,6 +215,28 @@
 @campaign-skills-container-height: 148px;
 @campaign-skills-container-height-mobile: 128px;
 
+
+// 响应式断点
+// -----------------------------
+@screen-xs: 480px;
+@screen-sm: 576px;
+@screen-md: 768px;
+@screen-lg: 992px;
+@screen-xl: 1200px;
+@screen-xxl: 1600px;
+
+// Transition 动画
+// -----------------------------
+@transition-timing-function-cubic-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+@transition-timing-function: @transition-timing-function-cubic-bezier;
+
+// Keyframes 动画
+// -----------------------------
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 // 混合
 // -----------------------------
 .flex-center() {
@@ -222,21 +244,7 @@
   align-items: center;
 }
 
-// 动画
-// -----------------------------
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-// 响应式断点
-@screen-xs: 480px;
-@screen-sm: 576px;
-@screen-md: 768px;
-
-@screen-lg: 992px;
-@screen-xl: 1200px;
-@screen-xxl: 1600px;
 
 // 你可能还想添加一些常用的媒体查询混合，例如：
 .responsive(@minWidth, @rules) {
