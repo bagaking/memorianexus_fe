@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import CDNImage from '../Common/CDNImage';
 import { useParams } from 'react-router-dom';
 import { message } from 'antd';
@@ -13,7 +13,9 @@ import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 import { useIsMobile } from '../../hooks/useWindowSize';
 import MonsterCarousel, { MonsterCarouselRef } from './MonsterCarousel';
 import './CampaignChallenge.less';
-import RecordButton from '../Common/RecordButton'; // 导入录音按钮组件
+import RecordButton from '../Common/RecordButton';
+
+const PRELOAD_COUNT = 10;
 
 const CampaignChallenge: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -31,29 +33,22 @@ const CampaignChallenge: React.FC = () => {
     });
     const isMobile = useIsMobile();
 
-    const handleCardChange = (newIndex: number) => {
+    const handleCardChange = useCallback((newIndex: number) => {
         console.log(`Card changed to index ${newIndex}`);
-    };
+    }, []);
 
-    const handleUserAnswer = () => {
-        console.log(`handleUserAnswer called, currentMonsterIndex: ${currentMonsterIndex}`);
-        if (carouselRef.current) {
-            carouselRef.current.moveToNextCard();
-        }
-    };
-
-    const fetchCampaignName = async () => {
+    const fetchCampaignName = useCallback(async () => {
         try {
             const response = await getDungeonDetail(id!);
             setCampaignName(response.data.data.title);
         } catch (error) {
             console.error('Failed to fetch campaign name:', error);
         }
-    };
+    }, [id]);
 
-    const fetchMonstersAndDetails = async () => {
+    const fetchMonstersAndDetails = useCallback(async (count: number = 10) => {
         try {
-            const response = await getPracticeMonsters(id!, 10);
+            const response = await getPracticeMonsters(id!, count);
             const monstersData = response.data.data;
 
             const detailsPromises = monstersData.map((monster: DungeonMonster) =>
@@ -63,23 +58,38 @@ const CampaignChallenge: React.FC = () => {
             const detailsResponses = await Promise.all(detailsPromises);
             const details = detailsResponses.map(res => res.data.data);
 
-            setMonsters(monstersData);
-            setItemDetails(details);
-            setCurrentMonsterIndex(0); // 重置当前怪物索引
-            setLoading(false);
+            return { monsters: monstersData, itemDetails: details };
         } catch (error) {
             console.error(error);
             message.error('Failed to fetch monsters');
+            return null;
+        }
+    }, [id]);
+
+    const initializeMonsters = useCallback(async () => {
+        const data = await fetchMonstersAndDetails();
+        if (data) {
+            setMonsters(data.monsters);
+            setItemDetails(data.itemDetails);
+            setCurrentMonsterIndex(0);
             setLoading(false);
         }
-    };
+    }, [fetchMonstersAndDetails]);
 
     useEffect(() => {
         fetchCampaignName();
-        fetchMonstersAndDetails();
-    }, [id]);
+        initializeMonsters();
+    }, [fetchCampaignName, initializeMonsters]);
 
-    const handleAttackResult = async (result: PracticeResultEnum) => {
+    const handleNeedMoreData = useCallback(async () => {
+        const newData = await fetchMonstersAndDetails(PRELOAD_COUNT); // 获取PRELOAD_COUNT个新怪物
+        if (newData) {
+            setMonsters(prevMonsters => [...prevMonsters, ...newData.monsters]);
+            setItemDetails(prevDetails => [...prevDetails, ...newData.itemDetails]);
+        }
+    }, [fetchMonstersAndDetails]);
+
+    const handleAttackResult = useCallback(async (result: PracticeResultEnum) => {
         try {
             const submitResult = await submitPracticeResult(id!, {
                 monster_id: monsters[currentMonsterIndex].item_id,
@@ -88,12 +98,10 @@ const CampaignChallenge: React.FC = () => {
 
             const respData = submitResult.data;
 
-            console.log("respData", respData);
             if (respData && respData.points_update) {
                 updatePoints(respData.points_update);
                 await showReward(parseUint64(respData.points_update.cash));
                 
-                // 更新当前怪物的提交结果
                 const updatedMonsters = [...monsters];
                 updatedMonsters[currentMonsterIndex] = {
                     ...updatedMonsters[currentMonsterIndex],
@@ -104,30 +112,21 @@ const CampaignChallenge: React.FC = () => {
                         practice_count: respData.from.practice_count + 1,
                     }
                 };
-                setMonsters(updatedMonsters);
 
-                // 移动到下一张卡片
-                const nextIndex = (currentMonsterIndex + 1) % monsters.length;
-                setCurrentMonsterIndex(nextIndex);
-
-                // 如果到达最后一张卡片，重新获取怪物
-                if (nextIndex === 0) {
-                    await fetchMonstersAndDetails();
+                if (carouselRef.current) {
+                    carouselRef.current.moveToNextCard(updatedMonsters, itemDetails);
                 }
-
-                handleUserAnswer(); // 直接调用
             }
         } catch (error) {
             console.error(error);
             message.error('Failed to submit attack result');
         }
-    };
+    }, [currentMonsterIndex, id, monsters, updatePoints, itemDetails]);
 
-    const handleAudioStop = (audioBlob: Blob) => {
-        // 处理录音结束后的音频数据
+    const handleAudioStop = useCallback((audioBlob: Blob) => {
         console.log('录音结束，音频数据:', audioBlob);
         // 这里可以将音频数据上传到服务器或进行其他处理
-    };
+    }, []);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -154,11 +153,10 @@ const CampaignChallenge: React.FC = () => {
                     <MonsterCarousel
                         monsters={monsters}
                         itemDetails={itemDetails}
-                        showFullContent={false} // 由 MonsterCarousel 管理
-                        toggleMonsterContent={() => {}} // 由 MonsterCarousel 管理
                         currentMonsterIndex={currentMonsterIndex}
                         setCurrentMonsterIndex={setCurrentMonsterIndex}
                         onCardChange={handleCardChange}
+                        onNeedMoreData={handleNeedMoreData}
                         ref={carouselRef}
                     />
                     <div className="skills-and-record-container">
@@ -174,27 +172,19 @@ const CampaignChallenge: React.FC = () => {
                                 />
                             ))}
                         </div>
-                        {!isMobile && (
+                        <div className="record-button-container">
                             <RecordButton 
                                 onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
                                 onAudioStop={handleAudioStop} 
-                                position="right"
-                                shape="rounded"
+                                position={isMobile ? "bottom" : "right"}
+                                shape={isMobile ? "circle" : "rounded"}
                             />
-                        )}
+                        </div>
                     </div>
                 </div>
-                {isMobile && (
-                    <RecordButton 
-                        onRecord={(isRecording) => console.log(`Recording: ${isRecording}`)} 
-                        onAudioStop={handleAudioStop} 
-                        position="bottom"
-                        shape="circle"
-                    />
-                )}
             </div>
         </PageLayout>
     );
 };
 
-export default CampaignChallenge;
+export default React.memo(CampaignChallenge);

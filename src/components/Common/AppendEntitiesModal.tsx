@@ -4,6 +4,7 @@ import { Key, RowSelectMethod, TableRowSelection } from "antd/es/table/interface
 
 import PaginationComponent from "./PaginationComponent";
 import FirstLineMD from "./FirstLineMD";
+import './AppendEntitiesModal.less';
 
 interface AppendEntitiesModalProps {
     title?: React.ReactNode;
@@ -25,11 +26,11 @@ export interface EntityModalDataModel {
 }
 
 const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
-                                                                     title, footer, visible,
-                                                                     onCancel, onSubmit, fetchEntities,
-                                                                     abortedItems = [], defaultSelection = [], maxCount, enableSearch,
-                                                                     renderItem // 添加这个
-                                                                 }) => {
+    title, footer, visible,
+    onCancel, onSubmit, fetchEntities,
+    abortedItems = [], defaultSelection = [], maxCount, enableSearch,
+    renderItem
+}) => {
     const [form] = Form.useForm();
     const [selectedEntities, setSelectedEntities] = useState<EntityModalDataModel[]>([...abortedItems]);
     const [newEntity, setNewEntity] = useState<string>('');
@@ -79,7 +80,6 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             setSelectedEntities([...selectedEntities, entity]);
         }
     };
-
 
     const columns = [
         {
@@ -138,7 +138,6 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
     };
 
     const handleCancelModal = () => {
-        // console.log("handleCancelModal", abortedItems, defaultSelection)
         setSelectedEntities([...defaultSelection]);
         setNewEntity('');
         setSearchResults([]);
@@ -151,22 +150,22 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
     };
 
     return (
-        <Modal title={title || "Append Entities"} open={visible} onCancel={handleCancelModal} footer={footer} width={960} >
+        <Modal className="append-entities-modal" title={title || "Append Entities"} open={visible} onCancel={handleCancelModal} footer={footer} width={960} >
             <Form form={form} onFinish={handleFinish}>
                 <Form.Item >
-                        <Input
-                            value={newEntity}
-                            onChange={e => setNewEntity(e.target.value)}
-                            placeholder="Enter entity ID"
-                            onPressEnter={handleAddEntity}
-                            disabled={
-                                !!(maxCount && selectedEntities.length >= maxCount)
-                            } // 禁用输入框
-                        />
-                        <Button type="dashed" onClick={handleAddEntity} style={{marginTop: 8}}
-                                disabled={!!(maxCount && selectedEntities.length >= maxCount)}>
-                            Add Entity
-                        </Button>
+                    <Input
+                        value={newEntity}
+                        onChange={e => setNewEntity(e.target.value)}
+                        placeholder="Enter entity ID"
+                        onPressEnter={handleAddEntity}
+                        disabled={
+                            !!(maxCount && selectedEntities.length >= maxCount)
+                        } // 禁用输入框
+                    />
+                    <Button type="dashed" onClick={handleAddEntity} style={{marginTop: 8}}
+                            disabled={!!(maxCount && selectedEntities.length >= maxCount)}>
+                        Add Entity
+                    </Button>
                 </Form.Item>
                 <List
                     grid={{gutter: 2, column: 4}}
@@ -200,8 +199,7 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
             </Form>
 
             {fetchEntities && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-
+                <div className="pagination-container">
                     <PaginationComponent
                         currentPage={currentPage}
                         limit={reqLimit}
@@ -213,10 +211,9 @@ const AppendEntitiesModal: React.FC<AppendEntitiesModalProps> = ({
                     />
                     {enableSearch && (
                         <Input.Search
+                            className="search-input"
                             placeholder="Search items"
-                            // onChange={handleSearch}
                             onSearch={handleSearch}
-                            style={{ width: 120 }}
                         />
                     )}
                 </div>

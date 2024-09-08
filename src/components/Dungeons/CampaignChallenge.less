@@ -51,12 +51,29 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; // 改为 flex-start，让内容从顶部开始
+    justify-content: flex-start;
     padding: @spacing-xl;
-    max-width: 1200px;
     margin: 0 auto;
-    flex-grow: 1; // 允许内容区域增长以填充可用空间
+    flex-grow: 1;
     overflow-y: auto;
+    max-width: 1280px;
+
+    @media (max-width: @screen-md) {
+        padding: @spacing-md;
+        max-width: 100vw;
+    }
+
+    @media (min-width: @screen-md) {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    @media (max-width: @screen-sm) {
+        padding-bottom: calc(@campaign-skills-container-height + 20px);
+        overflow-y: auto;
+    }
 }
 
 // 标题样式
@@ -132,18 +149,29 @@
 
 // 响应式设计
 @media (max-width: @screen-md) {
-    .campaign-challenge-content {
-        padding: @spacing-md;
-    }
-
     .challenge-title {
         font-size: 2.5rem;
     }
 
+    .skills-and-record-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: auto;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .skills-container {
+        margin-right: 20px;
+        width: 100%;
         gap: @spacing-sm;
     }
 
+    .record-button-container {
+        align-self: flex-end;
+    }
+ 
     .skill-card {
         width: 100px;
         height: 140px;
@@ -151,12 +179,6 @@
 }
 
 @media (max-width: @screen-sm) { 
-
-    .campaign-challenge-content {
-        padding-bottom: calc(@campaign-skills-container-height + 20px); // 为技能容器留出空间
-        overflow-y: auto; // 允许内容滚动
-    }
-    
     .challenge-title {
         font-size: 2rem;
         margin-bottom: @spacing-md;
@@ -248,47 +270,5 @@
         position: fixed;
         right: 20px;
         bottom: calc(@campaign-skills-container-height + 20px);
-    }
-}
-
-// 为小屏幕调整
-@media (max-width: @screen-md) {
-    .campaign-challenge-content {
-        max-width: 100vw;
-    }
-
-    .skills-and-record-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .skills-container {
-        width: 100%;
-    }
-}
-
-// 新增：PC 上技能容器和录音按钮的布局调整
-@media (min-width: @screen-md) {
-    .campaign-challenge-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-    }
-
-    .skills-and-record-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        width: 100%;
-        margin-top: auto;
-    }
-
-    .skills-container {
-        margin-right: 20px;
-    }
-
-    .record-button-container {
-        align-self: flex-end;
     }
 }

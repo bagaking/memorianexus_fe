@@ -1,25 +1,36 @@
 @import '../Common/variables.less';
 
 // 可配置变量
-@golden-ratio: 1.618;
-@main-card-width: 280px;
+@main-card-width: 320px;
 @main-card-height: @main-card-width * @golden-ratio;
-@side-card-offset: @main-card-width * 1; // 增加偏移量
-@side-card-scale: 0.75; // 稍微缩小侧边卡片
-@side-card-perspective: 1200px; // 增加透视效果
-@side-card-rotate: 35deg; // 稍微增加旋转角度
-@side-card-opacity: 0.8;
-@transition-duration: 0.5s;
+@side-card-offset: @main-card-width * 1;
+@side-card-scale: 0.72;
+@side-card-perspective: 1200px;
+@side-card-rotate: 35deg;
+@transition-duration: 0.4s;
 @transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+// 位置变量
+@translate-center-x: calc(-@main-card-width / 2);
+
+@far-prev-translate-x: calc(@translate-center-x - @main-card-width * 2);
+@prev-translate-x: calc(@translate-center-x - @main-card-width);
+@current-translate-x: @translate-center-x;
+@next-translate-x: calc(@translate-center-x + @main-card-width);
+@far-next-translate-x: calc(@translate-center-x + @main-card-width * 2);
+
+@far-opacity: 0;
+@near-opacity: 0.8;
+@current-opacity: 1;
 
 .monster-carousel {
     position: relative;
-    width: 100vw; // 使用视口宽度
-    max-width: 100%; // 确保不超过父容器宽度
+    width: 100vw;
+    max-width: 100%;
     height: @main-card-height;
     perspective: @side-card-perspective;
     overflow: hidden;
-    margin: 0 auto; // 居中显示
+    margin: 0 auto;
 }
 
 .monster-cards-container {
@@ -31,82 +42,94 @@
 
 .monster-card-wrapper {
     position: absolute;
-    transition: all @transition-duration @transition-timing-function;
-    opacity: 0;
+    transition: transform @transition-duration @transition-timing-function,
+                opacity @transition-duration @transition-timing-function;
     width: @main-card-width;
     height: @main-card-height;
     left: 50%;
     transform-origin: center center -(@main-card-width / 2);
 
-    &.far-prev, &.far-next {
-        display: none;
+    &.far-prev {
+        transform: translateX(@far-prev-translate-x) scale(@side-card-scale) rotateY(@side-card-rotate);
+        opacity: @far-opacity;
+        z-index: 0;
     }
 
     &.prev {
-        transform: translateX(calc(-50% - @side-card-offset)) scale(@side-card-scale) rotateY(@side-card-rotate);
-        opacity: @side-card-opacity;
+        transform: translateX(@prev-translate-x) scale(@side-card-scale) rotateY(@side-card-rotate);
+        opacity: @near-opacity;
         z-index: 1;
     }
 
     &.current {
-        transform: translateX(-50%) scale(1) rotateY(0);
-        opacity: 1;
+        transform: translateX(@current-translate-x) scale(1) rotateY(0);
+        opacity: @current-opacity;
         z-index: 2;
     }
 
     &.next {
-        transform: translateX(calc(-50% + @side-card-offset)) scale(@side-card-scale) rotateY(-@side-card-rotate);
-        opacity: @side-card-opacity;
+        transform: translateX(@next-translate-x) scale(@side-card-scale) rotateY(-@side-card-rotate);
+        opacity: @near-opacity;
         z-index: 1;
+    }
+
+    &.far-next {
+        transform: translateX(@far-next-translate-x) scale(@side-card-scale) rotateY(-@side-card-rotate);
+        opacity: @far-opacity;
+        z-index: 0;
     }
 }
 
-.monster-cards-container.loaded {
+.monster-cards-container.slide-left,
+.monster-cards-container.slide-right {
     .monster-card-wrapper {
-        transition: all @transition-duration @transition-timing-function;
-        
-        &.prev, &.next {
-            opacity: @side-card-opacity;
-        }
-
-        &.far-prev, &.far-next {
-            opacity: 0;
-        }
+        transition: transform @transition-duration @transition-timing-function,
+                    opacity @transition-duration @transition-timing-function;
     }
 }
 
 .monster-cards-container.slide-left {
     .prev { 
-        transform: translateX(calc(-50% - @side-card-offset * 2)) scale(@side-card-scale) rotateY(@side-card-rotate);
-        opacity: 0;
+        transform: translateX(@far-prev-translate-x) scale(@side-card-scale) rotateY(@side-card-rotate);
+        opacity: @far-opacity;
         z-index: 0;
     }
     .current { 
-        transform: translateX(calc(-50% - @side-card-offset)) scale(@side-card-scale) rotateY(@side-card-rotate);
-        opacity: @side-card-opacity;
+        transform: translateX(@prev-translate-x) scale(@side-card-scale) rotateY(@side-card-rotate);
+        opacity: @near-opacity;
         z-index: 1;
     }
     .next { 
-        transform: translateX(-50%) scale(1) rotateY(0);
-        opacity: 1;
+        transform: translateX(@current-translate-x) scale(1) rotateY(0);
+        opacity: @current-opacity;
         z-index: 2;
+    }
+    .far-next { 
+        transform: translateX(@next-translate-x) scale(@side-card-scale) rotateY(-@side-card-rotate);
+        opacity: @near-opacity;
+        z-index: 1;
     }
 }
 
 .monster-cards-container.slide-right {
+    .far-prev { 
+        transform: translateX(@far-prev-translate-x) scale(@side-card-scale) rotateY(@side-card-rotate);
+        opacity: @near-opacity;
+        z-index: 1;
+    }
     .prev { 
-        transform: translateX(-50%) scale(1) rotateY(0);
-        opacity: 1;
+        transform: translateX(@current-translate-x) scale(1) rotateY(0);
+        opacity: @current-opacity;
         z-index: 2;
     }
     .current { 
-        transform: translateX(calc(-50% + @side-card-offset)) scale(@side-card-scale) rotateY(-@side-card-rotate);
-        opacity: @side-card-opacity;
+        transform: translateX(@next-translate-x) scale(@side-card-scale) rotateY(-@side-card-rotate);
+        opacity: @near-opacity;
         z-index: 1;
     }
     .next { 
-        transform: translateX(calc(-50% + @side-card-offset * 2)) scale(@side-card-scale) rotateY(-@side-card-rotate);
-        opacity: 0;
+        transform: translateX(@far-next-translate-x) scale(@side-card-scale) rotateY(-@side-card-rotate);
+        opacity: @far-opacity;
         z-index: 0;
     }
 }
@@ -119,52 +142,90 @@
 
 // 移动设备适配
 @media (max-width: 768px) {
-    @main-card-width: 220px;
+    @main-card-width: 280px;
     @main-card-height: @main-card-width * @golden-ratio;
-    @side-card-offset: @main-card-width * 0.8; // 调整移动设备的偏移量
+    @side-card-scale: 0.7;
+    @mobile-perspective: 800px;
+    @mobile-rotate: 25deg;
+
+    // 位置变量
+    @translate-center-x: calc(-@main-card-width / 2);
+    @far-prev-translate-x: calc(@translate-center-x - @main-card-width * 2);
+    @prev-translate-x: calc(@translate-center-x - @main-card-width);
+    @current-translate-x: @translate-center-x;
+    @next-translate-x: calc(@translate-center-x + @main-card-width);
+    @far-next-translate-x: calc(@translate-center-x + @main-card-width * 2);
 
     .monster-carousel {
         height: @main-card-height;
+        perspective: @mobile-perspective;
     }
 
     .monster-card-wrapper {
         width: @main-card-width;
         height: @main-card-height;
-    }
 
-    .monster-card-wrapper {
+        &.far-prev {
+            transform: translateX(@far-prev-translate-x) scale(@side-card-scale) rotateY(@mobile-rotate) translateZ(-100px);
+            opacity: @far-opacity;
+        }
+
         &.prev {
-            transform: translateX(calc(-50% - @side-card-offset)) scale(@side-card-scale) rotateY(@side-card-rotate);
+            transform: translateX(@prev-translate-x) scale(@side-card-scale) rotateY(@mobile-rotate) translateZ(-100px);
+            opacity: @near-opacity;
+        }
+
+        &.current {
+            transform: translateX(@current-translate-x) scale(1) rotateY(0) translateZ(0);
+            opacity: @current-opacity;
         }
 
         &.next {
-            transform: translateX(calc(-50% + @side-card-offset)) scale(@side-card-scale) rotateY(-@side-card-rotate);
-        }
-    }
-}
-
-// 大屏幕适配
-@media (min-width: 1200px) {
-    @main-card-width: 320px;
-    @main-card-height: @main-card-width * @golden-ratio;
-    @side-card-offset: @main-card-width * 1.1; // 增加大屏幕的偏移量
-
-    .monster-carousel {
-        height: @main-card-height;
-    }
-
-    .monster-card-wrapper {
-        width: @main-card-width;
-        height: @main-card-height;
-    }
-
-    .monster-card-wrapper {
-        &.prev {
-            transform: translateX(calc(-50% - @side-card-offset)) scale(@side-card-scale) rotateY(@side-card-rotate);
+            transform: translateX(@next-translate-x) scale(@side-card-scale) rotateY(-@mobile-rotate) translateZ(-100px);
+            opacity: @near-opacity;
         }
 
-        &.next {
-            transform: translateX(calc(-50% + @side-card-offset)) scale(@side-card-scale) rotateY(-@side-card-rotate);
+        &.far-next {
+            transform: translateX(@far-next-translate-x) scale(@side-card-scale) rotateY(-@mobile-rotate) translateZ(-100px);
+            opacity: @far-opacity;
+        }
+    }
+
+    .monster-cards-container.slide-left {
+        .prev { 
+            transform: translateX(@far-prev-translate-x) scale(@side-card-scale) rotateY(@mobile-rotate) translateZ(-100px);
+            opacity: @far-opacity;
+        }
+        .current { 
+            transform: translateX(@prev-translate-x) scale(@side-card-scale) rotateY(@mobile-rotate) translateZ(-100px);
+            opacity: @near-opacity;
+        }
+        .next { 
+            transform: translateX(@current-translate-x) scale(1) rotateY(0) translateZ(0);
+            opacity: @current-opacity;
+        }
+        .far-next { 
+            transform: translateX(@next-translate-x) scale(@side-card-scale) rotateY(-@mobile-rotate) translateZ(-100px);
+            opacity: @near-opacity;
+        }
+    }
+
+    .monster-cards-container.slide-right {
+        .far-prev { 
+            transform: translateX(@prev-translate-x) scale(@side-card-scale) rotateY(@mobile-rotate) translateZ(-100px);
+            opacity: @near-opacity;
+        }
+        .prev { 
+            transform: translateX(@current-translate-x) scale(1) rotateY(0) translateZ(0);
+            opacity: @current-opacity;
+        }
+        .current { 
+            transform: translateX(@next-translate-x) scale(@side-card-scale) rotateY(-@mobile-rotate) translateZ(-100px);
+            opacity: @near-opacity;
+        }
+        .next { 
+            transform: translateX(@far-next-translate-x) scale(@side-card-scale) rotateY(-@mobile-rotate) translateZ(-100px);
+            opacity: @far-opacity;
         }
     }
 }

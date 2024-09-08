@@ -23,7 +23,6 @@ const TriggerDiv = styled.div<{ $bgColor: string; $isHovered: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: ${props => props.$isHovered ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none'};
-  z-index: 1000;
   
   & > * {
     margin: 0;

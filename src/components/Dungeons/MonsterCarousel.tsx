@@ -1,85 +1,128 @@
 import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { DungeonMonsterWithResult, Item } from "../../api";
-import MonsterFightCard from './MonsterFightCard'; // 导入新的 MonsterFightCard 组件
+import MonsterFightCard from './MonsterFightCard';
 import './MonsterCarousel.less';
 
 interface MonsterCarouselProps {
     monsters: DungeonMonsterWithResult[];
     itemDetails: Item[];
     currentMonsterIndex: number;
-    showFullContent: boolean;
-    toggleMonsterContent: () => void;
     setCurrentMonsterIndex: (index: number) => void;
     onCardChange: (index: number) => void;
+    onNeedMoreData: () => void;
 }
 
 export interface MonsterCarouselRef {
-    moveToNextCard: () => void;
+    moveToNextCard: (newMonsters?: DungeonMonsterWithResult[], newItemDetails?: Item[]) => void;
 }
 
-// 这个轮播组件实现的是有 3D 感的卡牌切换
+const TRANSITION_DURATION = 500;
+const PRELOAD_THRESHOLD = 3; // 当剩余3个怪物时开始预加载
+
+// # AI 不要删这一段
+// ## 动画说明: ------------------
+// 切换时的动画连贯很重要，要避免更新数据导致内容看起来跳变。整个动画交互看起来的效果是：
+// 卡片向左飞行时，应该严格飞行到前一张卡片所在的位置，即 current 飞到与之前 prev 重合的位置，next 飞到与之前 current 重合的位置
+// 中间的卡片会飞到左边，这个 content 要保持一直打开的状态再飞过去，也就是原本如果是打开的，
+// 就要把 sammary 刷上去以后开始飞，如果原本没打开，就替用户打开。而右边的卡片飞到中间变成 
+// current 卡片，保持关闭的状态。
+// ## 数据刷新时机: ---------------
+// 数据更新要等动画播完, 要在位置刷回来的瞬间赋值。
+// 也就是说，动画播完，位置刷回来，再赋值（在同一瞬间），这样动画和数据都是连贯的。
+// ## 卡片交互说明: ---------------
+// 另所有比 current 比当前早 (靠左) 的卡片，都要始终保持打开状态;
+// 当前卡片一开始关闭，可以点击打开或关闭; 
+// 之后的卡片保持关闭;
+
 const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
     monsters,
     itemDetails,
     currentMonsterIndex,
-    showFullContent,
-    toggleMonsterContent,
     setCurrentMonsterIndex,
-    onCardChange
+    onCardChange,
+    onNeedMoreData
 }, ref) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [disableTransition, setDisableTransition] = useState(false);
     const [displayedIndex, setDisplayedIndex] = useState(currentMonsterIndex);
+    const [openCardIndex, setOpenCardIndex] = useState<number | null>(null);
+    const [displayedMonsters, setDisplayedMonsters] = useState(monsters);
+    const [displayedItemDetails, setDisplayedItemDetails] = useState(itemDetails);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    const TRANSITION_DURATION = 500; // 与 CSS 中的过渡时间保持一致
+    const pendingUpdateRef = useRef<{ monsters?: DungeonMonsterWithResult[], itemDetails?: Item[], newIndex?: number } | null>(null);
 
     const resetCarousel = useCallback(() => {
         setDisableTransition(true);
         setSlideDirection(null);
-        setDisplayedIndex(currentMonsterIndex);
         
-        // 如果 monster-content 是显示状态，则关闭它
-        if (showFullContent) {
-            toggleMonsterContent();
+        // 关键: 在重置位置的同时更新数据
+        if (pendingUpdateRef.current) {
+            const { monsters: newMonsters, itemDetails: newItemDetails, newIndex } = pendingUpdateRef.current;
+            if (newMonsters) setDisplayedMonsters(newMonsters);
+            if (newItemDetails) setDisplayedItemDetails(newItemDetails);
+            if (newIndex !== undefined) {
+                setDisplayedIndex(newIndex);
+                setCurrentMonsterIndex(newIndex);
+            }
+            pendingUpdateRef.current = null;
         }
         
+        // 使用 requestAnimationFrame 确保在下一帧重新启用过渡效果
         requestAnimationFrame(() => {
-            setDisableTransition(false);
+            requestAnimationFrame(() => {
+                setDisableTransition(false);
+                setSlideDirection(null);
+            });
         });
-    }, [currentMonsterIndex, showFullContent, toggleMonsterContent]);
+    }, [setCurrentMonsterIndex]);
 
-    const changeCard = useCallback((newIndex: number, animate: boolean = true) => {
-        if (newIndex < 0 || newIndex >= monsters.length) return;
-
-        if (showFullContent) {
-            toggleMonsterContent();
-        }
+    const changeCard = useCallback((newIndex: number, animate: boolean = true, newMonsters?: DungeonMonsterWithResult[], newItemDetails?: Item[]) => {
+        if (newIndex < 0 || newIndex >= displayedMonsters.length) return;
 
         if (animate) {
+            // 开始动画
             setSlideDirection(newIndex > displayedIndex ? 'left' : 'right');
             setIsTransitioning(true);
-            setCurrentMonsterIndex(newIndex);
+            setOpenCardIndex(null);  // 新的当前卡片应该是关闭的
+
+            // 存储待更新的数据
+            pendingUpdateRef.current = { monsters: newMonsters, itemDetails: newItemDetails, newIndex };
+
+            // 设置一个延迟,等待动画完成后更新数据
+            setTimeout(() => {
+                setIsTransitioning(false);
+                resetCarousel();  // 重置轮播并更新数据
+            }, TRANSITION_DURATION);
         } else {
+            // 立即更新，不进行动画
             setDisableTransition(true);
-            setCurrentMonsterIndex(newIndex);
             setDisplayedIndex(newIndex);
+            setCurrentMonsterIndex(newIndex);
+            setOpenCardIndex(null);
+            if (newMonsters) setDisplayedMonsters(newMonsters);
+            if (newItemDetails) setDisplayedItemDetails(newItemDetails);
             requestAnimationFrame(() => {
-                setTimeout(() => {
+                requestAnimationFrame(() => {
                     setDisableTransition(false);
-                }, 100);
+                });
             });
         }
 
         onCardChange(newIndex);
-    }, [displayedIndex, monsters.length, showFullContent, toggleMonsterContent, setCurrentMonsterIndex, onCardChange]);
 
-    const moveToNextCard = useCallback(() => {
-        const nextIndex = (currentMonsterIndex + 1) % monsters.length;
-        changeCard(nextIndex, true);
-    }, [currentMonsterIndex, monsters.length, changeCard]);
+        // 检查是否需要预加载新数据
+        if (displayedMonsters.length - newIndex <= PRELOAD_THRESHOLD) {
+            // 触发预加载逻辑
+            onNeedMoreData();
+        }
+    }, [displayedIndex, displayedMonsters.length, onCardChange, resetCarousel, setCurrentMonsterIndex, onNeedMoreData]);
+
+    const moveToNextCard = useCallback((newMonsters?: DungeonMonsterWithResult[], newItemDetails?: Item[]) => {
+        const nextIndex = (displayedIndex + 1) % displayedMonsters.length;
+        changeCard(nextIndex, true, newMonsters, newItemDetails);
+    }, [displayedIndex, displayedMonsters.length, changeCard]);
 
     useImperativeHandle(ref, () => ({
         moveToNextCard
@@ -99,69 +142,44 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
         }
     }, [isTransitioning, resetCarousel]);
 
-    useEffect(() => {
-        if (!isTransitioning) {
-            setDisplayedIndex(currentMonsterIndex);
+    const handleCardClick = useCallback((index: number) => {
+        if (index === displayedIndex && !isTransitioning) {
+            setOpenCardIndex(openCardIndex === index ? null : index);
+            onCardChange(index);
         }
-    }, [currentMonsterIndex, isTransitioning]);
+    }, [displayedIndex, isTransitioning, onCardChange, openCardIndex]);
 
-    const handleCardClick = (index: number) => {
-        console.log(`Clicked index: ${index}, displayedIndex: ${displayedIndex}`); // 调试信息
-        if (index !== displayedIndex) return;
+    const renderMonsterCard = useCallback((index: number, position: string) => {
+        // 使用模运算确保索引总是在有效范围内
+        const wrappedIndex = ((index % displayedMonsters.length) + displayedMonsters.length) % displayedMonsters.length;
+        const monster = displayedMonsters[wrappedIndex];
+        const itemDetail = displayedItemDetails.find(detail => detail.id === monster.item_id);
+        const isActive = wrappedIndex === displayedIndex;
+        const isOpen = wrappedIndex < displayedIndex || wrappedIndex === openCardIndex;
 
-        if (!isTransitioning) {
-            // 直接设置 showFullContent
-            toggleMonsterContent(); // 调用切换内容的函数
-        }
-    };
-
-    const renderMonsterCard = (index: number) => {
-        if (index < 0 || index >= monsters.length) return null;
-        const monster = monsters[index];
-        const itemDetail = itemDetails.find(detail => detail.id === monster.item_id);
-        const isActive = index === displayedIndex;
-        const isPrev = index === displayedIndex - 1;
-
-        // 传递 showFullContent 给当前和之前的卡片
         return (
             <MonsterFightCard 
                 monster={monster}
                 itemDetail={itemDetail}
                 isActive={isActive}
-                isPrev={isPrev}
+                isOpen={isOpen}
                 disableTransition={disableTransition}
-                showFullContent={isActive || isPrev} // 当前或之前的卡片都显示内容
-                onClick={() => handleCardClick(index)} // 处理点击事件
+                onClick={() => handleCardClick(wrappedIndex)}
             />
         );
-    };
+    }, [displayedMonsters, displayedItemDetails, displayedIndex, openCardIndex, disableTransition, handleCardClick]);
 
-    const renderMonsterCards = () => {
-        const prevIndex = displayedIndex - 1;
-        const nextIndex = displayedIndex + 1;
-        const farPrevIndex = displayedIndex - 2;
-        const farNextIndex = displayedIndex + 2;
-
+    const renderMonsterCards = useCallback(() => {
         return (
             <div className={`monster-cards-container ${isLoaded ? 'loaded' : ''} ${slideDirection ? `slide-${slideDirection}` : ''} ${disableTransition ? 'no-transition' : ''}`}>
-                <div className={`monster-card-wrapper far-prev ${disableTransition ? 'no-transition' : ''}`}>
-                    {renderMonsterCard(farPrevIndex)}
-                </div>
-                <div className={`monster-card-wrapper prev ${disableTransition ? 'no-transition' : ''}`}>
-                    {renderMonsterCard(prevIndex)}
-                </div>
-                <div className={`monster-card-wrapper current ${disableTransition ? 'no-transition' : ''}`}>
-                    {renderMonsterCard(displayedIndex)}
-                </div>
-                <div className={`monster-card-wrapper next ${disableTransition ? 'no-transition' : ''}`}>
-                    {renderMonsterCard(nextIndex)}
-                </div>
-                <div className={`monster-card-wrapper far-next ${disableTransition ? 'no-transition' : ''}`}>
-                    {renderMonsterCard(farNextIndex)}
-                </div>
+                {['far-prev', 'prev', 'current', 'next', 'far-next'].map((position, i) => (
+                    <div key={position} className={`monster-card-wrapper ${position} ${disableTransition ? 'no-transition' : ''}`}>
+                        {renderMonsterCard(displayedIndex + i - 2, position)}
+                    </div>
+                ))}
             </div>
         );
-    };
+    }, [isLoaded, slideDirection, disableTransition, displayedIndex, renderMonsterCard]);
 
     return (
         <div className="monster-carousel">
@@ -170,4 +188,4 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
     );
 });
 
-export default MonsterCarousel;
+export default React.memo(MonsterCarousel);
