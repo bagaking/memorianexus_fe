@@ -12,9 +12,9 @@ interface FirstLineProps {
     showName?: string;
     link?: string;
     linkText?: string;
+    allowToggle?: boolean; // 新增属性，控制是否允许悬停显示内容
     [key: string]: any;
 }
-
 
 const ContentWrapper = styled.div`
   max-height: 60vh; // 使用视口高度的百分比
@@ -63,6 +63,7 @@ const FirstLineMD: React.FC<FirstLineProps> = ({
     showName, 
     link,
     linkText = "",
+    allowToggle = true, // 默认允许悬停显示
     ...rest 
 }) => {
     const firstLine = content.split('\n')[0];
@@ -84,9 +85,13 @@ const FirstLineMD: React.FC<FirstLineProps> = ({
             <TaggedMarkdown mode="tag">
                 {showName || firstLine}
             </TaggedMarkdown>
-            {hasMoreContent && <Ellipsis>...</Ellipsis>}
+            {hasMoreContent && allowToggle && <Ellipsis>...</Ellipsis>}
         </InlineContent>
     );
+
+    if (!allowToggle) {
+        return triggerContent;
+    }
 
     return (
         <HoverDetails
@@ -97,8 +102,6 @@ const FirstLineMD: React.FC<FirstLineProps> = ({
             overlayStyle={{ maxWidth: '90vw' }} // 添加这一行
             {...rest}
         />
-
-        
     );
 };
 

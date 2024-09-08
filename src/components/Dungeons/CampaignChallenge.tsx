@@ -23,7 +23,6 @@ const CampaignChallenge: React.FC = () => {
     const [itemDetails, setItemDetails] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
     const { updatePoints } = useUserPoints();
-    const [showFullContent, setShowFullContent] = useState(false);
     const [campaignName, setCampaignName] = useState('');
     const { contentRef, AnimatedTitle } = useScrollAnimation(loading, {
         animationDuration: 2000,
@@ -110,7 +109,6 @@ const CampaignChallenge: React.FC = () => {
                 // 移动到下一张卡片
                 const nextIndex = (currentMonsterIndex + 1) % monsters.length;
                 setCurrentMonsterIndex(nextIndex);
-                setShowFullContent(false); // 重置卡片状态
 
                 // 如果到达最后一张卡片，重新获取怪物
                 if (nextIndex === 0) {
@@ -123,10 +121,6 @@ const CampaignChallenge: React.FC = () => {
             console.error(error);
             message.error('Failed to submit attack result');
         }
-    };
-
-    const toggleMonsterContent = () => {
-        setShowFullContent(!showFullContent);
     };
 
     const handleAudioStop = (audioBlob: Blob) => {
@@ -160,8 +154,8 @@ const CampaignChallenge: React.FC = () => {
                     <MonsterCarousel
                         monsters={monsters}
                         itemDetails={itemDetails}
-                        showFullContent={showFullContent}
-                        toggleMonsterContent={toggleMonsterContent}
+                        showFullContent={false} // 由 MonsterCarousel 管理
+                        toggleMonsterContent={() => {}} // 由 MonsterCarousel 管理
                         currentMonsterIndex={currentMonsterIndex}
                         setCurrentMonsterIndex={setCurrentMonsterIndex}
                         onCardChange={handleCardChange}

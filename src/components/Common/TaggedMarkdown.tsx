@@ -25,18 +25,19 @@ const defaultTagStyles: { [key: string]: React.CSSProperties } = {
 };
 
 const tagStyle: React.CSSProperties = {
-  borderRadius: '4px', 
-  padding: '0 4px', 
+  borderRadius: '2px', 
+  padding: '0 2px', 
   marginRight: '4px', 
-  fontSize: '8px',
-  lineHeight: '16px',
-  verticalAlign: 'middle',
+  fontSize: '7px',
+  lineHeight: '8px',
+  verticalAlign: 'top',
+  opacity: 0.9,
 };
 
 export const createTaggedRenderer = (tagStyles: { [key: string]: React.CSSProperties }, mode: 'tag' | 'heading' | 'both' = 'tag') => {
   return (nodeType: string) => {
     return ({ children }: React.PropsWithChildren<{}>) => (
-      <span style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '4px' }}>
         {(mode === 'tag' || mode === 'both') && (
           <Tag color={tagStyles[nodeType]?.color || 'default'} style={{ 
             ...tagStyle,
@@ -45,14 +46,16 @@ export const createTaggedRenderer = (tagStyles: { [key: string]: React.CSSProper
             <Text type="secondary">{nodeType}</Text>
           </Tag>
         )}
-        {mode === 'heading' ? (
-          React.createElement(nodeType, { style: { margin: 0 } }, children)
-        ) : mode === 'both' ? (
-          React.createElement(nodeType, { style: { margin: 0 } }, children)
-        ) : (
-          <Text strong>{children}</Text>
-        )}
-      </span>
+        <div style={{ flex: 1 }}>
+          {mode === 'heading' ? (
+            React.createElement(nodeType, { style: { margin: 0 } }, children)
+          ) : mode === 'both' ? (
+            React.createElement(nodeType, { style: { margin: 0 } }, children)
+          ) : (
+            <Text strong>{children}</Text>
+          )}
+        </div>
+      </div>
     );
   };
 };

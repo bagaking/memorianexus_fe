@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { DungeonMonsterWithResult, Item, parsePercentage } from "../../api";
-import MonsterHealthBar from './MonsterHealthBar';
-import MonsterPortrait from './MonsterPortrait';
-import { TaggedMarkdown } from '../Common/TaggedMarkdown';
+import { DungeonMonsterWithResult, Item } from "../../api";
+import MonsterFightCard from './MonsterFightCard'; // 导入新的 MonsterFightCard 组件
 import './MonsterCarousel.less';
 
 interface MonsterCarouselProps {
@@ -19,6 +17,7 @@ export interface MonsterCarouselRef {
     moveToNextCard: () => void;
 }
 
+// 这个轮播组件实现的是有 3D 感的卡牌切换
 const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
     monsters,
     itemDetails,
@@ -33,7 +32,6 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [disableTransition, setDisableTransition] = useState(false);
     const [displayedIndex, setDisplayedIndex] = useState(currentMonsterIndex);
-    const [localShowFullContent, setLocalShowFullContent] = useState(showFullContent);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const TRANSITION_DURATION = 500; // 与 CSS 中的过渡时间保持一致
@@ -107,28 +105,14 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
         }
     }, [currentMonsterIndex, isTransitioning]);
 
-    useEffect(() => {
-        setLocalShowFullContent(showFullContent);
-    }, [showFullContent]);
-
     const handleCardClick = (index: number) => {
-        // 只允许当前显示的卡片被点击
+        console.log(`Clicked index: ${index}, displayedIndex: ${displayedIndex}`); // 调试信息
         if (index !== displayedIndex) return;
 
         if (!isTransitioning) {
-            // 如果当前卡片有 submitResult，保持全内容状态
-            const monster = monsters[index];
-            if (monster.submitResult) {
-                setLocalShowFullContent(true);
-            } else {
-                setLocalShowFullContent(!localShowFullContent);
-                toggleMonsterContent();
-            }
+            // 直接设置 showFullContent
+            toggleMonsterContent(); // 调用切换内容的函数
         }
-    };
-
-    const getFirstNonEmptyLine = (content: string = "") => {
-        return content.split('\n').filter(line => line.trim() !== '')[0] || '';
     };
 
     const renderMonsterCard = (index: number) => {
@@ -138,52 +122,17 @@ const MonsterCarousel = forwardRef<MonsterCarouselRef, MonsterCarouselProps>(({
         const isActive = index === displayedIndex;
         const isPrev = index === displayedIndex - 1;
 
-        const getPracticeCount = (practiceCount: number | { SQL: string; Vars: number[]; WithoutParentheses: boolean }) => {
-            if (typeof practiceCount === 'number') {
-                return practiceCount;
-            }
-            return '更新中';
-        };
-
-        // console.log("render Monster:", monster);
-
+        // 传递 showFullContent 给当前和之前的卡片
         return (
-            <div 
-                onClick={() => handleCardClick(index)}
-                className={`monster-card 
-                    ${isActive ? 'active' : ''} 
-                    ${isPrev ? 'prev' : ''} 
-                    ${(localShowFullContent && isActive || monster.submitResult) ? 'show-full-content' : ''} 
-                    ${disableTransition ? 'no-transition' : ''}`
-                } 
-            >
-                <div className="monster-image-container">
-                    <MonsterPortrait 
-                        id={monster.item_id}
-                        alt="Monster Avatar" 
-                    />
-                    <MonsterHealthBar 
-                        health={100 - parsePercentage(monster.familiarity)} fillClassName={`${disableTransition ? 'no-transition' : ''}`}
-                    />
-                    <div className="monster-title-container">
-                        <div className="monster-title">
-                            <TaggedMarkdown mode='tag'>{getFirstNonEmptyLine(itemDetail?.content)}</TaggedMarkdown>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className={`monster-content ${disableTransition ? 'no-transition' : ''} `}>
-                    {monster.submitResult && (
-                        <div className="monster-result-info">
-                            <p>熟练度: {monster.submitResult.familiarity}%</p>
-                            <p>下次复习: {new Date(monster.submitResult.next_practice_at || '').toLocaleString()}</p>
-                            <p>上次练习: {new Date(monster.submitResult.practice_at || '').toLocaleString()}</p>
-                            <p>练习次数: {getPracticeCount(monster.submitResult.practice_count || 0)}</p>
-                        </div>
-                    )}
-                    <TaggedMarkdown mode='tag'>{itemDetail?.content || ''}</TaggedMarkdown>
-                </div>
-            </div>
+            <MonsterFightCard 
+                monster={monster}
+                itemDetail={itemDetail}
+                isActive={isActive}
+                isPrev={isPrev}
+                disableTransition={disableTransition}
+                showFullContent={isActive || isPrev} // 当前或之前的卡片都显示内容
+                onClick={() => handleCardClick(index)} // 处理点击事件
+            />
         );
     };
 

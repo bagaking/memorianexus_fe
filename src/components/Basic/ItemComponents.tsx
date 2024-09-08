@@ -33,7 +33,7 @@ const IconWrapper = styled.span<{ level: number }>`
 
 interface DifficultyImportanceProps {
   difficulty: number | undefined;
-  importance: number | undefined;
+  importance?: number;
   familiarity?: number | string; // 修改 familiarity 属性为可能的浮点数或字符串
 }
 
@@ -52,6 +52,7 @@ export const DifficultyImportance: React.FC<DifficultyImportanceProps> = ({ diff
           <TrophyFilled />
         </IconWrapper>
       </Tooltip>
+      {importance !== undefined && 
       <Tooltip title={`Importance: ${importance || 'N/A'}`}>
         <div>
           {[...Array(5)].map((_, index) => (
@@ -59,6 +60,7 @@ export const DifficultyImportance: React.FC<DifficultyImportanceProps> = ({ diff
           ))}
         </div>
       </Tooltip>
+      }
       {familiarityValue !== undefined && (
         <Tooltip title={`Familiarity: ${familiarityValue || 'N/A'}`}>
           <div style={{ width: '100px' }}> {/* 设置宽度以保持一致性 */}
