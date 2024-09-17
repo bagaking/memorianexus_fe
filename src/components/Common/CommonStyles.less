@@ -1,0 +1,115 @@
+@import './variables.less';
+
+.create-new-one-button {
+    margin-bottom: @spacing-md;
+    width: 100%;
+    background-color: @btn-primary-color;
+    border-color: @btn-primary-color;
+    color: @color-white;
+    font-size: @font-size-lg;
+    transition: background-color @transition-duration-base, border-color @transition-duration-base;
+
+    &:hover {
+        background-color: lighten(@btn-primary-color, 10%);
+        border-color: lighten(@btn-primary-color, 10%);
+        color: @color-white;
+    }
+}
+
+// Markdown 内容样式
+.markdown-content {
+    font-family: 'Roboto', sans-serif;
+    font-size: @font-size-base;
+    line-height: 1.6;
+    color: @page-text-color;
+    word-wrap: break-word;
+
+    h1, h2, h3 {
+        margin-top: @spacing-lg;
+        margin-bottom: @spacing-sm;
+        font-weight: @font-weight-bold;
+    }
+
+    p {
+        margin: @spacing-sm 0;
+    }
+
+    code {
+        background-color: lighten(@color-primary-light, 40%);
+        padding: @padding-xs @padding-sm;
+        border-radius: @border-radius-sm;
+    }
+}
+
+// 表格样式
+.ant-table {
+    background: @color-white;
+    border-radius: @border-radius-lg;
+    box-shadow: @box-shadow-navbar;
+    overflow: hidden;
+
+    &-thead > tr > th {
+        background-color: lighten(@color-primary-light, 45%);
+        font-weight: @font-weight-bold;
+    }
+
+    &-tbody > tr > td {
+        background-color: @color-white;
+    }
+
+    &-tbody > tr:hover > td {
+        background-color: lighten(@color-primary-light, 50%);
+    }
+}
+
+// 按钮样式
+.ant-btn-link {
+    padding: 0;
+    color: @btn-primary-color;
+    font-weight: @font-weight-bold;
+
+    &:hover {
+        color: lighten(@btn-primary-color, 10%);
+    }
+}
+
+// 卡片样式
+.ant-card {
+    margin: @spacing-lg 0;
+    border-radius: @border-radius-lg;
+    box-shadow: @box-shadow-navbar;
+
+    h2 {
+        font-size: @font-size-lg;
+        font-weight: @font-weight-bold;
+    }
+}
+
+// 分页组件样式
+.pagination-container {
+    padding: @padding-md 0;
+    text-align: center;
+}
+
+// 响应式布局
+@media (max-width: @screen-md) {
+    .markdown-content {
+        font-size: @font-size-sm;
+    }
+
+    .table-container {
+        table {
+            width: 100%;
+            display: block;
+        }
+
+        th, td {
+            white-space: nowrap;
+        }
+    }
+}
+
+// 表格容器
+.table-container {
+    overflow-x: auto;
+}
