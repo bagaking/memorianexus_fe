@@ -1,0 +1,78 @@
+@import './variables.less';
+
+.custom-modal {
+    // 确保模态框在遮罩层之上
+    z-index: @z-index-modal;
+
+    .ant-modal-content {
+        background-color: @page-background-color;
+        border-radius: @border-radius-lg;
+        box-shadow: @box-shadow-modal;
+        overflow: hidden;
+        // 确保内容可见
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .custom-modal-header {
+        background-color: @color-primary;
+        color: @color-text-light;
+        padding: @padding-md @padding-lg;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-bold;
+    }
+
+    .custom-modal-body {
+        padding: @padding-lg;
+        font-size: @font-size-base;
+        color: @page-text-color;
+    }
+
+    .custom-modal-footer {
+        background-color: @page-background-color;
+        border-top: 1px solid @color-card-border;
+        padding: @padding-md @padding-lg;
+        text-align: right;
+
+        .cancel-button {
+            margin-right: @margin-sm;
+        }
+
+        .confirm-button {
+            background-color: @btn-primary-color;
+            border-color: @btn-primary-color;
+
+            &:hover,
+            &:focus {
+                background-color: lighten(@btn-primary-color, 10%);
+                border-color: lighten(@btn-primary-color, 10%);
+            }
+        }
+    }
+}
+
+// 添加动画效果
+.custom-modal {
+    &.ant-modal-open {
+        .ant-modal-content {
+            animation: modalFadeIn @transition-duration-base ease-out;
+        }
+    }
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// 确保遮罩层在正确的层级
+.ant-modal-mask {
+    z-index: @z-index-modal-backdrop;
+}

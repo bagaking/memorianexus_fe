@@ -6,8 +6,9 @@
 
 .reward-container {
   position: fixed;
-  top: 10%;
+  top: 6%;
   left: 50%;
+  
   transform: translateX(-50%);
   z-index: @z-index-notification;
 }
@@ -21,7 +22,8 @@
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.4);
   animation: appear 0.5s @transition-timing-function, glow 2s ease-in-out infinite alternate;
   max-width: 400px;
-  border: 2px solid @light-gold;
+
+  border: 1px solid @light-gold;
   position: relative;
   overflow: hidden;
   transform-style: preserve-3d;
